@@ -74,6 +74,63 @@ export function Rotation({ enabled = true }: RotationProps) {
       preDragLimit: dragging._onPreDragLimit,
       panKeys: keyboard._panKeys,
     }
+    const overlayStyles = new Map<
+      HTMLElement,
+      { origin: string; suffix: string }
+    >()
+    const updateOverlays = () => {
+      const popupOrigins = new Map<HTMLElement, string>()
+      map.eachLayer((layer) => {
+        if (!(layer instanceof leaflet.Popup)) return
+        const element = layer.getElement()
+        const position = layer.getLatLng()
+        if (!element || !position) return
+        const anchor = map.latLngToLayerPoint(position)
+        const translation = leaflet.DomUtil.getPosition(element)
+        const marginBottom =
+          Number.parseFloat(window.getComputedStyle(element).marginBottom) || 0
+        // Pivot at the geographic anchor, including the popup's layout offsets.
+        // This keeps popupAnchor and offset in screen axes above the upright icon.
+        popupOrigins.set(
+          element,
+          `${anchor.x - translation.x - (Number.parseFloat(element.style.left) || 0)}px ${anchor.y - translation.y + element.offsetHeight + marginBottom + (Number.parseFloat(element.style.bottom) || 0)}px`,
+        )
+      })
+      for (const element of map
+        .getContainer()
+        .querySelectorAll<HTMLElement>(
+          ".leaflet-marker-icon, .leaflet-marker-shadow, .leaflet-popup",
+        )) {
+        let saved = overlayStyles.get(element)
+        if (!saved) {
+          saved = { origin: element.style.transformOrigin, suffix: "" }
+          overlayStyles.set(element, saved)
+        }
+        let transform = element.style.transform
+        if (saved.suffix && transform.endsWith(saved.suffix)) {
+          transform = transform.slice(0, -saved.suffix.length).trimEnd()
+        }
+        // Append rotation after Leaflet's translation so the geographic anchor
+        // stays in place. Icon margins encode the marker anchor coordinates.
+        saved.suffix = enabled ? `rotate(${-state.bearing}deg)` : ""
+        const next = [transform, saved.suffix].filter(Boolean).join(" ")
+        if (element.style.transform !== next) element.style.transform = next
+        const origin = !enabled
+          ? saved.origin
+          : (popupOrigins.get(element) ??
+            `${-(Number.parseFloat(element.style.marginLeft) || 0)}px ${-(Number.parseFloat(element.style.marginTop) || 0)}px`)
+        if (element.style.transformOrigin !== origin)
+          element.style.transformOrigin = origin
+      }
+    }
+    // Leaflet replaces transforms during pan, zoom, drag and icon changes.
+    const overlayObserver = new window.MutationObserver(updateOverlays)
+    overlayObserver.observe(map.getContainer(), {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["style", "class"],
+    })
     // Leaflet coordinates are unrotated; both conversions must match the CSS rotation.
     const rotate = (point: Leaflet.Point, angle: number) =>
       rotateAroundCenter(leaflet, point, map.getSize().divideBy(2), angle)
@@ -106,10 +163,12 @@ export function Rotation({ enabled = true }: RotationProps) {
     dragging._onPreDragLimit = preDragLimit
     state.enabled = enabled
     state.apply = () => {
-      const offset = original.to.call(map, leaflet.point(0, 0))
-      const center = map.getSize().divideBy(2).subtract(offset)
+      // CSS rotate also rotates Leaflet's translate transform. Keep this pivot
+      // fixed in container coordinates so panning is transformed exactly once.
+      const center = map.getSize().divideBy(2)
       pane.style.transformOrigin = `${center.x}px ${center.y}px`
       pane.style.rotate = `${enabled ? state.bearing : 0}deg`
+      updateOverlays()
       keyboard._panKeys = Object.fromEntries(
         Object.entries(original.panKeys).map(([key, offset]) => {
           const point = movement(leaflet.point(offset))
@@ -128,6 +187,15 @@ export function Rotation({ enabled = true }: RotationProps) {
     state.apply()
 
     return () => {
+      overlayObserver.disconnect()
+      for (const [element, saved] of overlayStyles) {
+        if (saved.suffix && element.style.transform.endsWith(saved.suffix)) {
+          element.style.transform = element.style.transform
+            .slice(0, -saved.suffix.length)
+            .trimEnd()
+        }
+        element.style.transformOrigin = saved.origin
+      }
       map.off("move resize zoom", state.apply)
       map.layerPointToContainerPoint = original.to
       map.containerPointToLayerPoint = original.from

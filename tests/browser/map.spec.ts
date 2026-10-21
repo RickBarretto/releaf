@@ -86,6 +86,80 @@ test("toolbar isolates events, search retains focus and map remounts", async ({
   await expect(page.getByTestId("view")).toContainText('"zoom":5')
 })
 
+test("markers stay upright through rotation, zoom and disabling rotation", async ({
+  page,
+}) => {
+  const marker = page.locator(".leaflet-marker-icon")
+  const initial = (await marker.boundingBox())!
+  for (let turn = 0; turn < 2; turn++) {
+    await page.getByRole("button", { name: "Rotate", exact: true }).click()
+    await expect(marker).toHaveAttribute("style", /rotate\(-/)
+    await expect
+      .poll(async () => (await marker.boundingBox())!.width)
+      .toBeCloseTo(initial.width, 0)
+    expect((await marker.boundingBox())!.height).toBeCloseTo(initial.height, 0)
+  }
+  await page.getByRole("button", { name: "Fly home" }).click()
+  await expect.poll(async () => (await view(page)).zoom).toBe(6)
+  await expect
+    .poll(async () => (await marker.boundingBox())!.width)
+    .toBeCloseTo(initial.width, 0)
+  await page.getByRole("button", { name: "Toggle rotation" }).click()
+  await expect
+    .poll(() => marker.evaluate((element) => element.style.transformOrigin))
+    .toBe("")
+  expect((await marker.boundingBox())!.height).toBeCloseTo(initial.height, 0)
+})
+
+test("popups stay upright when opened and updated on a rotated map", async ({
+  page,
+}) => {
+  const marker = page.locator(".leaflet-marker-icon")
+  await marker.click()
+  const popup = page.locator(".leaflet-popup")
+  const relativePosition = async () => {
+    const icon = (await marker.boundingBox())!
+    const box = (await popup.boundingBox())!
+    return {
+      x: box.x + box.width / 2 - icon.x - icon.width / 2,
+      y: box.y + box.height - icon.y,
+    }
+  }
+  const initialPosition = await relativePosition()
+  const assertUpright = async () => {
+    const dimensions = await popup.evaluate((element) => ({
+      width: element.getBoundingClientRect().width,
+      height: element.getBoundingClientRect().height,
+      layoutWidth: element.offsetWidth,
+      layoutHeight: element.offsetHeight,
+    }))
+    expect(dimensions.width).toBeCloseTo(dimensions.layoutWidth, 0)
+    expect(dimensions.height).toBeCloseTo(dimensions.layoutHeight, 0)
+    await expect
+      .poll(async () => (await relativePosition()).x)
+      .toBeCloseTo(initialPosition.x, 0)
+    await expect
+      .poll(async () => (await relativePosition()).y)
+      .toBeCloseTo(initialPosition.y, 0)
+  }
+  await assertUpright()
+  await page.getByRole("button", { name: "Rotate", exact: true }).click()
+  await expect(popup).toHaveAttribute("style", /rotate\(-45deg\)/)
+  await assertUpright()
+  await page.getByRole("button", { name: "Popup count 0" }).click()
+  await expect(
+    page.getByRole("button", { name: "Popup count 1" }),
+  ).toBeVisible()
+  await assertUpright()
+  await page.locator(".leaflet-popup-close-button").click()
+  await marker.click()
+  await expect(popup).toHaveAttribute("style", /rotate\(-45deg\)/)
+  await assertUpright()
+  await page.getByRole("button", { name: "Reset north" }).click()
+  await expect(popup).toHaveAttribute("style", /rotate\(0deg\)/)
+  await assertUpright()
+})
+
 test("rotation keeps marker click coordinates aligned after camera and size changes", async ({
   page,
 }) => {
@@ -141,6 +215,8 @@ for (const turns of [1, 2, 5]) {
     await expect
       .poll(async () => (await marker.boundingBox())!.x)
       .toBeCloseTo(dragged.x - 80, -1)
+    // Leaflet ignores another arrow key until the current pan animation ends.
+    await expect(map).toHaveAttribute("data-moving", "false")
     const right = (await marker.boundingBox())!
     expect(right.y).toBeCloseTo(dragged.y, -1)
     await page.keyboard.press("ArrowDown")

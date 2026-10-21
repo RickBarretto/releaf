@@ -7,8 +7,13 @@ const server = await createServer({
   root,
   configFile: false,
   appType: "custom",
-  server: { host: "127.0.0.1", port: 4173, strictPort: true },
+  server: {
+    host: "127.0.0.1",
+    port: Number(process.env.RELEAF_TEST_PORT ?? 4173),
+    strictPort: true,
+  },
   resolve: { dedupe: ["react", "react-dom", "leaflet"] },
+  optimizeDeps: { exclude: ["releaf"] },
 })
 server.middlewares.use(async (req, res, next) => {
   if (

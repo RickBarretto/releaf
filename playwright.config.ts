@@ -1,4 +1,6 @@
 import { defineConfig, devices } from "@playwright/test"
+
+const baseURL = `http://127.0.0.1:${process.env.RELEAF_TEST_PORT ?? 4173}`
 export default defineConfig({
   testDir: "./tests/browser",
   testMatch: "**/*.spec.ts",
@@ -8,7 +10,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
-    baseURL: "http://127.0.0.1:4173",
+    baseURL,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
@@ -19,7 +21,7 @@ export default defineConfig({
   ],
   webServer: {
     command: "bun tests/browser/fixture/server.ts",
-    url: "http://127.0.0.1:4173",
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
   },
 })

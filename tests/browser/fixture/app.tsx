@@ -26,6 +26,14 @@ export function App() {
       <div style={{ width: wide ? 900 : 700 }}>
         {mounted && (
           <MapContainer
+            eventHandlers={{
+              movestart: (event) => {
+                event.target.getContainer().dataset.moving = "true"
+              },
+              moveend: (event) => {
+                event.target.getContainer().dataset.moving = "false"
+              },
+            }}
             initialZoom={5}
             style={{ height: 450 }}
             options={{
