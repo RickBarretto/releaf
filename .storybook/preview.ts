@@ -17,6 +17,10 @@ const preview: Preview = {
   parameters: {
     layout: "padded",
     controls: { expanded: true },
+    docs: {
+      codePanel: true,
+      canvas: { sourceState: "shown" },
+    },
     options: { storySort: { order: ["Map", "Development"] } },
   },
   tags: ["autodocs"],
