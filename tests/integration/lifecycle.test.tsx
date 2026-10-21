@@ -1,6 +1,8 @@
-import { afterEach, expect, spyOn, test } from "bun:test"
+import { spawnSync } from "node:child_process"
+import { readFile } from "node:fs/promises"
 import type * as L from "leaflet"
 import { Component, createRef, type ReactNode } from "react"
+import { afterEach, expect, test, vi } from "vitest"
 import { cleanup, observers, render, waitFor } from "./helpers"
 
 afterEach(cleanup)
@@ -13,7 +15,7 @@ const {
   useMap,
   useLeaflet,
   Map: ReleafMap,
-} = await import("../../dist/index.js")
+} = await import("../../src/index")
 class Boundary extends Component<
   { children: ReactNode },
   { error: string | null }
@@ -61,7 +63,7 @@ test("maps run without ResizeObserver and expose live Leaflet to descendants", a
 })
 
 test("creation errors, missing context and invalid standalone overlays reach boundaries", async () => {
-  const log = spyOn(console, "error").mockImplementation(() => {})
+  const log = vi.spyOn(console, "error").mockImplementation(() => {})
   function Outside() {
     useMap()
     return null
@@ -157,17 +159,18 @@ test("zoom limits, rotation methods and pane styles restore when controls unmoun
 
 test("both published entrypoints retain client directives and import without browser globals", async () => {
   for (const entry of ["index", "events"]) {
-    const code = await Bun.file(`dist/${entry}.js`).text()
+    const code = await readFile(`dist/${entry}.js`, "utf8")
     expect(code.startsWith('"use client"')).toBe(true)
-    const result = Bun.spawnSync(
+    const result = spawnSync(
+      process.execPath,
       [
-        process.execPath,
         "-e",
         `await import("releaf${entry === "events" ? "/events" : ""}"); if (typeof window !== "undefined") throw Error("browser global");`,
       ],
       { cwd: process.cwd() },
     )
-    expect(result.exitCode).toBe(0)
+    expect(result.error).toBeUndefined()
+    expect(result.status).toBe(0)
     expect(result.stderr.toString()).toBe("")
   }
 })

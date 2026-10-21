@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "bun:test"
+import { spawnSync } from "node:child_process"
 import type * as L from "leaflet"
 import {
   act,
@@ -8,9 +8,10 @@ import {
   useContext,
   useState,
 } from "react"
+import { afterEach, describe, expect, test } from "vitest"
 import { cleanup, dom, observers, render, unmount } from "./helpers"
 
-// Test the published bundle, including its external imports and client boundary.
+// Exercise source with real Leaflet; subprocess checks verify the published bundle.
 afterEach(cleanup)
 
 const {
@@ -32,13 +33,13 @@ const {
   useMap,
   useMapEvents,
   useMapView,
-} = await import("../../dist/index.js")
+} = await import("../../src/index")
 
 describe("Releaf", () => {
   test("imports and renders on the server without browser globals", () => {
-    const result = Bun.spawnSync(
+    const result = spawnSync(
+      process.execPath,
       [
-        process.execPath,
         "-e",
         `
       import { createElement } from "react";
@@ -50,7 +51,8 @@ describe("Releaf", () => {
       ],
       { cwd: process.cwd() },
     )
-    expect(result.exitCode).toBe(0)
+    expect(result.error).toBeUndefined()
+    expect(result.status).toBe(0)
     expect(result.stdout.toString()).toContain('aria-label="Map"')
     expect(result.stdout.toString()).toContain("Loading map")
     expect(result.stderr.toString()).toBe("")

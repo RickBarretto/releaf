@@ -1,12 +1,12 @@
-import { afterEach, describe, expect, test } from "bun:test"
 import type * as L from "leaflet"
 import { act, createRef, StrictMode } from "react"
+import { afterEach, describe, expect, test } from "vitest"
 import { cleanup, dom, render, waitFor } from "./helpers"
 
 // Test the published bundle, including its external imports and client boundary.
 afterEach(cleanup)
 
-const { Map: ReleafMap } = await import("../../dist/index.js")
+const { Map: ReleafMap } = await import("../../src/index")
 
 describe("Map DSL", () => {
   test("composes view, tiles, positions, controls and rotation with cleanup", async () => {
@@ -75,7 +75,7 @@ describe("Map DSL", () => {
   })
 
   test("events entry shares map context and exposes positions with fresh callbacks", async () => {
-    const { useMapEvents: useEvents } = await import("../../dist/events.js")
+    const { useMapEvents: useEvents } = await import("../../src/events")
     const mapRef = createRef<L.Map>()
     const calls: unknown[] = []
     function Listener({ label }: { label: string }) {

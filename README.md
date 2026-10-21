@@ -1,8 +1,9 @@
 # {Re}Leaf
 
 A small, typed React wrapper for Leaflet. React 19.2+, React DOM 19.2+, and
-Leaflet 1.9.4 are peers. Bun handles the build and tests; no React wrapper,
-state library, or bundler dependency is required.
+Leaflet 1.9.4 are peers. Bun handles builds and package management; Vitest runs
+integration tests. No React wrapper, state library, or bundler dependency is
+required.
 
 ## Usage
 
@@ -143,12 +144,15 @@ bun run test
 bun run build
 ```
 
-Tests exercise the published ESM bundle against real Leaflet in jsdom, plus
-server rendering in fresh processes. Consumer type fixtures check the emitted
-declarations through `releaf` and `releaf/events`, including expected errors.
+Vitest tests exercise the source against real Leaflet in jsdom, plus
+server rendering and published-entrypoint checks in fresh Node processes.
+The test setup builds the package before running, including runs from VS Code.
+Consumer type fixtures check the emitted declarations through `releaf` and `releaf/events`, including expected errors.
 
 ```sh
-bun run test                 # Build and run Bun/jsdom integration tests
+bun run test                 # Build and run Vitest/jsdom integration tests
+bun run test:coverage        # Build and report integration coverage (console + LCOV)
+bun run test:watch           # Watch integration tests with Vitest
 bun run test:types           # Build and check test code and consumer types
 bunx playwright install --with-deps chromium firefox webkit
 bun run test:browser         # Build and run all three browser engines
@@ -166,7 +170,26 @@ installed once; Linux may also require the system dependencies installed by
 Mobile touch gestures and external provider integration remain consuming-app
 checks.
 
-GitHub Actions runs integration tests, type checks, lint, and separate Chromium,
+Vitest uses V8 coverage for `src/`, excluding test helpers and dependencies.
+`bun run test:coverage` prints a summary and writes `coverage/lcov.info` and
+`coverage/index.html`. Browser tests and SSR checks spawned in separate processes
+are not included. Reports are ignored by Git and LCOV is uploaded as the
+`integration-coverage` artifact in CI. Vitest runs on Node.js (22.12+), while Bun
+continues to manage dependencies and build the package.
+
+In VS Code, the existing Vitest extension discovers `vitest.config.ts`. Open the
+Testing view and choose **Run Tests with Coverage** to populate VS Code's Test
+Coverage view and source coverage overlays. Use **Test: Show Inline Coverage**
+to toggle the overlay. Running the coverage script in a terminal generates
+reports; use the Testing view action to populate the editor UI.
+
+Run `tests/browser/map.spec.ts` through the Playwright extension in the Testing
+view, or with `bun run test:browser tests/browser/map.spec.ts`. Workspace settings
+disable Bun's test explorer because these suites require Vitest or Playwright.
+After changing these settings, run **Developer: Reload Window** to refresh test
+discovery.
+
+GitHub Actions runs integration tests with coverage, type checks, lint, and separate Chromium,
 Firefox, and WebKit jobs on pushes and pull requests. Dependency versions are
 recorded in `bun.lock`; CI installs with `bun install --frozen-lockfile`.
 

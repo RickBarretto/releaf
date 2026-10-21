@@ -1,6 +1,6 @@
-import { afterEach, expect, spyOn, test } from "bun:test"
 import type * as Leaflet from "leaflet"
 import { act, createRef, useState } from "react"
+import { afterEach, expect, test, vi } from "vitest"
 import { cleanup, click, observers, render, waitFor } from "./helpers"
 
 afterEach(cleanup)
@@ -19,7 +19,7 @@ const {
   GeoJSON,
   useMapView,
   useMapEvents,
-} = await import("../../dist/index.js")
+} = await import("../../src/index")
 
 test("creation-only map options, camera freedom, keyed recreation and resize", async () => {
   const ref = createRef<Leaflet.Map>()
@@ -31,7 +31,7 @@ test("creation-only map options, camera freedom, keyed recreation and resize", a
   await render(tree(1, 3))
   const map = ref.current!
 
-  const invalidate = spyOn(map, "invalidateSize")
+  const invalidate = vi.spyOn(map, "invalidateSize")
   observers.at(-1)!.callback()
   expect(invalidate).toHaveBeenCalledWith({ pan: false })
 
@@ -267,17 +267,17 @@ test("actions compose handlers, cancellation, disabled children and controller m
     )!,
   )
   expect(map.getZoom()).toBe(zoom + 1)
-  const locate = spyOn(map, "locate").mockImplementation(() => map)
+  const locate = vi.spyOn(map, "locate").mockImplementation(() => map)
   await click(
     Array.from(document.querySelectorAll("button")).find(
       (b) => b.textContent === "Locate me",
     )!,
   )
   expect(locate).toHaveBeenCalledWith({ setView: false })
-  const fly = spyOn(map, "flyTo").mockImplementation(() => map)
+  const fly = vi.spyOn(map, "flyTo").mockImplementation(() => map)
   controller.flyTo({ latitude: 3, longitude: 4 }, 7, { animate: false })
   expect(fly).toHaveBeenCalledWith([3, 4], 7, { animate: false })
-  const fit = spyOn(map, "fitBounds").mockImplementation(() => map)
+  const fit = vi.spyOn(map, "fitBounds").mockImplementation(() => map)
   controller.fitBounds([{ latitude: 1, longitude: 2 }, [3, 4]])
   expect(fit).toHaveBeenCalledWith(
     [
@@ -361,8 +361,8 @@ test("event callbacks refresh without resubscribing and removed listeners stop f
     return null
   }
   await render(tree("layer"))
-  const on = spyOn(ref.current!, "on"),
-    off = spyOn(ref.current!, "off")
+  const on = vi.spyOn(ref.current!, "on"),
+    off = vi.spyOn(ref.current!, "off")
   await render(
     <MapContainer ref={ref}>
       <Listener label="first" />

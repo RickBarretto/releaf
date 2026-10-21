@@ -4,6 +4,8 @@
     "includes": [
       "**",
       "!!dist",
+      "!!coverage",
+      "!!.vitest",
       "!!node_modules",
       "!!storybook-static",
       "!!playwright-report",

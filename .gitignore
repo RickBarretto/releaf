@@ -16,6 +16,7 @@ storybook-static/
 *.log
 .cache/
 .vite/
+.vitest/
 
 # OS files
 .DS_Store

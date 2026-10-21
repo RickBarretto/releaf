@@ -1,7 +1,8 @@
-import { mock } from "bun:test"
+import { setTimeout } from "node:timers/promises"
 import { JSDOM } from "jsdom"
 import type { ReactNode } from "react"
 import { act } from "react"
+import { vi } from "vitest"
 export const dom = new JSDOM("<!doctype html><html><body></body></html>", {
   url: "http://localhost",
   pretendToBeVisual: true,
@@ -9,12 +10,15 @@ export const dom = new JSDOM("<!doctype html><html><body></body></html>", {
 Object.assign(globalThis, {
   window: dom.window,
   document: dom.window.document,
-  navigator: dom.window.navigator,
   HTMLElement: dom.window.HTMLElement,
   Element: dom.window.Element,
   SVGElement: dom.window.SVGElement,
   getComputedStyle: dom.window.getComputedStyle,
   IS_REACT_ACT_ENVIRONMENT: true,
+})
+Object.defineProperty(globalThis, "navigator", {
+  configurable: true,
+  value: dom.window.navigator,
 })
 Object.defineProperty(dom.window.SVGSVGElement.prototype, "createSVGRect", {
   value: () => ({}),
@@ -66,7 +70,7 @@ export async function cleanup() {
   root = undefined
   document.body.innerHTML = ""
   observers.length = 0
-  mock.restore()
+  vi.restoreAllMocks()
 }
 
 export async function waitFor(assertion: () => void, timeout = 2000) {
@@ -78,7 +82,7 @@ export async function waitFor(assertion: () => void, timeout = 2000) {
     } catch (error) {
       if (Date.now() >= deadline) throw error
       await act(async () => {
-        await Bun.sleep(5)
+        await setTimeout(5)
       })
     }
   }

@@ -1,10 +1,10 @@
-import { afterEach, describe, expect, test } from "bun:test"
 import { act } from "react"
+import { afterEach, describe, expect, test } from "vitest"
 import { cleanup, click, key, render, type, waitFor } from "./helpers"
 
 afterEach(cleanup)
 
-const { SearchBar } = await import("../../dist/index.js")
+const { SearchBar } = await import("../../src/index")
 
 describe("search contracts", () => {
   test("debounces, trims the minimum-length check, and cancels on unmount", async () => {
