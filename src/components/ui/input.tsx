@@ -3,7 +3,11 @@
 import type { ComponentProps } from "react"
 import { cn } from "../../lib/utils"
 
-export function Input({ className, type, ...props }: ComponentProps<"input">) {
+export function Input({
+  className,
+  type,
+  ...props
+}: Omit<ComponentProps<"input">, "style">) {
   return (
     <input
       type={type}

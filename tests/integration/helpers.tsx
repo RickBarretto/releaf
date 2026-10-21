@@ -58,7 +58,7 @@ export async function render(node: ReactNode) {
   })
   await waitFor(() => {
     const containers = host.querySelectorAll(".leaflet-container")
-    if (host.querySelector('div[style*="width: 100%"]') && !containers.length)
+    if (host.querySelector('[data-slot="map-container"]') && !containers.length)
       throw new Error("Map not ready")
     if (containers.length && !containers[0].querySelector(".leaflet-pane"))
       throw new Error("Map not ready")
