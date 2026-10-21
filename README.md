@@ -46,6 +46,7 @@ export function CityMap() {
 
 ## shadcn/ui
 
+The library uses Tailwind CSS v4 utilities, including its attribution footer.
 Map actions and search inputs use internal shadcn/ui components. Import
 `releaf/styles.css` once for compiled styles; Tailwind is not required in your app.
 Customize map sizing with `className`. The quick start uses a custom CSS class:

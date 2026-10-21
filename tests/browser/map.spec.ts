@@ -107,3 +107,26 @@ test("internal shadcn controls load packaged styles and inherit theme tokens", a
   })
   await expect(button).toHaveCSS("background-color", "rgb(20, 100, 60)")
 })
+
+test("attribution utilities override Leaflet and inherit theme tokens", async ({
+  page,
+}) => {
+  const footer = page.locator('[data-slot="map-footer"]')
+  await expect(footer).toHaveCSS("padding", "4px 8px")
+  await expect(footer).toHaveCSS("margin", "8px")
+  await expect(footer).toHaveCSS("border-radius", "8px")
+  await expect(footer).toHaveCSS("background-color", "rgb(255, 255, 255)")
+  const link = footer.getByRole("link", { name: "{Re}leaf" })
+  await expect(link).toHaveCSS("display", "inline")
+  await expect(link).toHaveCSS("font-size", "11px")
+  await expect(link).toHaveCSS("color", "rgb(23, 23, 23)")
+  await link.hover()
+  await expect(link).toHaveCSS("text-decoration-line", "underline")
+  await page.evaluate(() => {
+    document.documentElement.style.setProperty(
+      "--background",
+      "rgb(240, 245, 250)",
+    )
+  })
+  await expect(footer).toHaveCSS("background-color", "rgb(240, 245, 250)")
+})

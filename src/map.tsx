@@ -3,7 +3,6 @@
 import type * as Leaflet from "leaflet"
 import type { ComponentPropsWithoutRef, ReactNode, Ref } from "react"
 import { useEffect, useImperativeHandle, useRef, useState } from "react"
-import { buttonVariants } from "./components/ui/button"
 import type { MapContextValue } from "./context"
 import { MapContext, useEventHandlers, useMapContext } from "./context"
 import { cn } from "./lib/utils"
@@ -23,13 +22,17 @@ function AttributionFooter() {
     control.setPrefix(branding)
     element.dataset.slot = "map-footer"
     element.setAttribute("aria-label", "Map copyright and contributors")
-    element.classList.add("releaf-map-footer")
+    // Leaflet styles are unlayered; important utilities keep its defaults from winning.
+    const footerClasses =
+      "box-border! max-w-[calc(100vw-2rem)]! m-2! px-2! py-1! border! border-solid! border-border! rounded-lg! bg-background! text-muted-foreground! shadow-[0_1px_3px_#0000001a]! font-[inherit]! text-[0.6875rem]! leading-normal!".split(
+        " ",
+      )
+    element.classList.add(...footerClasses)
     const styleLinks = () => {
       for (const link of element.querySelectorAll("a")) {
         link.className = cn(
           link.className,
-          buttonVariants({ variant: "ghost", size: "sm" }),
-          "releaf-attribution-link",
+          "inline! h-auto! p-0! rounded-xs! text-foreground! text-[length:inherit]! whitespace-normal! no-underline! hover:underline! outline-none focus-visible:ring-2 focus-visible:ring-ring",
         )
       }
     }
@@ -42,7 +45,7 @@ function AttributionFooter() {
       control.setPrefix(
         typeof previousPrefix === "string" ? previousPrefix : false,
       )
-      element.classList.remove("releaf-map-footer")
+      element.classList.remove(...footerClasses)
       delete element.dataset.slot
       element.removeAttribute("aria-label")
     }
