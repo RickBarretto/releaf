@@ -48,16 +48,14 @@ export {
   TileLayer,
   type TileLayerProps,
 } from "./layers"
-
+export { requestCurrentLocation, useCurrentLocation } from "./location"
 export {
   MapContainer,
   type MapContainerProps,
   MapView,
   type MapViewProps,
 } from "./map"
-
 export { Popup, type PopupProps, Tooltip, type TooltipProps } from "./overlays"
-
 export {
   SearchBar,
   type SearchBarProps,

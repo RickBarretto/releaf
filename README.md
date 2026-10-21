@@ -85,6 +85,52 @@ import { Button } from "@/components/ui/button";
 
 Your button supplies the style; ReLeaf supplies the map action. No `asChild` needed.
 
+## Request the user's location
+
+Create the request in a click handler and keep its promise in state.
+`useCurrentLocation` reads that promise using React's Suspense API. Location
+permission is requested only after the click. Use HTTPS or localhost.
+
+```tsx
+import { Suspense, useState } from "react";
+import { Map, requestCurrentLocation, useCurrentLocation, type Position } from "releaf";
+
+function UserLocation({ request }: { request: Promise<Position> }) {
+  const position = useCurrentLocation(request);
+  return (
+    <>
+      <Map.View position={position} zoom={16} />
+      <Map.Marker position={position} />
+    </>
+  );
+}
+
+export function LocationMap() {
+  const [request, setRequest] = useState<Promise<Position> | null>(null);
+  return (
+    <Map.Root>
+      <Map.View position={{ latitude: 51.5074, longitude: -0.1278 }} />
+      <Map.Zoom zoom={13} />
+      <Map.Tiles.OpenStreetMap />
+      <Map.Toolbar top left>
+        <button type="button" onClick={() => setRequest(requestCurrentLocation())}>
+          Use my current location
+        </button>
+      </Map.Toolbar>
+      <Suspense fallback={<Map.Toolbar bottom left>Requesting location…</Map.Toolbar>}>
+        {request && <UserLocation request={request} />}
+      </Suspense>
+    </Map.Root>
+  );
+}
+```
+
+Wrap this example in your application's error boundary to handle denied
+permission, timeouts, or unavailable geolocation. `requestCurrentLocation`
+accepts browser `PositionOptions` and defaults to a ten-second timeout.
+See **Map / DSL / Current Location** in Storybook for a complete example
+with error feedback and retry.
+
 ## Explore
 
 - [API guide](docs/api.md) — components, hooks, search, and shadcn composition.
