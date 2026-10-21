@@ -1,35 +1,4 @@
-import type { Marker } from "leaflet"
-import { AlertCircle, Minus, Plus } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
-import { Map, type Position, requestCurrentLocation } from "releaf"
-import { useMapEvents } from "releaf/events"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "../../src/components/ui/alert"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../src/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldLabel,
-} from "../../src/components/ui/field"
-import { Spinner } from "../../src/components/ui/spinner"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../../src/components/ui/tooltip"
-import { Button } from "../components/ui/button"
-
-const panel = "w-80 max-w-[calc(100vw-100px)]"
+import { Map, type Position } from "releaf"
 
 const initial: Position = { latitude: 51.5074, longitude: -0.1278 }
 const places = [
@@ -47,193 +16,6 @@ const places = [
   },
 ]
 
-function PickerControls() {
-  const [selected, setSelected] = useState(initial)
-  // Camera changes are separate: dragging the pin should not recenter the map.
-  const [camera, setCamera] = useState(initial)
-  const [locating, setLocating] = useState(false)
-  const [error, setError] = useState("")
-  const [source, setSource] = useState("Initial location")
-  const marker = useRef<Marker>(null)
-  const requestId = useRef(0)
-
-  useEffect(
-    () => () => {
-      requestId.current += 1
-    },
-    [],
-  )
-
-  function select(position: Position, source: string, recenter = false) {
-    // A later selection takes precedence over a pending location request.
-    requestId.current += 1
-    setLocating(false)
-    setError("")
-    setSelected(position)
-    setSource(source)
-    if (recenter) setCamera(position)
-  }
-
-  useMapEvents({ click: (event) => select(event.position, "Map click") })
-
-  async function locate() {
-    const id = ++requestId.current
-    setLocating(true)
-    setError("")
-    try {
-      const position = await requestCurrentLocation()
-      if (id === requestId.current) select(position, "Current location", true)
-    } catch (cause) {
-      if (id === requestId.current) {
-        setLocating(false)
-        setError(
-          cause instanceof Error ? cause.message : "Location unavailable",
-        )
-      }
-    }
-  }
-
-  return (
-    <TooltipProvider>
-      <Map.View position={camera} zoom={13} animate={false} />
-      <Map.Toolbar top right>
-        <div className="rounded-xl border bg-background p-2 text-foreground shadow-lg flex flex-col gap-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Map.Actions.ZoomIn>
-                <Button variant="ghost" size="icon" aria-label="Zoom in">
-                  <Plus />
-                </Button>
-              </Map.Actions.ZoomIn>
-            </TooltipTrigger>
-            <TooltipContent side="left" className="z-[1100]">
-              Zoom in
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Map.Actions.ZoomOut>
-                <Button variant="ghost" size="icon" aria-label="Zoom out">
-                  <Minus />
-                </Button>
-              </Map.Actions.ZoomOut>
-            </TooltipTrigger>
-            <TooltipContent side="left" className="z-[1100]">
-              Zoom out
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      </Map.Toolbar>
-      <Map.Marker
-        ref={marker}
-        position={selected}
-        draggable
-        options={{
-          autoPan: true,
-          title: "Drag to select a location",
-          alt: "Selected location",
-        }}
-        eventHandlers={{
-          dragend: () => {
-            const position = marker.current?.getLatLng()
-            if (position)
-              select(
-                { latitude: position.lat, longitude: position.lng },
-                "Marker drag",
-              )
-          },
-        }}
-      >
-        <Map.Tooltip>Drag me to refine your selection</Map.Tooltip>
-      </Map.Marker>
-      <Map.Toolbar top left onClick={(event) => event.stopPropagation()}>
-        <Card className={panel}>
-          <CardContent className="space-y-4">
-            <Field>
-              <FieldLabel htmlFor="picker-search">Find a location</FieldLabel>
-              <Map.SearchBar
-                className="flex flex-col gap-2 [&_[role=status]:empty]:hidden [&_[role=listbox]:empty]:hidden"
-                search={(query) =>
-                  places.filter((place) =>
-                    place.label
-                      .toLocaleLowerCase()
-                      .includes(query.trim().toLocaleLowerCase()),
-                  )
-                }
-                onSelect={(place) =>
-                  select(
-                    { latitude: place.latitude, longitude: place.longitude },
-                    "Search result",
-                    true,
-                  )
-                }
-              >
-                <Map.SearchBar.Input
-                  id="picker-search"
-                  aria-describedby="picker-search-description"
-                  aria-label="Find a location"
-                  placeholder="Try Paris or São Paulo"
-                />
-                <Map.SearchBar.Results
-                  className="m-0 list-none p-0 [&_[role=option]]:cursor-pointer [&_[role=option]]:rounded-sm [&_[role=option]]:px-2 [&_[role=option]]:py-1.5 [&_[aria-selected=true]]:bg-accent [&_[aria-selected=true]]:text-accent-foreground"
-                  emptyMessage="No matching demo places"
-                  errorMessage="Search failed. Try again."
-                />
-              </Map.SearchBar>
-              <FieldDescription id="picker-search-description">
-                Four demo places · Use arrow keys and Enter to select.
-              </FieldDescription>
-            </Field>
-            <Button
-              type="button"
-              className="w-full"
-              disabled={locating}
-              onClick={locate}
-            >
-              {locating && <Spinner aria-hidden="true" />}
-              {locating
-                ? "Finding your location…"
-                : error
-                  ? "Retry current location"
-                  : "Use current location"}
-            </Button>
-            <span
-              role="status"
-              className="block text-xs text-muted-foreground empty:hidden"
-            >
-              {locating ? "Allow location access when your browser asks." : ""}
-            </span>
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle />
-                <AlertTitle>Location unavailable</AlertTitle>
-                <AlertDescription>
-                  {error} You can still search or choose on the map.
-                </AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-        </Card>
-      </Map.Toolbar>
-      <Map.Toolbar bottom left>
-        <Card className={panel} role="status" aria-label="Selected coordinates">
-          <CardHeader>
-            <CardTitle>Selected coordinates</CardTitle>
-            <CardDescription>
-              {source} · Click the map or drag the marker to refine.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <output className="block" aria-label="Latitude and longitude">
-              {selected.latitude.toFixed(5)}, {selected.longitude.toFixed(5)}
-            </output>
-          </CardContent>
-        </Card>
-      </Map.Toolbar>
-    </TooltipProvider>
-  )
-}
-
 /** Complete provider-independent picker; tileUrl lets tests run without network services. */
 export function LocationPicker({ tileUrl }: { tileUrl?: string }) {
   return (
@@ -244,7 +26,7 @@ export function LocationPicker({ tileUrl }: { tileUrl?: string }) {
         requires HTTPS or localhost.
       </p>
       <Map.Root
-        className="mt-4 h-[600px] overflow-hidden rounded-xl border border-border"
+        className="picker-map mt-4 h-[600px] overflow-hidden rounded-xl border border-border"
         aria-label="Location picker map"
         initialCenter={[initial.latitude, initial.longitude]}
         initialZoom={13}
@@ -256,7 +38,37 @@ export function LocationPicker({ tileUrl }: { tileUrl?: string }) {
         ) : (
           <Map.Tiles.OpenStreetMap />
         )}
-        <PickerControls />
+        <Map.Navigation />
+        <Map.LocationPicker defaultValue={initial}>
+          <Map.LocationPicker.Marker />
+          <Map.Toolbar
+            top
+            left
+            data-slot="map-panel"
+            className="w-80 max-w-[calc(100vw-100px)] flex flex-col gap-3 rounded-xl border bg-background p-3"
+          >
+            <Map.LocationPicker.Search
+              search={(query) =>
+                places.filter((place) =>
+                  place.label
+                    .toLocaleLowerCase()
+                    .includes(query.trim().toLocaleLowerCase()),
+                )
+              }
+              getPosition={(place) => place}
+            >
+              <Map.SearchBar.Input
+                aria-label="Find a location"
+                placeholder="Try Paris or São Paulo"
+              />
+              <Map.SearchBar.Results emptyMessage="No matching demo places" />
+            </Map.LocationPicker.Search>
+            <Map.LocationPicker.Locate />
+          </Map.Toolbar>
+          <Map.Toolbar bottom left>
+            <Map.LocationPicker.Coordinates />
+          </Map.Toolbar>
+        </Map.LocationPicker>
       </Map.Root>
     </section>
   )

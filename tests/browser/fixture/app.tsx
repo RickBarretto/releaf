@@ -7,7 +7,7 @@ import {
   useMapEvents,
   useMapView,
 } from "releaf"
-export function App() {
+export function App({ navigation = false }: { navigation?: boolean }) {
   const [mounted, setMounted] = useState(true)
   const [wide, setWide] = useState(false)
   return (
@@ -55,6 +55,16 @@ export function App() {
               </Map.Popup>
               <Map.Tooltip>Marker tooltip</Map.Tooltip>
             </Map.Marker>
+            {navigation && (
+              <Map.Navigation
+                home={{ latitude: 0, longitude: 0 }}
+                locate
+                positions={[
+                  [0, 0],
+                  [2, 2],
+                ]}
+              />
+            )}
             <Status />
           </MapContainer>
         )}

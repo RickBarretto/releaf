@@ -50,3 +50,36 @@ export const badSearch = (
 )
 // @ts-expect-error DSL positions cannot be strings
 export const badMarker = <Map.Marker position="city" />
+
+export const controls = (
+  <Map.Root>
+    <Map.Navigation home={position} positions={[position]} locate />
+    <Map.LocationPicker
+      defaultValue={position}
+      onValueChange={(value, details) => {
+        value?.latitude.toFixed()
+        details.source.toUpperCase()
+      }}
+    >
+      <Map.LocationPicker.Search
+        search={() => [{ name: "City", position }]}
+        getLabel={(result) => result.name}
+        getPosition={(result) => result.position}
+      />
+      <Map.LocationPicker.Marker />
+      <Map.LocationPicker.Locate />
+      <Map.LocationPicker.Coordinates precision={3} />
+    </Map.LocationPicker>
+    <Map.Search
+      search={() => [{ label: "City", position }]}
+      getPosition={(result) => result.position}
+    />
+    <Map.Actions.FitBounds positions={[position]} />
+  </Map.Root>
+)
+export const invalidMapSearch = (
+  // @ts-expect-error custom result shapes need a label accessor
+  <Map.Search search={() => [{ name: "City" }]} getPosition={() => position} />
+)
+// @ts-expect-error picker values use named coordinates
+export const invalidPicker = <Map.LocationPicker value={[1, 2]} />
