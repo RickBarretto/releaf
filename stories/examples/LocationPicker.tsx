@@ -1,8 +1,13 @@
 import type { Marker } from "leaflet"
+import { Minus, Plus } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { type Position, Map as ReleafMap, requestCurrentLocation } from "releaf"
 import { useMapEvents } from "releaf/events"
+import { Button } from "../components/ui/button"
 import "./location-picker.css"
+
+const panel =
+  "flex w-80 max-w-[calc(100vw-100px)] flex-col gap-3 rounded-xl border bg-background p-4 text-sm text-foreground shadow-lg"
 
 const initial: Position = { latitude: 51.5074, longitude: -0.1278 }
 const places = [
@@ -69,6 +74,30 @@ function PickerControls() {
   return (
     <>
       <ReleafMap.View position={camera} zoom={13} animate={false} />
+      <ReleafMap.Toolbar top right>
+        <div className="rounded-xl border bg-background p-2 text-foreground shadow-lg flex flex-col gap-1">
+          <ReleafMap.Actions.ZoomIn>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Zoom in"
+              title="Zoom in"
+            >
+              <Plus />
+            </Button>
+          </ReleafMap.Actions.ZoomIn>
+          <ReleafMap.Actions.ZoomOut>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Zoom out"
+              title="Zoom out"
+            >
+              <Minus />
+            </Button>
+          </ReleafMap.Actions.ZoomOut>
+        </div>
+      </ReleafMap.Toolbar>
       <ReleafMap.Marker
         ref={marker}
         position={selected}
@@ -92,8 +121,9 @@ function PickerControls() {
         <ReleafMap.Tooltip>Drag me to refine your selection</ReleafMap.Tooltip>
       </ReleafMap.Marker>
       <ReleafMap.Toolbar top left onClick={(event) => event.stopPropagation()}>
-        <div className="location-picker-panel">
+        <div className={panel}>
           <ReleafMap.SearchBar
+            className="flex flex-col gap-2 [&_[role=status]:empty]:hidden [&_[role=listbox]:empty]:hidden"
             search={(query) =>
               places.filter((place) =>
                 place.label
@@ -114,39 +144,43 @@ function PickerControls() {
               placeholder="Try Paris or São Paulo"
             />
             <ReleafMap.SearchBar.Results
+              className="m-0 list-none p-0 [&_[role=option]]:cursor-pointer [&_[role=option]]:rounded-sm [&_[role=option]]:px-2 [&_[role=option]]:py-1.5 [&_[aria-selected=true]]:bg-accent [&_[aria-selected=true]]:text-accent-foreground"
               emptyMessage="No matching demo places"
               errorMessage="Search failed. Try again."
             />
           </ReleafMap.SearchBar>
-          <p>Four demo places · Use arrow keys and Enter to select.</p>
-          <button type="button" disabled={locating} onClick={locate}>
+          <p className="m-0 text-xs leading-relaxed text-muted-foreground">
+            Four demo places · Use arrow keys and Enter to select.
+          </p>
+          <Button type="button" disabled={locating} onClick={locate}>
             {locating
               ? "Finding your location…"
               : error
                 ? "Retry current location"
                 : "Use current location"}
-          </button>
-          <span role="status">
+          </Button>
+          <span
+            role="status"
+            className="block text-xs text-muted-foreground empty:hidden"
+          >
             {locating ? "Allow location access when your browser asks." : ""}
           </span>
           {error && (
-            <p role="alert">
+            <p role="alert" className="m-0 text-sm text-destructive">
               {error} You can still search or choose on the map.
             </p>
           )}
         </div>
       </ReleafMap.Toolbar>
       <ReleafMap.Toolbar bottom left>
-        <div
-          className="location-picker-panel"
-          role="status"
-          aria-label="Selected coordinates"
-        >
+        <div className={panel} role="status" aria-label="Selected coordinates">
           <strong>Selected coordinates</strong>
-          <output aria-label="Latitude and longitude">
+          <output className="block" aria-label="Latitude and longitude">
             {selected.latitude.toFixed(5)}, {selected.longitude.toFixed(5)}
           </output>
-          <p>{source} · Click the map or drag the marker to refine.</p>
+          <p className="m-0 text-xs leading-relaxed text-muted-foreground">
+            {source} · Click the map or drag the marker to refine.
+          </p>
         </div>
       </ReleafMap.Toolbar>
     </>
@@ -167,6 +201,7 @@ export function LocationPicker({ tileUrl }: { tileUrl?: string }) {
         aria-label="Location picker map"
         initialCenter={[initial.latitude, initial.longitude]}
         initialZoom={13}
+        options={{ zoomControl: false }}
         fallback={<p>Loading map…</p>}
       >
         {tileUrl ? (
