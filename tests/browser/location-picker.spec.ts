@@ -26,6 +26,8 @@ test("search, marker drag and map click share the selected coordinates", async (
   await expect(coordinates).toHaveText("48.85840, 2.29450")
   await expect(input).toBeFocused()
   const marker = page.locator(".leaflet-marker-icon")
+  // Wait for the search camera animation before starting a drag.
+  await marker.click({ trial: true })
   const box = (await marker.boundingBox())!
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
   await page.mouse.down()

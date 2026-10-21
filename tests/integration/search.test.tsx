@@ -110,6 +110,7 @@ describe("search contracts", () => {
     await key("Enter")
     expect(selected).toEqual([items[1]])
     expect(input.value).toBe("Two")
+    expect(document.querySelector('[role="status"]')!.textContent).toBe("")
     expect(input.getAttribute("aria-expanded")).toBe("false")
     await type("o")
     await waitFor(() =>

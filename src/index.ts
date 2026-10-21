@@ -6,11 +6,30 @@ export {
   useMap,
   useMapView,
 } from "./context"
-
+export {
+  Coordinates,
+  type CoordinatesProps,
+  type LayerItemProps,
+  LayerSwitcher,
+  type LayerSwitcherProps,
+  LocationControl,
+  type LocationControlProps,
+  LocationPicker,
+  type LocationPickerProps,
+  MapSearch,
+  type MapSearchProps,
+  Navigation,
+  type NavigationProps,
+  type PickerSearchProps,
+  type SelectionDetails,
+  type SelectionSource,
+  useLocationPicker,
+} from "./controls"
 export {
   type ActionProps,
   type CustomTilesProps,
   type DSLMarkerProps,
+  type FitBoundsProps,
   type FlyToProps,
   type LocateProps,
   Map,
@@ -21,9 +40,7 @@ export {
   type ViewProps,
   type ZoomProps,
 } from "./dsl"
-
 export { type MapEventHandlers, useMapEvents } from "./events"
-
 export {
   Circle,
   CircleMarker,
@@ -48,7 +65,12 @@ export {
   TileLayer,
   type TileLayerProps,
 } from "./layers"
-export { requestCurrentLocation, useCurrentLocation } from "./location"
+export {
+  type LocationRequestStatus,
+  requestCurrentLocation,
+  useCurrentLocation,
+  useLocationRequest,
+} from "./location"
 export {
   MapContainer,
   type MapContainerProps,

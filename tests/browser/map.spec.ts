@@ -101,10 +101,14 @@ test("internal shadcn controls load packaged styles and inherit theme tokens", a
 }) => {
   const button = page.locator('[data-slot="button"]').first()
   await expect(button).toHaveCSS("height", "36px")
-  await expect(button).toHaveCSS("background-color", "rgb(23, 23, 23)")
+  await expect(button).toHaveAttribute("data-variant", "ghost")
+  await expect(button).toHaveAttribute("data-size", "icon")
+  await expect(button.locator("svg")).toBeVisible()
+  await expect(button).toHaveCSS("background-color", "rgba(0, 0, 0, 0)")
   await page.evaluate(() => {
-    document.documentElement.style.setProperty("--primary", "rgb(20, 100, 60)")
+    document.documentElement.style.setProperty("--accent", "rgb(20, 100, 60)")
   })
+  await button.hover()
   await expect(button).toHaveCSS("background-color", "rgb(20, 100, 60)")
 })
 

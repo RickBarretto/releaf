@@ -132,11 +132,20 @@ accepts browser `PositionOptions` and defaults to a ten-second timeout.
 See **Map / DSL / Current Location** in Storybook for a complete example
 with error feedback and retry.
 
+## Ready-made controls
+
+Compose `Map.Navigation`, `Map.Search`, `Map.LocationControl`,
+`Map.Coordinates`, and `Map.LayerSwitcher` inside `Map.Root`.
+`Map.LocationPicker` combines click selection, a draggable marker, and current
+location with retry; add its `.Search` child with your provider for place search.
+All controls ship styled and support custom composition.
+See the [control and picker APIs](docs/api.md#composed-controls).
+
 ## Explore
 
 - **Map / Location Picker / Complete** in Storybook combines search, current
   location with retry, a draggable marker, map clicks, and selected coordinates.
-  [Example source](stories/examples/LocationPicker.tsx) · [composition notes](docs/location-picker.md).
+  [Example source](stories/examples/LocationPicker.tsx) · [composition notes](docs/api.md#location-picker).
 - [API guide](docs/api.md) — components, hooks, search, and shadcn composition.
 - [Development guide](docs/development.md) — setup, tests, and Storybook demos.
 - [DSL design](DSL.md) — the compound Map API.

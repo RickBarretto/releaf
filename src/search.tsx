@@ -9,8 +9,8 @@ import {
   useRef,
   useState,
 } from "react"
-
 import { Input as UIInput } from "./components/ui/input"
+import { cn } from "./lib/utils"
 
 export interface SearchPlace {
   id?: string | number
@@ -40,6 +40,7 @@ interface SearchState {
   label: (place: unknown) => string
   select: (place: unknown) => void
   loading: boolean
+  showEmpty: boolean
   error: unknown
   id: string
   active: number
@@ -141,6 +142,7 @@ function Root<T>({
       callbacks.current.onSelect(place as T)
     },
     loading,
+    showEmpty: query.trim().length >= minLength && query !== selected,
     error,
     id,
     active,
@@ -213,23 +215,29 @@ function Results({
   loadingMessage = "Searching…",
   emptyMessage = "No results",
   errorMessage = "Search failed",
+  className,
   ...props
 }: SearchResultsProps) {
   const state = useSearch()
 
   return (
     <>
-      <div role="status">
+      <div role="status" className="empty:hidden">
         {state.loading
           ? loadingMessage
           : state.error
             ? errorMessage
-            : state.query && !state.results.length
+            : state.showEmpty && !state.results.length
               ? emptyMessage
               : null}
       </div>
       <ul
         {...props}
+        data-slot="search-results"
+        className={cn(
+          "m-0 list-none space-y-1 p-0 text-sm empty:hidden text-foreground [&_[role=option]]:cursor-pointer [&_[role=option]]:rounded-md [&_[role=option]]:px-2 [&_[role=option]]:py-1.5 [&_[aria-selected=true]]:bg-accent [&_[aria-selected=true]]:text-accent-foreground",
+          className,
+        )}
         id={state.id}
         // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: The combobox controls this ARIA listbox via aria-activedescendant.
         role="listbox"

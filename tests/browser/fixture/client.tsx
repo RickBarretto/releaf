@@ -12,6 +12,8 @@ else
     new URLSearchParams(location.search).has("picker") ? (
       <LocationPicker tileUrl="/tiles/{z}/{x}/{y}.svg" />
     ) : (
-      <App />
+      <App
+        navigation={new URLSearchParams(location.search).has("navigation")}
+      />
     ),
   )
