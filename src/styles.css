@@ -5,6 +5,9 @@
 @source "./map.tsx";
 
 @theme inline {
+  --color-card: var(--card, #fff);
+  --color-card-foreground: var(--card-foreground, #171717);
+  --color-destructive: var(--destructive, #dc2626);
   --color-background: var(--releaf-background);
   --color-foreground: var(--releaf-foreground);
   --color-primary: var(--releaf-primary);
@@ -19,7 +22,14 @@
   --color-ring: var(--releaf-ring);
 }
 
-:where([data-slot="button"], [data-slot="input"], [data-slot="map-footer"]) {
+:where(
+  [data-slot="button"],
+  [data-slot="input"],
+  [data-slot="map-footer"],
+  [data-slot="card"],
+  [data-slot="alert"],
+  [data-slot="tooltip-content"]
+) {
   --releaf-background: var(--background, #fff);
   --releaf-foreground: var(--foreground, #171717);
   --releaf-primary: var(--primary, #171717);
