@@ -66,7 +66,7 @@ Camera components apply settings when their props change.
 | --- | --- | --- | --- |
 | `Map.View` | `position` | `PositionExpression` | Required |
 | | `zoom` | `number` | Current zoom |
-| | `animate` | `boolean` | `false` |
+| | `animate` | `boolean` | `true`; disabled when reduced motion is preferred |
 | `Map.Zoom` | `zoom` | `number` | Required |
 | | `minZoom` | `number` | `0` |
 | | `maxZoom` | `number` | `Infinity` |
@@ -75,7 +75,7 @@ Camera components apply settings when their props change.
 | | `duration` | `number` | `300`; animation duration in milliseconds |
 | `MapView` | `center` | `Leaflet.LatLngExpression` | Required |
 | | `zoom` | `number` | Required |
-| | `animate` | `boolean` | `false` |
+| | `animate` | `boolean` | `true`; disabled when reduced motion is preferred |
 
 ```tsx
 <Map.View position={home} />

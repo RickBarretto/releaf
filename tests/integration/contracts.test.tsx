@@ -425,3 +425,46 @@ test("layer and overlay classes update without replacing Leaflet classes", async
   await render(tree())
   expect(marker.getElement()!.classList.contains("second")).toBe(false)
 })
+
+test.each([
+  "MapView",
+  "Map.View",
+])("%s animates by default and respects motion preferences", async (kind) => {
+  const ref = createRef<Leaflet.Map>()
+  const tree = (latitude: number, animate?: boolean) => (
+    <MapContainer ref={ref} options={{ zoomAnimation: false }}>
+      {kind === "MapView" ? (
+        <MapView center={[latitude, 0]} zoom={2} animate={animate} />
+      ) : (
+        <ReleafMap.View position={[latitude, 0]} zoom={2} animate={animate} />
+      )}
+    </MapContainer>
+  )
+  const original = Object.getOwnPropertyDescriptor(window, "matchMedia")
+  let reduced = false
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: vi.fn(() => ({ matches: reduced })),
+  })
+  try {
+    await render(tree(0))
+    const setView = vi.spyOn(ref.current!, "setView")
+    // Record options without starting real timers for Leaflet's pan animation.
+    setView.mockReturnValue(ref.current!)
+    await render(tree(1))
+    expect(setView).toHaveBeenLastCalledWith([1, 0], 2, { animate: true })
+    await render(tree(2, false))
+    expect(setView).toHaveBeenLastCalledWith([2, 0], 2, { animate: false })
+    reduced = true
+    await render(tree(3))
+    expect(setView).toHaveBeenLastCalledWith([3, 0], 2, { animate: false })
+    await render(tree(4, true))
+    expect(setView).toHaveBeenLastCalledWith([4, 0], 2, { animate: false })
+    reduced = false
+    await render(tree(5))
+    expect(setView).toHaveBeenLastCalledWith([5, 0], 2, { animate: true })
+  } finally {
+    if (original) Object.defineProperty(window, "matchMedia", original)
+    else Reflect.deleteProperty(window, "matchMedia")
+  }
+})
