@@ -1,6 +1,6 @@
 import type * as L from "leaflet"
 import { act, createRef, StrictMode } from "react"
-import { afterEach, describe, expect, test } from "vitest"
+import { afterEach, describe, expect, test, vi } from "vitest"
 import { cleanup, dom, render, waitFor } from "./helpers"
 
 // Test the published bundle, including its external imports and client boundary.
@@ -33,7 +33,7 @@ describe("Map DSL", () => {
         <ReleafMap.Root ref={mapRef} options={{ zoomAnimation: false }}>
           <ReleafMap.View position={{ latitude: 1, longitude: 2 }} />
           <ReleafMap.Zoom zoom={7} minZoom={3} maxZoom={19} />
-          <ReleafMap.Rotation enabled={enabled} />
+          <ReleafMap.Rotation animate={false} enabled={enabled} />
           <ReleafMap.Tiles.OpenStreetMap />
           <ReleafMap.Marker
             ref={markerRef}
@@ -76,6 +76,50 @@ describe("Map DSL", () => {
     expect(map.getPane("mapPane")!.style.rotate).toBe("0deg")
     await render(<ReleafMap.Root ref={mapRef} />)
     expect(document.querySelector("[data-testid=toolbar]")).toBeNull()
+  })
+
+  test("animates rotation, accumulates clicks and resets north by the shortest route", async () => {
+    const mapRef = createRef<L.Map>()
+    let controller: ReturnType<typeof ReleafMap.useController>
+    function Controls() {
+      controller = ReleafMap.useController()
+      return null
+    }
+    await render(
+      <ReleafMap.Root ref={mapRef}>
+        <ReleafMap.Zoom zoom={10} />
+        <ReleafMap.Rotation duration={300} />
+        <Controls />
+      </ReleafMap.Root>,
+    )
+    let tick: FrameRequestCallback = () => {}
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
+      tick = callback
+      return 1
+    })
+    const cancel = vi.spyOn(window, "cancelAnimationFrame")
+    vi.spyOn(window.performance, "now").mockReturnValue(0)
+    const pane = mapRef.current!.getPane("mapPane")!
+    controller!.rotateBy(-45)
+    tick(150)
+    expect(Number.parseFloat(pane.style.rotate)).toBeGreaterThan(-45)
+    expect(Number.parseFloat(pane.style.rotate)).toBeLessThan(0)
+    const point = mapRef.current!.latLngToContainerPoint([2, 3])
+    expect(
+      mapRef.current!.containerPointToLatLng(point).distanceTo([2, 3]),
+    ).toBeLessThan(1000)
+    controller!.rotateBy(-45)
+    expect(cancel).toHaveBeenCalled()
+    tick(300)
+    expect(pane.style.rotate).toBe("270deg")
+    controller!.resetNorth()
+    tick(150)
+    expect(Number.parseFloat(pane.style.rotate)).toBeGreaterThan(270)
+    tick(300)
+    expect(pane.style.rotate).toBe("0deg")
+    controller!.rotateBy(45)
+    await cleanup()
+    expect(cancel).toHaveBeenCalledTimes(2)
   })
 
   test("events entry shares map context and exposes positions with fresh callbacks", async () => {

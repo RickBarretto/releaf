@@ -41,7 +41,7 @@ test("drag, zoom, marker dragging, popup interaction and tooltip hover", async (
   await expect
     .poll(async () => (await view(page)).zoom)
     .toBeGreaterThan(initialZoom + 1)
-  await page.getByRole("button", { name: "Fly home" }).click()
+  await page.getByRole("button", { name: "Go to location" }).click()
   await expect.poll(async () => (await view(page)).zoom).toBe(6)
   // Return marker to the viewport using zoom-out before interacting.
   await page.getByRole("button", { name: "Zoom out", exact: true }).click()
@@ -86,6 +86,24 @@ test("toolbar isolates events, search retains focus and map remounts", async ({
   await expect(page.getByTestId("view")).toContainText('"zoom":5')
 })
 
+test("animated rotation completes without accumulating overlay transforms", async ({
+  page,
+}) => {
+  for (let turn = 1; turn <= 3; turn++) {
+    await page.getByRole("button", { name: "Rotate", exact: true }).click()
+    await expect(page.locator(".leaflet-map-pane")).toHaveCSS(
+      "rotate",
+      `${turn * 45}deg`,
+    )
+    const transform = await page
+      .locator(".leaflet-marker-icon")
+      .evaluate((element) => element.style.transform)
+    expect(transform.match(/rotate\(/g)).toHaveLength(1)
+  }
+  await page.getByRole("button", { name: "Reset north", exact: true }).click()
+  await expect(page.locator(".leaflet-map-pane")).toHaveCSS("rotate", "0deg")
+})
+
 test("markers stay upright through rotation, zoom and disabling rotation", async ({
   page,
 }) => {
@@ -99,7 +117,7 @@ test("markers stay upright through rotation, zoom and disabling rotation", async
       .toBeCloseTo(initial.width, 0)
     expect((await marker.boundingBox())!.height).toBeCloseTo(initial.height, 0)
   }
-  await page.getByRole("button", { name: "Fly home" }).click()
+  await page.getByRole("button", { name: "Go to location" }).click()
   await expect.poll(async () => (await view(page)).zoom).toBe(6)
   await expect
     .poll(async () => (await marker.boundingBox())!.width)
@@ -166,7 +184,7 @@ test("rotation keeps marker click coordinates aligned after camera and size chan
   const pane = page.locator(".leaflet-map-pane")
   await page.getByRole("button", { name: "Rotate", exact: true }).click()
   await expect(pane).toHaveCSS("rotate", "45deg")
-  await page.getByRole("button", { name: "Fly home" }).click()
+  await page.getByRole("button", { name: "Go to location" }).click()
   await expect.poll(async () => (await view(page)).zoom).toBe(6)
   await page.getByRole("button", { name: "Resize map" }).click()
   await expect(page.locator(".leaflet-container")).toHaveJSProperty(

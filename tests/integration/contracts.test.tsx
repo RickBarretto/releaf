@@ -242,7 +242,7 @@ test("actions compose handlers, cancellation, disabled children and controller m
   }
   await render(
     <ReleafMap.Root ref={ref}>
-      <ReleafMap.Rotation />
+      <ReleafMap.Rotation animate={false} />
       <Controls />
     </ReleafMap.Root>,
   )

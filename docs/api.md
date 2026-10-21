@@ -66,6 +66,8 @@ Camera components apply settings when their props change.
 | | `minZoom` | `number` | `0` |
 | | `maxZoom` | `number` | `Infinity` |
 | `Map.Rotation` | `enabled` | `boolean` | `true`; enables controller rotation |
+| | `animate` | `boolean` | `true`; respects reduced motion preferences |
+| | `duration` | `number` | `300`; animation duration in milliseconds |
 | `MapView` | `center` | `Leaflet.LatLngExpression` | Required |
 | | `zoom` | `number` | Required |
 | | `animate` | `boolean` | `false` |

@@ -62,16 +62,10 @@ export function useController() {
           options,
         ),
       rotateBy: (degrees: number) => {
-        const state = getRotationState(map)
-        if (state.enabled) {
-          state.bearing = (((state.bearing + degrees) % 360) + 360) % 360
-          state.apply()
-        }
+        getRotationState(map).turn(degrees)
       },
       resetNorth: () => {
-        const state = getRotationState(map)
-        state.bearing = 0
-        state.apply()
+        getRotationState(map).turn(null)
       },
     }),
     [map],

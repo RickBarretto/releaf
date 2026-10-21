@@ -7,6 +7,7 @@ import { useMapContext } from "./context"
 interface RotationState {
   bearing: number
   enabled: boolean
+  turn: (degrees: number | null) => void
   apply: () => void
 }
 
@@ -16,7 +17,7 @@ const rotations = new WeakMap<Leaflet.Map, RotationState>()
 export function getRotationState(map: Leaflet.Map): RotationState {
   let state = rotations.get(map)
   if (!state) {
-    state = { bearing: 0, enabled: false, apply() {} }
+    state = { bearing: 0, enabled: false, turn() {}, apply() {} }
     rotations.set(map, state)
   }
 
@@ -46,10 +47,18 @@ function rotateAroundCenter(
 export interface RotationProps {
   /** Disable rotation temporarily while preserving the current bearing. */
   enabled?: boolean
+  /** Animate bearing changes. Respects prefers-reduced-motion. */
+  animate?: boolean
+  /** Rotation animation duration in milliseconds. */
+  duration?: number
 }
 
 /** Rotate the map pane and restore native coordinate conversions on cleanup. */
-export function Rotation({ enabled = true }: RotationProps) {
+export function Rotation({
+  enabled = true,
+  animate = true,
+  duration = 300,
+}: RotationProps) {
   const { map, leaflet } = useMapContext()
 
   useEffect(() => {
@@ -78,7 +87,16 @@ export function Rotation({ enabled = true }: RotationProps) {
       HTMLElement,
       { origin: string; suffix: string }
     >()
+    const overlayObserverOptions = {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["style", "class"],
+    }
     const updateOverlays = () => {
+      // Observe Leaflet's changes, but never feed our own style writes back
+      // into the observer (CSS serialization can round animated angles).
+      overlayObserver.disconnect()
       const popupOrigins = new Map<HTMLElement, string>()
       map.eachLayer((layer) => {
         if (!(layer instanceof leaflet.Popup)) return
@@ -115,6 +133,14 @@ export function Rotation({ enabled = true }: RotationProps) {
         saved.suffix = enabled ? `rotate(${-state.bearing}deg)` : ""
         const next = [transform, saved.suffix].filter(Boolean).join(" ")
         if (element.style.transform !== next) element.style.transform = next
+        // Browsers round fractional angles when serializing CSS. Remember the
+        // serialized suffix so the next update replaces it instead of appending
+        // another rotation and triggering an endless MutationObserver loop.
+        if (saved.suffix) {
+          saved.suffix = element.style.transform.slice(
+            element.style.transform.lastIndexOf("rotate("),
+          )
+        }
         const origin = !enabled
           ? saved.origin
           : (popupOrigins.get(element) ??
@@ -122,15 +148,11 @@ export function Rotation({ enabled = true }: RotationProps) {
         if (element.style.transformOrigin !== origin)
           element.style.transformOrigin = origin
       }
+      overlayObserver.observe(map.getContainer(), overlayObserverOptions)
     }
     // Leaflet replaces transforms during pan, zoom, drag and icon changes.
     const overlayObserver = new window.MutationObserver(updateOverlays)
-    overlayObserver.observe(map.getContainer(), {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["style", "class"],
-    })
+    overlayObserver.observe(map.getContainer(), overlayObserverOptions)
     // Leaflet coordinates are unrotated; both conversions must match the CSS rotation.
     const rotate = (point: Leaflet.Point, angle: number) =>
       rotateAroundCenter(leaflet, point, map.getSize().divideBy(2), angle)
@@ -183,10 +205,58 @@ export function Rotation({ enabled = true }: RotationProps) {
         map,
         rotate(leaflet.point(point), enabled ? -state.bearing : 0),
       )
+    let frame: number | undefined
+    let target = state.bearing
+    const normalize = (angle: number) => ((angle % 360) + 360) % 360
+    state.turn = (degrees) => {
+      if (degrees !== null && (!enabled || !Number.isFinite(degrees))) return
+      if (frame !== undefined) window.cancelAnimationFrame(frame)
+      frame = undefined
+      target = degrees === null ? 0 : target + degrees
+      const start = state.bearing
+      // Reset north takes the shortest route; rotateBy preserves direction.
+      const end =
+        degrees === null
+          ? start + ((540 - normalize(start)) % 360) - 180
+          : target
+      const finish = () => {
+        state.bearing = normalize(end)
+        target = state.bearing
+        state.apply()
+      }
+      if (
+        !enabled ||
+        !animate ||
+        !Number.isFinite(duration) ||
+        duration <= 0 ||
+        window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+      ) {
+        finish()
+        return
+      }
+      target = end
+      const started = window.performance.now()
+      const tick = (now: number) => {
+        const progress = Math.min(1, Math.max(0, (now - started) / duration))
+        if (progress === 1) {
+          frame = undefined
+          finish()
+          return
+        }
+        const eased = 1 - (1 - progress) ** 3
+        state.bearing = start + (end - start) * eased
+        state.apply()
+        frame = window.requestAnimationFrame(tick)
+      }
+      frame = window.requestAnimationFrame(tick)
+    }
     map.on("move resize zoom", state.apply)
     state.apply()
 
     return () => {
+      if (frame !== undefined) window.cancelAnimationFrame(frame)
+      state.bearing = normalize(target)
+      state.turn = () => {}
       overlayObserver.disconnect()
       for (const [element, saved] of overlayStyles) {
         if (saved.suffix && element.style.transform.endsWith(saved.suffix)) {
@@ -213,7 +283,7 @@ export function Rotation({ enabled = true }: RotationProps) {
       state.enabled = false
       state.apply = () => {}
     }
-  }, [map, leaflet, enabled])
+  }, [map, leaflet, enabled, animate, duration])
 
   return null
 }
