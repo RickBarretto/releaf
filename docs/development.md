@@ -48,11 +48,16 @@ bun run storybook
 Open **http://localhost:6006**. Storybook imports the library source directly,
 so edits to `src/` refresh the examples without rebuilding `dist/`.
 
-The examples use a local [shadcn/ui](https://ui.shadcn.com/docs/installation/manual)
-Button in `stories/components/ui/`, Tailwind CSS v4, and Lucide icons. All UI
-dependencies are development dependencies; the published package still contains
-only `dist/`. `components.json` points future shadcn additions at the stories
-folder, using the `@/` alias.
+The library owns its [shadcn/ui](https://ui.shadcn.com/docs/installation/manual)
+Button and Input in `src/components/ui/`, with shared utilities in `src/lib/`.
+Map actions and search use these primitives internally; Storybook shares the same
+Button. `components.json` targets `src/` through the root TypeScript `@/` alias.
+Storybook retains its own `@/` alias for example imports.
+
+UI runtime dependencies are published dependencies. The build emits
+`dist/styles.css` using Tailwind v4 through Vite; consumers import
+`releaf/styles.css` without needing Tailwind. The stylesheet excludes Preflight
+and uses inherited shadcn theme tokens with neutral fallbacks.
 
 ```sh
 bun run build-storybook       # Generate storybook-static/

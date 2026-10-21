@@ -10,6 +10,8 @@ import {
   useState,
 } from "react"
 
+import { Input as UIInput } from "./components/ui/input"
+
 export interface SearchPlace {
   id?: string | number
   label: string
@@ -160,7 +162,7 @@ function Input({
   const state = useSearch()
 
   return (
-    <input
+    <UIInput
       aria-label="Search places"
       {...props}
       role="combobox"

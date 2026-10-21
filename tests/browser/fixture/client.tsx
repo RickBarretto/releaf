@@ -1,5 +1,6 @@
 import { createRoot, hydrateRoot } from "react-dom/client"
 import "leaflet/dist/leaflet.css"
+import "releaf/styles.css"
 import { App } from "./app"
 
 const host = document.getElementById("root")!

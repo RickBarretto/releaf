@@ -55,7 +55,11 @@ describe("Map DSL", () => {
         ".leaflet-bottom.leaflet-left [data-testid=toolbar]",
       ),
     ).not.toBeNull()
-    const zoom = document.querySelector('[aria-label="Zoom in"]')!
+    const zoom = document.querySelector(
+      '[data-testid="toolbar"] [aria-label="Zoom in"]',
+    )!
+    expect(zoom.getAttribute("data-slot")).toBe("button")
+    expect(document.querySelector("button")?.querySelector("button")).toBeNull()
     await act(async () => {
       zoom.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }))
     })

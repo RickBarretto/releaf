@@ -127,7 +127,7 @@ test("popups stay upright when opened and updated on a rotated map", async ({
   }
   const initialPosition = await relativePosition()
   const assertUpright = async () => {
-    const dimensions = await popup.evaluate((element) => ({
+    const dimensions = await popup.evaluate((element: HTMLElement) => ({
       width: element.getBoundingClientRect().width,
       height: element.getBoundingClientRect().height,
       layoutWidth: element.offsetWidth,
@@ -235,4 +235,16 @@ test("server markup hydrates and becomes interactive without errors", async ({
   await expect(page.locator(".leaflet-container")).toBeVisible()
   await page.getByRole("button", { name: "Zoom in", exact: true }).click()
   await expect.poll(async () => (await view(page)).zoom).toBe(6)
+})
+
+test("internal shadcn controls load packaged styles and inherit theme tokens", async ({
+  page,
+}) => {
+  const button = page.locator('[data-slot="button"]').first()
+  await expect(button).toHaveCSS("height", "36px")
+  await expect(button).toHaveCSS("background-color", "rgb(23, 23, 23)")
+  await page.evaluate(() => {
+    document.documentElement.style.setProperty("--primary", "rgb(20, 100, 60)")
+  })
+  await expect(button).toHaveCSS("background-color", "rgb(20, 100, 60)")
 })

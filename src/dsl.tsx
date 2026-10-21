@@ -10,6 +10,7 @@ import {
   useState,
 } from "react"
 import { createPortal } from "react-dom"
+import { Button } from "./components/ui/button"
 import { useMap, useMapContext } from "./context"
 import type { MarkerProps, TileLayerProps } from "./layers"
 import { Marker, TileLayer } from "./layers"
@@ -199,9 +200,9 @@ function Action({
   }
 
   return (
-    <button type="button" {...props} onClick={click}>
+    <Button {...props} onClick={click}>
       {children}
-    </button>
+    </Button>
   )
 }
 

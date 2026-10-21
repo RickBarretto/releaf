@@ -44,7 +44,7 @@
       }
     },
     {
-      "includes": ["stories/**/*.css"],
+      "includes": ["stories/**/*.css", "src/**/*.css"],
       "css": {
         "parser": {
           "tailwindDirectives": true

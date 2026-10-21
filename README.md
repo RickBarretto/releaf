@@ -8,12 +8,12 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-typed-3178c6?logo=typescript&logoColor=white)](src/index.ts)
 
 Build location pickers, searchable maps, and dashboards with typed React
-components for Leaflet. Bring your own UI—including shadcn/ui.
+components for Leaflet. Built-in controls use shadcn/ui, with support for your own components.
 
 ## At a Glance
 
 - **Composable:** markers, popups, shapes, GeoJSON, and tile layers.
-- **Customizable:** unstyled controls that fit your design system.
+- **Customizable:** shadcn/ui controls that fit your design system.
 - **Interactive:** zoom, rotation, fly-to, and search with your provider.
 - **React-ready:** typed hooks, refs, and server rendering support.
 
@@ -30,6 +30,7 @@ bun add releaf leaflet react react-dom
 "use client";
 
 import "leaflet/dist/leaflet.css";
+import "releaf/styles.css";
 import { Map } from "releaf";
 
 export function CityMap() {
@@ -44,6 +45,11 @@ export function CityMap() {
 ```
 
 ## shadcn/ui
+
+Map actions and search inputs use internal shadcn/ui components. Import
+`releaf/styles.css` once for compiled styles; Tailwind is not required in your app.
+Styles omit Tailwind Preflight and inherit your shadcn theme variables, with neutral
+fallback colors. You can still supply custom child buttons.
 
 In an [existing shadcn/ui app](https://ui.shadcn.com/docs/installation), add a
 [Button](https://ui.shadcn.com/docs/components/button):

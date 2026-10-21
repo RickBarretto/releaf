@@ -25,6 +25,9 @@ describe("search contracts", () => {
         <SearchBar.Results />
       </SearchBar>,
     )
+    expect(document.querySelector("input")?.getAttribute("data-slot")).toBe(
+      "input",
+    )
     await type(" ")
     await type("a")
     expect(calls).toEqual([])
