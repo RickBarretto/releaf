@@ -1,5 +1,5 @@
 {
   "bun.test.enable": false,
-  "playwright.showBrowser": false,
+  "playwright.reuseBrowser": false,
   "playwright.showTrace": false
 }
