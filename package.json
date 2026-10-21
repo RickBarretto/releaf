@@ -1,0 +1,58 @@
+{
+  "name": "releaf",
+  "version": "0.1.0",
+  "description": "A lean, typed React wrapper for Leaflet.",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./events": {
+      "types": "./dist/events.d.ts",
+      "import": "./dist/events.js"
+    }
+  },
+  "scripts": {
+    "build": "rm -rf dist && bun build src/index.ts src/events.ts --outdir dist --splitting --packages external --production --banner '\"use client\";' && tsc -p tsconfig.build.json",
+    "test": "bun run build && bun test",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run build",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "storybook": "storybook dev -p 6006 --no-open",
+    "build-storybook": "storybook build",
+    "typecheck:stories": "tsc -p tsconfig.storybook.json --noEmit"
+  },
+  "dependencies": {
+    "@types/leaflet": "^1.9.21"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.0.0",
+    "@biomejs/biome": "2.4.15",
+    "storybook": "10.5.7",
+    "@storybook/react-vite": "10.5.7",
+    "@storybook/addon-docs": "10.5.7",
+    "vite": "7.3.7",
+    "@tailwindcss/vite": "4.3.3",
+    "tailwindcss": "4.3.3",
+    "@radix-ui/react-slot": "1.3.3",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "tailwind-merge": "3.6.0",
+    "lucide-react": "1.33.0",
+    "@types/node": "^22.0.0"
+  },
+  "peerDependencies": {
+    "leaflet": "^1.9.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}

@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build output and coverage
+dist/
+coverage/
+storybook-static/
+*.tsbuildinfo
+
+# Local environment variables
+.env
+.env.*
+!.env.example
+
+# Logs and caches
+*.log
+.cache/
+.vite/
+
+# OS files
+.DS_Store
+Thumbs.db
