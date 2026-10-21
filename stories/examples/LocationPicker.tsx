@@ -28,7 +28,6 @@ import {
   TooltipTrigger,
 } from "../../src/components/ui/tooltip"
 import { Button } from "../components/ui/button"
-import "./location-picker.css"
 
 const panel = "w-80 max-w-[calc(100vw-100px)]"
 
@@ -238,14 +237,14 @@ function PickerControls() {
 /** Complete provider-independent picker; tileUrl lets tests run without network services. */
 export function LocationPicker({ tileUrl }: { tileUrl?: string }) {
   return (
-    <section className="location-picker">
+    <section className="mx-auto max-w-5xl font-sans">
       <h1>Choose a location</h1>
       <p>
         Search, use your current location, or drag the marker. Location access
         requires HTTPS or localhost.
       </p>
       <ReleafMap.Root
-        className="location-picker-map"
+        className="mt-4 h-[600px] overflow-hidden rounded-xl border border-border"
         aria-label="Location picker map"
         initialCenter={[initial.latitude, initial.longitude]}
         initialZoom={13}
