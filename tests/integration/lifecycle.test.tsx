@@ -7,15 +7,8 @@ import { cleanup, observers, render, waitFor } from "./helpers"
 
 afterEach(cleanup)
 
-const {
-  MapContainer,
-  Marker,
-  Popup,
-  Tooltip,
-  useMap,
-  useLeaflet,
-  Map: ReleafMap,
-} = await import("../../src/index")
+const { MapContainer, Marker, Popup, Tooltip, useMap, useLeaflet, Map } =
+  await import("../../src/index")
 class Boundary extends Component<
   { children: ReactNode },
   { error: string | null }
@@ -130,18 +123,16 @@ test("nested popup and tooltip bindings detach while the parent survives", async
 
 test("zoom limits restore when controls unmount", async () => {
   const ref = createRef<L.Map>()
-  await render(
-    <ReleafMap.Root ref={ref} options={{ minZoom: 2, maxZoom: 18 }} />,
-  )
+  await render(<Map.Root ref={ref} options={{ minZoom: 2, maxZoom: 18 }} />)
   const map = ref.current!
   await render(
-    <ReleafMap.Root ref={ref}>
-      <ReleafMap.Zoom zoom={5} minZoom={3} maxZoom={10} />
-    </ReleafMap.Root>,
+    <Map.Root ref={ref}>
+      <Map.Zoom zoom={5} minZoom={3} maxZoom={10} />
+    </Map.Root>,
   )
   expect(map.getMinZoom()).toBe(3)
   expect(map.getMaxZoom()).toBe(10)
-  await render(<ReleafMap.Root ref={ref} />)
+  await render(<Map.Root ref={ref} />)
   expect(map.getMinZoom()).toBe(2)
   expect(map.getMaxZoom()).toBe(18)
 })

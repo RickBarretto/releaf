@@ -1,9 +1,9 @@
 import type * as L from "leaflet"
 import { StrictMode, useState } from "react"
 import {
+  Map,
   MapContainer,
   type Position,
-  Map as ReleafMap,
   useMapEvents,
   useMapView,
 } from "releaf"
@@ -38,8 +38,8 @@ export function App() {
             }}
             fallback={<p>Loading map</p>}
           >
-            <ReleafMap.Tiles.Custom url="/tiles/{z}/{x}/{y}.svg" />
-            <ReleafMap.Marker
+            <Map.Tiles.Custom url="/tiles/{z}/{x}/{y}.svg" />
+            <Map.Marker
               position={[0, 0]}
               options={{ draggable: true }}
               eventHandlers={{
@@ -50,11 +50,11 @@ export function App() {
                 },
               }}
             >
-              <ReleafMap.Popup>
+              <Map.Popup>
                 <Counter />
-              </ReleafMap.Popup>
-              <ReleafMap.Tooltip>Marker tooltip</ReleafMap.Tooltip>
-            </ReleafMap.Marker>
+              </Map.Popup>
+              <Map.Tooltip>Marker tooltip</Map.Tooltip>
+            </Map.Marker>
             <Status />
           </MapContainer>
         )}
@@ -81,25 +81,25 @@ function Status() {
       <output data-testid="view">{JSON.stringify(view)}</output>
       <output data-testid="click">{JSON.stringify(clicked)}</output>
       <output data-testid="selected">{selected}</output>
-      <ReleafMap.Toolbar bottom left>
-        <ReleafMap.Actions.ZoomIn />
-        <ReleafMap.Actions.ZoomOut />
-        <ReleafMap.Actions.FlyTo
+      <Map.Toolbar bottom left>
+        <Map.Actions.ZoomIn />
+        <Map.Actions.ZoomOut />
+        <Map.Actions.FlyTo
           position={{ latitude: 2, longitude: 2 }}
           zoom={6}
           options={{ animate: false }}
         >
           Fly home
-        </ReleafMap.Actions.FlyTo>
-        <ReleafMap.SearchBar
+        </Map.Actions.FlyTo>
+        <Map.SearchBar
           debounceMs={0}
           search={(q) => [{ label: `${q} City` }, { label: `${q} Town` }]}
           onSelect={(p) => setSelected(p.label)}
         >
-          <ReleafMap.SearchBar.Input />
-          <ReleafMap.SearchBar.Results />
-        </ReleafMap.SearchBar>
-      </ReleafMap.Toolbar>
+          <Map.SearchBar.Input />
+          <Map.SearchBar.Results />
+        </Map.SearchBar>
+      </Map.Toolbar>
     </>
   )
 }

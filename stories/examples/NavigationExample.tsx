@@ -1,4 +1,4 @@
-import { Map as ReleafMap } from "releaf"
+import { Map } from "releaf"
 
 import { Frame, home } from "./MapFrame"
 
@@ -11,15 +11,15 @@ export function Playground({ zoom }: { zoom: number }) {
       description="Pan the map, open a marker, or try the navigation toolbar. Adjust zoom in Storybook Controls."
       zoom={zoom}
     >
-      <ReleafMap.Marker position={home}>
-        <ReleafMap.Popup>
+      <Map.Marker position={home}>
+        <Map.Popup>
           <strong>Home</strong>
           <p>London, United Kingdom</p>
-        </ReleafMap.Popup>
-      </ReleafMap.Marker>
-      <ReleafMap.Marker position={{ latitude: 51.515, longitude: -0.09 }}>
-        <ReleafMap.Popup>Another stop</ReleafMap.Popup>
-      </ReleafMap.Marker>
+        </Map.Popup>
+      </Map.Marker>
+      <Map.Marker position={{ latitude: 51.515, longitude: -0.09 }}>
+        <Map.Popup>Another stop</Map.Popup>
+      </Map.Marker>
       <Navigation />
     </Frame>
   )

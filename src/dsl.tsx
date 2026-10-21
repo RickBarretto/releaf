@@ -329,7 +329,7 @@ function OpenStreetMap(props: Omit<CustomTilesProps, "url">) {
   )
 }
 
-const ReleafMap = {
+const Map = {
   Root: MapContainer,
   View,
   Zoom,
@@ -343,4 +343,4 @@ const ReleafMap = {
   useController,
 }
 
-export { ReleafMap as Map }
+export { Map }

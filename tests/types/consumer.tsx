@@ -1,10 +1,10 @@
 import type * as L from "leaflet"
 import { createRef } from "react"
 import {
+  Map,
   MapContainer,
   Marker,
   type Position,
-  Map as ReleafMap,
   SearchBar,
   useMapEvents,
 } from "releaf"
@@ -14,8 +14,8 @@ const position: Position = { latitude: 1, longitude: 2 }
 export const valid = (
   <MapContainer ref={createRef<L.Map>()}>
     <Marker ref={createRef<L.Marker>()} position={[1, 2]} />
-    <ReleafMap.Marker position={position} />
-    <ReleafMap.Actions.FlyTo position={position} />
+    <Map.Marker position={position} />
+    <Map.Actions.FlyTo position={position} />
     <SearchBar
       search={() => [{ name: "City" }]}
       getLabel={(p) => p.name}
@@ -49,4 +49,4 @@ export const badSearch = (
   <SearchBar search={() => [{ name: "City" }]} onSelect={() => {}} />
 )
 // @ts-expect-error DSL positions cannot be strings
-export const badMarker = <ReleafMap.Marker position="city" />
+export const badMarker = <Map.Marker position="city" />

@@ -6,7 +6,7 @@ import { cleanup, click, observers, render, waitFor } from "./helpers"
 afterEach(cleanup)
 
 const {
-  Map: ReleafMap,
+  Map,
   MapContainer,
   MapView,
   Marker,
@@ -217,33 +217,33 @@ test("GeoJSON clears absent data and does not replace unchanged features", async
 
 test("actions compose handlers, cancellation, disabled children and controller methods", async () => {
   const ref = createRef<Leaflet.Map>()
-  let controller!: ReturnType<typeof ReleafMap.useController>
+  let controller!: ReturnType<typeof Map.useController>
   const calls: string[] = []
   function Controls() {
-    controller = ReleafMap.useController()
+    controller = Map.useController()
     return (
-      <ReleafMap.Toolbar>
-        <ReleafMap.Actions.ZoomIn onClick={() => calls.push("parent")}>
+      <Map.Toolbar>
+        <Map.Actions.ZoomIn onClick={() => calls.push("parent")}>
           <button type="button" onClick={() => calls.push("child")}>
             Go
           </button>
-        </ReleafMap.Actions.ZoomIn>
-        <ReleafMap.Actions.ZoomOut onClick={(e) => e.preventDefault()}>
+        </Map.Actions.ZoomIn>
+        <Map.Actions.ZoomOut onClick={(e) => e.preventDefault()}>
           Cancel
-        </ReleafMap.Actions.ZoomOut>
-        <ReleafMap.Actions.ZoomIn>
+        </Map.Actions.ZoomOut>
+        <Map.Actions.ZoomIn>
           <button type="button" disabled>
             Disabled
           </button>
-        </ReleafMap.Actions.ZoomIn>
-        <ReleafMap.Actions.Locate options={{ setView: false }} />
-      </ReleafMap.Toolbar>
+        </Map.Actions.ZoomIn>
+        <Map.Actions.Locate options={{ setView: false }} />
+      </Map.Toolbar>
     )
   }
   await render(
-    <ReleafMap.Root ref={ref}>
+    <Map.Root ref={ref}>
       <Controls />
-    </ReleafMap.Root>,
+    </Map.Root>,
   )
   const map = ref.current!,
     zoom = map.getZoom()
@@ -389,17 +389,17 @@ test("layer and overlay classes update without replacing Leaflet classes", async
   const tree = (className?: string) => (
     <MapContainer>
       <Marker ref={ref} position={[0, 0]} className={className}>
-        <ReleafMap.Popup open className={className}>
+        <Map.Popup open className={className}>
           Content
-        </ReleafMap.Popup>
+        </Map.Popup>
       </Marker>
-      <ReleafMap.Toolbar>
-        <ReleafMap.Actions.ZoomIn className="h-8">
+      <Map.Toolbar>
+        <Map.Actions.ZoomIn className="h-8">
           <button type="button" className="h-9 custom-button">
             Zoom
           </button>
-        </ReleafMap.Actions.ZoomIn>
-      </ReleafMap.Toolbar>
+        </Map.Actions.ZoomIn>
+      </Map.Toolbar>
     </MapContainer>
   )
   await render(tree("first"))
@@ -431,7 +431,7 @@ test.each([
       {kind === "MapView" ? (
         <MapView center={[latitude, 0]} zoom={2} animate={animate} />
       ) : (
-        <ReleafMap.View position={[latitude, 0]} zoom={2} animate={animate} />
+        <Map.View position={[latitude, 0]} zoom={2} animate={animate} />
       )}
     </MapContainer>
   )

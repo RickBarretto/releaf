@@ -1,6 +1,6 @@
 import { WifiOff } from "lucide-react"
 
-import { Map as ReleafMap } from "releaf"
+import { Map } from "releaf"
 
 import {
   Card,
@@ -23,14 +23,14 @@ export function OfflinePreviewExample({ online }: { online: boolean }) {
       tiles={online}
     >
       {!online && (
-        <ReleafMap.Tiles.Custom
+        <Map.Tiles.Custom
           url={grid}
           attribution="Local schematic grid · Not geographic map data"
         />
       )}
-      <ReleafMap.Marker position={home}>
-        <ReleafMap.Popup>Home in London</ReleafMap.Popup>
-      </ReleafMap.Marker>
+      <Map.Marker position={home}>
+        <Map.Popup>Home in London</Map.Popup>
+      </Map.Marker>
       {online ? (
         <Navigation />
       ) : (

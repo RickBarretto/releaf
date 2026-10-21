@@ -4,7 +4,7 @@ import { useState } from "react"
 
 import type { Position } from "releaf"
 
-import { Map as ReleafMap } from "releaf"
+import { Map } from "releaf"
 
 import { useMapEvents } from "releaf/events"
 
@@ -34,7 +34,7 @@ function Picker() {
   }
   return (
     <>
-      <ReleafMap.Toolbar bottom left>
+      <Map.Toolbar bottom left>
         <div className={`${panel} max-w-72 space-y-2 p-3`}>
           <p className="text-sm">
             {selected
@@ -55,8 +55,8 @@ function Picker() {
             {status}
           </p>
         </div>
-      </ReleafMap.Toolbar>
-      {selected && <ReleafMap.Marker position={selected} />}
+      </Map.Toolbar>
+      {selected && <Map.Marker position={selected} />}
     </>
   )
 }

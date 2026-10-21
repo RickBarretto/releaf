@@ -6,7 +6,7 @@ import { cleanup, dom, render, waitFor } from "./helpers"
 // Test the published bundle, including its external imports and client boundary.
 afterEach(cleanup)
 
-const { Map: ReleafMap } = await import("../../src/index")
+const { Map } = await import("../../src/index")
 
 describe("Map DSL", () => {
   test("composes view, tiles, positions, controls with cleanup", async () => {
@@ -14,34 +14,25 @@ describe("Map DSL", () => {
     const markerRef = createRef<L.Marker>()
     function Controls() {
       return (
-        <ReleafMap.Toolbar bottom left data-testid="toolbar">
-          <ReleafMap.Actions.ZoomIn />
-          <ReleafMap.Actions.FlyTo
-            position={{ latitude: 5, longitude: 6 }}
-            zoom={8}
-          >
+        <Map.Toolbar bottom left data-testid="toolbar">
+          <Map.Actions.ZoomIn />
+          <Map.Actions.FlyTo position={{ latitude: 5, longitude: 6 }} zoom={8}>
             <button type="button">Home</button>
-          </ReleafMap.Actions.FlyTo>
-        </ReleafMap.Toolbar>
+          </Map.Actions.FlyTo>
+        </Map.Toolbar>
       )
     }
     const tree = () => (
       <StrictMode>
-        <ReleafMap.Root ref={mapRef} options={{ zoomAnimation: false }}>
-          <ReleafMap.View
-            position={{ latitude: 1, longitude: 2 }}
-            animate={false}
-          />
-          <ReleafMap.Zoom zoom={7} minZoom={3} maxZoom={19} />
-          <ReleafMap.Tiles.OpenStreetMap />
-          <ReleafMap.Marker
-            ref={markerRef}
-            position={{ latitude: 1, longitude: 2 }}
-          >
-            <ReleafMap.Popup>Home</ReleafMap.Popup>
-          </ReleafMap.Marker>
+        <Map.Root ref={mapRef} options={{ zoomAnimation: false }}>
+          <Map.View position={{ latitude: 1, longitude: 2 }} animate={false} />
+          <Map.Zoom zoom={7} minZoom={3} maxZoom={19} />
+          <Map.Tiles.OpenStreetMap />
+          <Map.Marker ref={markerRef} position={{ latitude: 1, longitude: 2 }}>
+            <Map.Popup>Home</Map.Popup>
+          </Map.Marker>
           <Controls />
-        </ReleafMap.Root>
+        </Map.Root>
       </StrictMode>
     )
     await render(tree())
@@ -63,7 +54,7 @@ describe("Map DSL", () => {
       zoom.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }))
     })
     expect(map.getZoom()).toBe(8)
-    await render(<ReleafMap.Root ref={mapRef} />)
+    await render(<Map.Root ref={mapRef} />)
     expect(document.querySelector("[data-testid=toolbar]")).toBeNull()
   })
 
@@ -76,9 +67,9 @@ describe("Map DSL", () => {
       return null
     }
     const tree = (label: string) => (
-      <ReleafMap.Root ref={mapRef}>
+      <Map.Root ref={mapRef}>
         <Listener label={label} />
-      </ReleafMap.Root>
+      </Map.Root>
     )
     await render(tree("first"))
     await act(async () => {
@@ -103,14 +94,14 @@ describe("Map DSL", () => {
     const search = (query: string) =>
       new Promise<{ label: string }[]>((resolve) => pending.set(query, resolve))
     await render(
-      <ReleafMap.SearchBar
+      <Map.SearchBar
         search={search}
         onSelect={(place) => selected.push(place)}
         debounceMs={0}
       >
-        <ReleafMap.SearchBar.Input />
-        <ReleafMap.SearchBar.Results />
-      </ReleafMap.SearchBar>,
+        <Map.SearchBar.Input />
+        <Map.SearchBar.Results />
+      </Map.SearchBar>,
     )
     const input = document.querySelector("input")!
     async function type(value: string) {

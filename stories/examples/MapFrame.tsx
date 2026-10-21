@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { type Position, Map as ReleafMap } from "releaf"
+import { Map, type Position } from "releaf"
 
 export const home: Position = { latitude: 51.5074, longitude: -0.1278 }
 export const panel =
@@ -27,16 +27,16 @@ export function Frame({
         <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
         <p className="text-sm text-muted-foreground">{description}</p>
       </header>
-      <ReleafMap.Root
+      <Map.Root
         className="demo-map relative h-[520px]"
         options={{ zoomControl: false, zoomAnimation: false }}
         fallback={<p>Loading map…</p>}
       >
-        <ReleafMap.View position={home} />
-        <ReleafMap.Zoom zoom={zoom} minZoom={3} maxZoom={19} />
-        {tiles && <ReleafMap.Tiles.OpenStreetMap />}
+        <Map.View position={home} />
+        <Map.Zoom zoom={zoom} minZoom={3} maxZoom={19} />
+        {tiles && <Map.Tiles.OpenStreetMap />}
         {children}
-      </ReleafMap.Root>
+      </Map.Root>
     </section>
   )
 }
