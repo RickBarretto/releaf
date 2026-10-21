@@ -1,7 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test"
-import { JSDOM } from "jsdom"
 import type * as L from "leaflet"
-import type { ReactNode } from "react"
 import {
   act,
   createContext,
@@ -10,48 +8,12 @@ import {
   useContext,
   useState,
 } from "react"
+import { cleanup, dom, observers, render, unmount } from "./helpers"
 
-const dom = new JSDOM("<!doctype html><html><body></body></html>", {
-  url: "http://localhost",
-  pretendToBeVisual: true,
-})
-Object.assign(globalThis, {
-  window: dom.window,
-  document: dom.window.document,
-  navigator: dom.window.navigator,
-  HTMLElement: dom.window.HTMLElement,
-  Element: dom.window.Element,
-  SVGElement: dom.window.SVGElement,
-  getComputedStyle: dom.window.getComputedStyle,
-  IS_REACT_ACT_ENVIRONMENT: true,
-})
-Object.defineProperty(dom.window.SVGSVGElement.prototype, "createSVGRect", {
-  value: () => ({}),
-})
-Object.defineProperty(dom.window.HTMLElement.prototype, "clientWidth", {
-  get: () => 800,
-})
-Object.defineProperty(dom.window.HTMLElement.prototype, "clientHeight", {
-  get: () => 400,
-})
-
-const observers: Array<{ disconnected: boolean; callback: () => void }> = []
-globalThis.ResizeObserver = class {
-  entry = { disconnected: false, callback: () => this.callback() }
-  constructor(private callback: () => void) {
-    observers.push(this.entry)
-  }
-  observe() {}
-  unobserve() {}
-  disconnect() {
-    this.entry.disconnected = true
-  }
-} as unknown as typeof ResizeObserver
-
-const { createRoot } = await import("react-dom/client")
 // Test the published bundle, including its external imports and client boundary.
+afterEach(cleanup)
+
 const {
-  Map: ReleafMap,
   MapContainer,
   MapView,
   Marker,
@@ -70,32 +32,7 @@ const {
   useMap,
   useMapEvents,
   useMapView,
-} = await import("../dist/index.js")
-
-let root: ReturnType<typeof createRoot> | undefined
-let host: HTMLDivElement
-async function render(node: ReactNode) {
-  if (!root) {
-    host = document.createElement("div")
-    document.body.append(host)
-    root = createRoot(host)
-  }
-  await act(async () => {
-    root!.render(node)
-  })
-  // Leaflet is intentionally loaded asynchronously after the DOM commits.
-  for (let i = 0; i < 6; i++)
-    await act(async () => {
-      await Bun.sleep(5)
-    })
-}
-
-afterEach(async () => {
-  if (root) await act(async () => root!.unmount())
-  root = undefined
-  document.body.innerHTML = ""
-  observers.length = 0
-})
+} = await import("../../dist/index.js")
 
 describe("Releaf", () => {
   test("imports and renders on the server without browser globals", () => {
@@ -146,7 +83,7 @@ describe("Releaf", () => {
           />
           <Circle
             ref={circleRef}
-            center={[1, 2]}
+            center={updated ? [3, 4] : [1, 2]}
             radius={updated ? 200 : 100}
             pathOptions={{ color: updated ? "red" : "blue" }}
           />
@@ -187,14 +124,14 @@ describe("Releaf", () => {
     expect(marker.getLatLng().equals([10, 20])).toBe(true)
     expect(marker.dragging?.enabled()).toBe(true)
     expect(tileRef.current!.options.opacity).toBe(0.4)
+    expect(circleRef.current!.getLatLng().equals([3, 4])).toBe(true)
     expect(circleRef.current!.getRadius()).toBe(200)
     expect(circleRef.current!.options.color).toBe("red")
     let removed = false
     map.on("unload", () => {
       removed = true
     })
-    await act(async () => root!.unmount())
-    root = undefined
+    await unmount()
     expect(removed).toBe(true)
     expect(map.hasLayer(marker)).toBe(false)
     expect(mapRef.current).toBeNull()
@@ -323,17 +260,19 @@ describe("Releaf", () => {
       <MapContainer>
         <GeoJSON
           ref={geoRef}
-          data={{
-            type: "Feature",
-            properties: { id: updated ? 2 : 1 },
-            geometry: {
-              type: "LineString",
-              coordinates: [
-                [0, 0],
-                [1, 1],
-              ],
-            },
-          }}
+          data={
+            {
+              type: "Feature",
+              properties: { id: updated ? 2 : 1 },
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [0, 0],
+                  [1, 1],
+                ],
+              },
+            } as import("geojson").Feature
+          }
           pathOptions={{ color: updated ? "red" : "blue" }}
         />
         <ImageOverlay
@@ -415,161 +354,5 @@ describe("Releaf", () => {
     )
     await render(tree(false))
     expect(document.querySelector(".leaflet-popup")).toBeNull()
-  })
-})
-
-describe("Map DSL", () => {
-  test("composes view, tiles, positions, controls and rotation with cleanup", async () => {
-    const mapRef = createRef<L.Map>()
-    const markerRef = createRef<L.Marker>()
-    let controller: ReturnType<typeof ReleafMap.useController>
-    function Controls() {
-      controller = ReleafMap.useController()
-      return (
-        <ReleafMap.Toolbar bottom left data-testid="toolbar">
-          <ReleafMap.Actions.ZoomIn />
-          <ReleafMap.Actions.FlyTo
-            position={{ latitude: 5, longitude: 6 }}
-            zoom={8}
-          >
-            <button type="button">Home</button>
-          </ReleafMap.Actions.FlyTo>
-          <ReleafMap.Actions.ResetNorth />
-        </ReleafMap.Toolbar>
-      )
-    }
-    const tree = (enabled: boolean) => (
-      <StrictMode>
-        <ReleafMap.Root ref={mapRef} options={{ zoomAnimation: false }}>
-          <ReleafMap.View position={{ latitude: 1, longitude: 2 }} />
-          <ReleafMap.Zoom zoom={7} minZoom={3} maxZoom={19} />
-          <ReleafMap.Rotation enabled={enabled} />
-          <ReleafMap.Tiles.OpenStreetMap />
-          <ReleafMap.Marker
-            ref={markerRef}
-            position={{ latitude: 1, longitude: 2 }}
-          >
-            <ReleafMap.Popup>Home</ReleafMap.Popup>
-          </ReleafMap.Marker>
-          <Controls />
-        </ReleafMap.Root>
-      </StrictMode>
-    )
-    await render(tree(true))
-    const map = mapRef.current!
-    expect(map.getCenter().distanceTo([1, 2])).toBeLessThan(1000)
-    expect(map.getZoom()).toBe(7)
-    expect(markerRef.current!.getLatLng().equals([1, 2])).toBe(true)
-    expect(
-      document.querySelector(
-        ".leaflet-bottom.leaflet-left [data-testid=toolbar]",
-      ),
-    ).not.toBeNull()
-    const zoom = document.querySelector('[aria-label="Zoom in"]')!
-    await act(async () => {
-      zoom.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }))
-    })
-    expect(map.getZoom()).toBe(8)
-    await act(async () => {
-      controller!.rotateBy(45)
-    })
-    expect(map.getPane("mapPane")!.style.rotate).toBe("45deg")
-    const point = map.latLngToContainerPoint([2, 3])
-    expect(map.containerPointToLatLng(point).distanceTo([2, 3])).toBeLessThan(
-      1000,
-    )
-    await render(tree(false))
-    expect(map.getPane("mapPane")!.style.rotate).toBe("0deg")
-    await render(<ReleafMap.Root ref={mapRef} />)
-    expect(document.querySelector("[data-testid=toolbar]")).toBeNull()
-  })
-
-  test("events entry shares map context and exposes positions with fresh callbacks", async () => {
-    const { useMapEvents: useEvents } = await import("../dist/events.js")
-    const mapRef = createRef<L.Map>()
-    const calls: unknown[] = []
-    function Listener({ label }: { label: string }) {
-      useEvents({ click: (event) => calls.push([label, event.position]) })
-      return null
-    }
-    const tree = (label: string) => (
-      <ReleafMap.Root ref={mapRef}>
-        <Listener label={label} />
-      </ReleafMap.Root>
-    )
-    await render(tree("first"))
-    await act(async () => {
-      mapRef.current!.fire("click", { latlng: { lat: 1, lng: 2 } })
-    })
-    await render(tree("second"))
-    await act(async () => {
-      mapRef.current!.fire("click", { latlng: { lat: 3, lng: 4 } })
-    })
-    expect(calls).toEqual([
-      ["first", { latitude: 1, longitude: 2 }],
-      ["second", { latitude: 3, longitude: 4 }],
-    ])
-  })
-
-  test("search ignores stale responses and selects using keyboard", async () => {
-    const pending = new globalThis.Map<
-      string,
-      (places: { label: string }[]) => void
-    >()
-    const selected: unknown[] = []
-    const search = (query: string) =>
-      new Promise<{ label: string }[]>((resolve) => pending.set(query, resolve))
-    await render(
-      <ReleafMap.SearchBar
-        search={search}
-        onSelect={(place) => selected.push(place)}
-        debounceMs={0}
-      >
-        <ReleafMap.SearchBar.Input />
-        <ReleafMap.SearchBar.Results />
-      </ReleafMap.SearchBar>,
-    )
-    const input = document.querySelector("input")!
-    async function type(value: string) {
-      await act(async () => {
-        Object.getOwnPropertyDescriptor(
-          dom.window.HTMLInputElement.prototype,
-          "value",
-        )!.set!.call(input, value)
-        input.dispatchEvent(new dom.window.Event("input", { bubbles: true }))
-      })
-      await act(async () => {
-        await Bun.sleep(5)
-      })
-    }
-    await type("old")
-    await type("new")
-    await act(async () => {
-      pending.get("new")!([{ label: "New place" }])
-    })
-    await act(async () => {
-      pending.get("old")!([{ label: "Old place" }])
-    })
-    expect(document.querySelector('[role="option"]')!.textContent).toBe(
-      "New place",
-    )
-    await act(async () => {
-      input.dispatchEvent(
-        new dom.window.KeyboardEvent("keydown", {
-          key: "ArrowDown",
-          bubbles: true,
-        }),
-      )
-    })
-    await act(async () => {
-      input.dispatchEvent(
-        new dom.window.KeyboardEvent("keydown", {
-          key: "Enter",
-          bubbles: true,
-        }),
-      )
-    })
-    expect(selected).toEqual([{ label: "New place" }])
-    expect(input.value).toBe("New place")
   })
 })

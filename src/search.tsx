@@ -176,10 +176,14 @@ function Input({
           const count = state.results.length
           if (count)
             state.setActive(
-              (state.active +
-                (event.key === "ArrowDown" ? 1 : count - 1) +
-                count) %
-                count,
+              state.active < 0
+                ? event.key === "ArrowDown"
+                  ? 0
+                  : count - 1
+                : (state.active +
+                    (event.key === "ArrowDown" ? 1 : -1) +
+                    count) %
+                    count,
             )
         } else if (event.key === "Enter" && state.active >= 0) {
           event.preventDefault()

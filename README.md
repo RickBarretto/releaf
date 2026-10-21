@@ -143,11 +143,32 @@ bun run test
 bun run build
 ```
 
-Tests build and exercise the published ESM bundle against real Leaflet in jsdom,
-plus server rendering in a fresh process. jsdom is a development dependency;
-there is no browser test framework. Tests do not request real tiles. Visual tile
-rendering, gestures, and provider integration still need browser checks in the
-consuming app.
+Tests exercise the published ESM bundle against real Leaflet in jsdom, plus
+server rendering in fresh processes. Consumer type fixtures check the emitted
+declarations through `releaf` and `releaf/events`, including expected errors.
+
+```sh
+bun run test                 # Build and run Bun/jsdom integration tests
+bun run test:types           # Build and check test code and consumer types
+bunx playwright install --with-deps chromium firefox webkit
+bun run test:browser         # Build and run all three browser engines
+bun run test:browser --project=chromium
+bun run test:all             # Source types, integration, test types, browsers
+```
+
+Browser tests start a dedicated Vite fixture on `127.0.0.1:4173`, import the
+built package, and use local SVG tiles and local Leaflet marker images. They
+cover gestures, portals, search, resize, rotation, remounting, and SSR hydration.
+No tile provider or geocoding service is contacted. Browser binaries must be
+installed once; Linux may also require the system dependencies installed by
+`--with-deps`. Playwright keeps screenshots and traces for failures in
+`test-results/`; inspect a trace with `bunx playwright show-trace <trace.zip>`.
+Mobile touch gestures and external provider integration remain consuming-app
+checks.
+
+GitHub Actions runs integration tests, type checks, lint, and separate Chromium,
+Firefox, and WebKit jobs on pushes and pull requests. Dependency versions are
+recorded in `bun.lock`; CI installs with `bun install --frozen-lockfile`.
 
 The build emits an ESM bundle and `.d.ts` files in `dist/`, keeping peers external.
 `@types/leaflet` is the only direct dependency so consumers receive the Leaflet
