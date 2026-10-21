@@ -9,6 +9,41 @@ afterEach(cleanup)
 const { Map } = await import("../../src/index")
 
 describe("Map DSL", () => {
+  test("attribution defaults, overrides, and restores live provider credits", async () => {
+    const mapRef = createRef<L.Map>()
+    const tree = (custom: boolean) => (
+      <Map.Root ref={mapRef}>
+        <Map.Tiles.OpenStreetMap />
+        {custom && (
+          <Map.Attribution
+            top
+            left
+            prefix="Custom credits"
+            className="custom-attribution"
+          />
+        )}
+      </Map.Root>
+    )
+    await render(tree(false))
+    const footer = () => document.querySelector('[data-slot="map-footer"]')!
+    await waitFor(() => expect(footer()).not.toBeNull())
+    expect(footer().textContent).toContain("{Re}leaf")
+    expect(footer().textContent).toContain("OpenStreetMap")
+    await render(tree(true))
+    expect(
+      document.querySelectorAll(".leaflet-control-attribution"),
+    ).toHaveLength(1)
+    expect(footer().textContent).toContain("Custom credits")
+    expect(footer().textContent).toContain("OpenStreetMap")
+    expect(footer().classList.contains("custom-attribution")).toBe(true)
+    expect(mapRef.current!.attributionControl.getPosition()).toBe("topleft")
+    await render(tree(false))
+    expect(footer().textContent).toContain("{Re}leaf")
+    expect(footer().classList.contains("custom-attribution")).toBe(false)
+    expect(mapRef.current!.attributionControl.getPosition()).toBe("bottomright")
+    expect(Map.Attributtion).toBe(Map.Attribution)
+  })
+
   test("composes view, tiles, positions, controls with cleanup", async () => {
     const mapRef = createRef<L.Map>()
     const markerRef = createRef<L.Marker>()

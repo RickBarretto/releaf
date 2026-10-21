@@ -9,6 +9,7 @@ you need to implement your own controls.
 
 - [Setup](#setup)
 - [Map and coordinates](#map)
+- [Attribution](#mapattribution)
 - [Camera](#camera)
 - [Tiles](#tiles)
 - [Layers](#layers)
@@ -102,6 +103,33 @@ Use Tailwind utilities such as `h-96` in a Tailwind app, or pass a custom CSS
 class with a height rule (for example, `.city-map { height: 24rem; }`).
 `className` merges with the defaults using the same class-merging utility as
 shadcn/ui. The `style` prop is not supported.
+
+### `Map.Attribution`
+
+Every map includes a themed attribution footer by default. Add this component
+inside `Map.Root` or `MapContainer` to customize that footer. Tile-provider credits
+stay visible and update as layers change. Removing the component restores the default.
+`Map.Attributtion` is an alias; `MapAttribution` and `MapAttributionProps` are also exported.
+
+```tsx
+<Map.Root>
+  <Map.Tiles.OpenStreetMap />
+  <Map.Attribution bottom left prefix="My map" />
+</Map.Root>
+```
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `top` | `boolean` | `false` | Place the footer at the top. |
+| `bottom` | `boolean` | Bottom when `top` is omitted | Place the footer at the bottom; wins when both vertical flags are true. |
+| `left` | `boolean` | `false` | Place the footer on the left; wins when both horizontal flags are true. |
+| `right` | `boolean` | Right when `left` is omitted | Place the footer on the right. |
+| `prefix` | `string \| false` | Releaf and Leaflet links | Leaflet HTML prefix; `false` hides only the prefix. |
+| `className` | `string` | — | Additional footer classes. |
+
+Placement uses boolean props: `<Map.Attribution top right />`, for example.
+With no flags, placement is bottom right. There is no `position` prop.
+If multiple attribution components are mounted, the last registered one takes precedence.
 
 ### Coordinates
 
