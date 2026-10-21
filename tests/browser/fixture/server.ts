@@ -43,7 +43,7 @@ server.middlewares.use(async (req, res, next) => {
     )
     return
   }
-  if (req.url !== "/hydrate" && req.url !== "/") return next()
+  if (req.url !== "/hydrate" && req.url?.split("?")[0] !== "/") return next()
   try {
     const { App } = await server.ssrLoadModule("/app.tsx")
     const { createElement } = await import("react")
