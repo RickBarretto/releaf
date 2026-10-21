@@ -19,7 +19,7 @@ import { useMap, useMapContext } from "./context"
 import type { MarkerProps, TileLayerProps } from "./layers"
 import { Marker, TileLayer } from "./layers"
 import { cn } from "./lib/utils"
-import { MapContainer } from "./map"
+import { MapAttribution, MapContainer } from "./map"
 import type { PopupProps, TooltipProps } from "./overlays"
 import { Popup, Tooltip } from "./overlays"
 import { SearchBar } from "./search"
@@ -413,6 +413,8 @@ function FitBounds({ positions, options, ...props }: FitBoundsProps) {
 
 export const MapPrimitives = {
   Root: MapContainer,
+  Attribution: MapAttribution,
+  Attributtion: MapAttribution,
   View,
   Zoom,
   Toolbar,

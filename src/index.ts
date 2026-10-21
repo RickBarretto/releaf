@@ -72,6 +72,8 @@ export {
   useLocationRequest,
 } from "./location"
 export {
+  MapAttribution,
+  type MapAttributionProps,
   MapContainer,
   type MapContainerProps,
   MapView,

@@ -2,24 +2,76 @@
 
 import type * as Leaflet from "leaflet"
 import type { ComponentPropsWithoutRef, ReactNode, Ref } from "react"
-import { useEffect, useImperativeHandle, useRef, useState } from "react"
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react"
 import type { MapContextValue } from "./context"
 import { MapContext, useEventHandlers, useMapContext } from "./context"
 import { cn } from "./lib/utils"
 
+export interface MapAttributionProps {
+  top?: boolean
+  bottom?: boolean
+  left?: boolean
+  right?: boolean
+  /** HTML prefix, as supported by Leaflet. Provider credits remain visible. */
+  prefix?: string | false
+  className?: string
+}
+
+const AttributionContext = createContext<React.Dispatch<
+  React.SetStateAction<MapAttributionProps[]>
+> | null>(null)
+
+/** Customize the map's built-in attribution without duplicating provider credits. */
+export function MapAttribution({
+  top,
+  bottom,
+  left,
+  right,
+  prefix,
+  className,
+}: MapAttributionProps) {
+  const register = useContext(AttributionContext)
+  if (!register) throw new Error("Map.Attribution must be inside Map.Root")
+  useEffect(() => {
+    const configuration = { top, bottom, left, right, prefix, className }
+    register((current) => [...current, configuration])
+    return () =>
+      register((current) => current.filter((item) => item !== configuration))
+  }, [register, top, bottom, left, right, prefix, className])
+  return null
+}
+
 /** Keep Leaflet's live provider credits, with the same tokens as shadcn controls. */
-function AttributionFooter() {
+function AttributionFooter({
+  top,
+  bottom,
+  left,
+  prefix,
+  className,
+}: MapAttributionProps) {
   const { map } = useMapContext()
+  const position =
+    `${top && !bottom ? "top" : "bottom"}${left ? "left" : "right"}` as Leaflet.ControlPosition
 
   useEffect(() => {
     const control = map.attributionControl
-    const element = control?.getContainer()
-    if (!element) return
+    if (!control) return
 
     const previousPrefix = control.options.prefix
+    const previousPosition = control.getPosition()
+    control.setPosition(position)
+    const element = control.getContainer()
+    if (!element) return
     const branding =
       '<a href="https://github.com/RickBarretto/releaf">{Re}leaf</a> · Powered by <a href="https://leafletjs.com">Leaflet</a>'
-    control.setPrefix(branding)
+    control.setPrefix(prefix ?? branding)
     element.dataset.slot = "map-footer"
     element.setAttribute("aria-label", "Map copyright and contributors")
     // Leaflet styles are unlayered; important utilities keep its defaults from winning.
@@ -27,7 +79,8 @@ function AttributionFooter() {
       "box-border! max-w-[calc(100vw-2rem)]! m-2! px-2! py-1! border! border-solid! border-border! rounded-lg! bg-background! text-muted-foreground! shadow-[0_1px_3px_#0000001a]! font-[inherit]! text-[0.6875rem]! leading-normal!".split(
         " ",
       )
-    element.classList.add(...footerClasses)
+    const customClasses = className?.split(/\s+/).filter(Boolean) ?? []
+    element.classList.add(...footerClasses, ...customClasses)
     const styleLinks = () => {
       for (const link of element.querySelectorAll("a")) {
         link.className = cn(
@@ -45,11 +98,12 @@ function AttributionFooter() {
       control.setPrefix(
         typeof previousPrefix === "string" ? previousPrefix : false,
       )
-      element.classList.remove(...footerClasses)
+      control.setPosition(previousPosition)
+      element.classList.remove(...footerClasses, ...customClasses)
       delete element.dataset.slot
       element.removeAttribute("aria-label")
     }
-  }, [map])
+  }, [map, position, prefix, className])
 
   return null
 }
@@ -78,14 +132,17 @@ function Ready({
   eventHandlers?: Leaflet.LeafletEventHandlerFnMap
   children?: ReactNode
 }) {
+  const [attributions, setAttributions] = useState<MapAttributionProps[]>([])
   useImperativeHandle(mapRef, () => context.map, [context.map])
 
   useEventHandlers(context.map, eventHandlers)
 
   return (
     <MapContext value={context}>
-      <AttributionFooter />
-      {children}
+      <AttributionContext value={setAttributions}>
+        <AttributionFooter {...attributions.at(-1)} />
+        {children}
+      </AttributionContext>
     </MapContext>
   )
 }

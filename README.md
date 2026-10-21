@@ -151,3 +151,15 @@ See the [control and picker APIs](docs/api.md#composed-controls).
 - [DSL design](DSL.md) — the compound Map API.
 
 Try the demos locally: `bun install` → `bun run storybook` → **http://localhost:6006**.
+
+Every map includes a themed attribution footer with live tile-provider credits.
+Use `Map.Attribution` (`Map.Attributtion` is also supported) to customize it:
+
+```tsx
+<Map.Root>
+  <Map.Tiles.OpenStreetMap />
+  <Map.Attribution bottom left prefix="My map" />
+</Map.Root>
+```
+
+`prefix` accepts Leaflet HTML or `false` to hide the prefix while retaining provider credits.
