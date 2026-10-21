@@ -43,10 +43,12 @@ export function useLeaflet(): typeof Leaflet {
   return useMapContext().leaflet
 }
 
+/** Attach one listener per event name, dispatching to the latest committed callback. */
 export function useEventHandlers(
   target: Leaflet.Evented | null,
   handlers?: Leaflet.LeafletEventHandlerFnMap,
 ): void {
+  // A sorted name set keeps subscriptions stable across handler object recreation.
   const names = Object.keys(handlers ?? {})
     .sort()
     .join(" ")
@@ -105,6 +107,7 @@ export function useMapView(): MapViewSnapshot {
         snapshot.center[1] !== center.lng ||
         snapshot.zoom !== zoom
       ) {
+        // React requires referentially stable snapshots until the values change.
         snapshot = Object.freeze({
           center: Object.freeze([center.lat, center.lng] as const),
           zoom,

@@ -16,8 +16,12 @@ import { Marker, TileLayer } from "./layers"
 import { MapContainer } from "./map"
 import type { PopupProps, TooltipProps } from "./overlays"
 import { Popup, Tooltip } from "./overlays"
+import { getRotationState, Rotation } from "./rotation"
 import { SearchBar } from "./search"
 
+export type { RotationProps } from "./rotation"
+
+/** Geographic coordinates in degrees, independent of Leaflet tuple ordering. */
 export interface Position {
   latitude: number
   longitude: number
@@ -25,6 +29,7 @@ export interface Position {
 
 export type PositionExpression = Position | Leaflet.LatLngExpression
 
+/** Normalize named coordinates while preserving native Leaflet inputs. */
 export function toLatLng(
   position: PositionExpression,
 ): Leaflet.LatLngExpression {
@@ -33,24 +38,7 @@ export function toLatLng(
     : position
 }
 
-interface RotationState {
-  bearing: number
-  enabled: boolean
-  apply: () => void
-}
-
-const rotations = new WeakMap<Leaflet.Map, RotationState>()
-
-function rotation(map: Leaflet.Map): RotationState {
-  let state = rotations.get(map)
-  if (!state) {
-    state = { bearing: 0, enabled: false, apply() {} }
-    rotations.set(map, state)
-  }
-
-  return state
-}
-
+/** Stable imperative actions for the current map. Rotation requires <Map.Rotation>. */
 export function useController() {
   const map = useMap()
 
@@ -73,14 +61,14 @@ export function useController() {
           options,
         ),
       rotateBy: (degrees: number) => {
-        const state = rotation(map)
+        const state = getRotationState(map)
         if (state.enabled) {
           state.bearing = (((state.bearing + degrees) % 360) + 360) % 360
           state.apply()
         }
       },
       resetNorth: () => {
-        const state = rotation(map)
+        const state = getRotationState(map)
         state.bearing = 0
         state.apply()
       },
@@ -133,68 +121,8 @@ function Zoom({ zoom, minZoom, maxZoom }: ZoomProps) {
   return null
 }
 
-export interface RotationProps {
-  enabled?: boolean
-}
-
-function Rotation({ enabled = true }: RotationProps) {
-  const { map, leaflet } = useMapContext()
-
-  useEffect(() => {
-    const state = rotation(map)
-    const pane = map.getPane("mapPane")
-    if (!pane) return
-
-    const original = {
-      to: map.layerPointToContainerPoint,
-      from: map.containerPointToLayerPoint,
-      rotate: pane.style.rotate,
-      origin: pane.style.transformOrigin,
-    }
-    const rotate = (point: Leaflet.Point, angle: number) => {
-      const center = map.getSize().divideBy(2)
-      const p = point.subtract(center),
-        radians = (angle * Math.PI) / 180
-
-      return leaflet
-        .point(
-          p.x * Math.cos(radians) - p.y * Math.sin(radians),
-          p.x * Math.sin(radians) + p.y * Math.cos(radians),
-        )
-        .add(center)
-    }
-    state.enabled = enabled
-    state.apply = () => {
-      const offset = original.to.call(map, leaflet.point(0, 0))
-      const center = map.getSize().divideBy(2).subtract(offset)
-      pane.style.transformOrigin = `${center.x}px ${center.y}px`
-      pane.style.rotate = `${enabled ? state.bearing : 0}deg`
-    }
-    map.layerPointToContainerPoint = (point) =>
-      rotate(original.to.call(map, point), enabled ? state.bearing : 0)
-    map.containerPointToLayerPoint = (point) =>
-      original.from.call(
-        map,
-        rotate(leaflet.point(point), enabled ? -state.bearing : 0),
-      )
-    map.on("move resize zoom", state.apply)
-    state.apply()
-
-    return () => {
-      map.off("move resize zoom", state.apply)
-      map.layerPointToContainerPoint = original.to
-      map.containerPointToLayerPoint = original.from
-      pane.style.rotate = original.rotate
-      pane.style.transformOrigin = original.origin
-      state.enabled = false
-      state.apply = () => {}
-    }
-  }, [map, leaflet, enabled])
-
-  return null
-}
-
 export interface ToolbarProps extends ComponentPropsWithoutRef<"div"> {
+  /** Overrides corner flags; otherwise defaults to top right. */
   position?: Leaflet.ControlPosition
   top?: boolean
   bottom?: boolean
@@ -241,6 +169,7 @@ export interface ActionProps extends ComponentPropsWithoutRef<"button"> {
   asChild?: boolean
 }
 
+/** Compose child, consumer, and built-in actions; preventDefault cancels later steps. */
 function Action({
   children,
   asChild,
@@ -362,6 +291,7 @@ export interface CustomTilesProps
   extends TileLayerProps,
     Leaflet.TileLayerOptions {}
 
+/** Explicit options override shorthand tile options at creation. */
 function CustomTiles({
   url,
   options,

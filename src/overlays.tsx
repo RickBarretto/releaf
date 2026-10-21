@@ -10,6 +10,7 @@ export interface PopupProps {
   children?: ReactNode
   /** Required for standalone popups; nested popups bind to their layer. */
   position?: Leaflet.LatLngExpression
+  /** Creation-only options; change the component key to recreate the overlay. */
   options?: Leaflet.PopupOptions
   /** Omit for Leaflet's click-to-open behavior, or control visibility. */
   open?: boolean
@@ -17,11 +18,15 @@ export interface PopupProps {
 
 export interface TooltipProps {
   children?: ReactNode
+  /** Required when the tooltip is not nested inside a layer. */
   position?: Leaflet.LatLngExpression
+  /** Creation-only options; change the component key to recreate the overlay. */
   options?: Leaflet.TooltipOptions
+  /** Omit for native hover behavior, or control visibility explicitly. */
   open?: boolean
 }
 
+/** Bind to the nearest layer, or open directly on the map when standalone. */
 function useOverlay(
   kind: "popup" | "tooltip",
   { children, position, options, open }: PopupProps | TooltipProps,
@@ -90,10 +95,12 @@ function useOverlay(
   return state ? createPortal(children, state.element) : null
 }
 
+/** Render React content into a Leaflet popup through a persistent portal host. */
 export function Popup(props: PopupProps) {
   return useOverlay("popup", props)
 }
 
+/** Render React content into a Leaflet tooltip through a persistent portal host. */
 export function Tooltip(props: TooltipProps) {
   return useOverlay("tooltip", props)
 }

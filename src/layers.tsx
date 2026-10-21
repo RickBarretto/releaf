@@ -24,6 +24,7 @@ interface LayerProps<T extends Leaflet.Layer, O> {
   children?: ReactNode
 }
 
+/** Own one instance per parent; freeze the factory so options remain creation-only. */
 function useLayer<T extends Leaflet.Layer>(
   factory: (leaflet: typeof Leaflet) => T,
 ): T | null {
@@ -46,6 +47,7 @@ function useLayer<T extends Leaflet.Layer>(
   return layer
 }
 
+/** Mount descendants only after their Leaflet parent exists. */
 function LayerReady<T extends Leaflet.Layer>({
   layer,
   layerRef,
@@ -86,6 +88,7 @@ export interface TileLayerProps
   zIndex?: number
 }
 
+/** A tile source with mutable URL, opacity, and stacking order. */
 export function TileLayer(props: TileLayerProps) {
   const { url, options, opacity, zIndex } = props
   const [defaults] = useState(() => ({
@@ -117,6 +120,7 @@ export interface MarkerProps
   zIndexOffset?: number
 }
 
+/** A marker with mutable position and interaction props. */
 export function Marker(props: MarkerProps) {
   const { position, options, opacity, draggable, zIndexOffset } = props
   const [defaults] = useState(() => ({
@@ -154,6 +158,7 @@ interface PathProps<
   pathOptions?: Leaflet.PathOptions
 }
 
+/** Restore removed style overrides from the complete initial Leaflet options. */
 function usePathStyle(layer: Leaflet.Path | null, style?: Leaflet.PathOptions) {
   const initial = useMemo(() => {
     if (!layer) return null
@@ -178,6 +183,7 @@ export interface PolylineProps
   positions: Leaflet.LatLngExpression[] | Leaflet.LatLngExpression[][]
 }
 
+/** A line or multi-line geometry with mutable positions and style. */
 export function Polyline(props: PolylineProps) {
   const layer = useLayer((L) => L.polyline(props.positions, props.options))
 
@@ -198,6 +204,7 @@ export interface PolygonProps
     | Leaflet.LatLngExpression[][][]
 }
 
+/** A polygon, polygon with holes, or multi-polygon geometry. */
 export function Polygon(props: PolygonProps) {
   const layer = useLayer((L) => L.polygon(props.positions, props.options))
 
@@ -216,6 +223,7 @@ export interface CircleProps
   radius: number
 }
 
+/** A geographic circle whose radius is measured in meters. */
 export function Circle(props: CircleProps) {
   const layer = useLayer((L) =>
     L.circle(props.center, { ...props.options, radius: props.radius }),
@@ -240,6 +248,7 @@ export interface CircleMarkerProps
   radius?: number
 }
 
+/** A screen-sized circle whose radius is measured in pixels. */
 export function CircleMarker(props: CircleMarkerProps) {
   const [initialRadius] = useState(() => props.options?.radius ?? 10)
   const layer = useLayer((L) => L.circleMarker(props.center, props.options))
@@ -261,6 +270,7 @@ export interface RectangleProps extends PathProps<Leaflet.Rectangle> {
   bounds: Leaflet.LatLngBoundsExpression
 }
 
+/** A rectangular path with mutable geographic bounds. */
 export function Rectangle(props: RectangleProps) {
   const layer = useLayer((L) => L.rectangle(props.bounds, props.options))
 
@@ -278,6 +288,7 @@ export type LayerGroupProps = LayerProps<
   Leaflet.LayerOptions
 >
 
+/** Group children for shared membership without propagating their events. */
 export function LayerGroup(props: LayerGroupProps) {
   const layer = useLayer((L) => L.layerGroup([], props.options))
 
@@ -293,6 +304,7 @@ export type FeatureGroupProps = LayerProps<
   Leaflet.LayerOptions
 >
 
+/** Group children and propagate their events to the group. */
 export function FeatureGroup(props: FeatureGroupProps) {
   const layer = useLayer((L) => L.featureGroup([], props.options))
 
@@ -339,6 +351,7 @@ export interface ImageOverlayProps
   zIndex?: number
 }
 
+/** An image stretched across mutable geographic bounds. */
 export function ImageOverlay(props: ImageOverlayProps) {
   const { leaflet } = useMapContext()
   const [defaults] = useState(() => ({

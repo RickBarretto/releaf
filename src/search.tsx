@@ -17,13 +17,17 @@ export interface SearchPlace {
 
 export interface SearchBarProps<T>
   extends Omit<ComponentPropsWithoutRef<"div">, "onSelect"> {
+  /** Receives the original query; aborts when it changes or the component unmounts. */
   search: (
     query: string,
     signal: AbortSignal,
   ) => readonly T[] | Promise<readonly T[]>
   onSelect: (place: T) => void
+  /** Required for result types without a string label property. */
   getLabel?: (place: T) => string
+  /** Minimum trimmed query length; defaults to 1. */
   minLength?: number
+  /** Delay before searching, including the loading state; defaults to 250 ms. */
   debounceMs?: number
 }
 
@@ -40,10 +44,11 @@ interface SearchState {
   setActive: (index: number) => void
 }
 
-const Context = createContext<SearchState | null>(null)
+// The generic root owns typed values; compound children consume an erased context.
+const SearchContext = createContext<SearchState | null>(null)
 
 function useSearch() {
-  const value = useContext(Context)
+  const value = useContext(SearchContext)
   if (!value)
     throw new Error("SearchBar components must be inside <Map.SearchBar>.")
 
@@ -72,6 +77,7 @@ function Root<T>({
   const id = useId()
   const callbacks = useRef({ search, onSelect, getLabel })
 
+  // Callback identity changes must not restart the current debounce or request.
   useEffect(() => {
     callbacks.current = { search, onSelect, getLabel }
   })
@@ -82,6 +88,7 @@ function Root<T>({
     setActive(-1)
     setError(null)
     setLoading(false)
+    // Selecting a result updates the input without searching for its label again.
     if (query.trim().length < minLength || query === selected) return
 
     setLoading(true)
@@ -89,6 +96,7 @@ function Root<T>({
       void Promise.resolve()
         .then(() => callbacks.current.search(query, controller.signal))
         .then(
+          // Check cancellation even when the provider ignores its AbortSignal.
           (items) => {
             if (!controller.signal.aborted) {
               setResults(items)
@@ -138,9 +146,9 @@ function Root<T>({
   }
 
   return (
-    <Context value={state}>
+    <SearchContext value={state}>
       <div {...props}>{children}</div>
-    </Context>
+    </SearchContext>
   )
 }
 
@@ -174,17 +182,13 @@ function Input({
         if (event.key === "ArrowDown" || event.key === "ArrowUp") {
           event.preventDefault()
           const count = state.results.length
-          if (count)
-            state.setActive(
-              state.active < 0
-                ? event.key === "ArrowDown"
-                  ? 0
-                  : count - 1
-                : (state.active +
-                    (event.key === "ArrowDown" ? 1 : -1) +
-                    count) %
-                    count,
-            )
+          if (count) {
+            const direction = event.key === "ArrowDown" ? 1 : -1
+            // Starting above the first option makes the first arrow pick an endpoint.
+            const current =
+              state.active < 0 ? (direction === 1 ? -1 : 0) : state.active
+            state.setActive((current + direction + count) % count)
+          }
         } else if (event.key === "Enter" && state.active >= 0) {
           event.preventDefault()
           state.select(state.results[state.active])
@@ -256,4 +260,5 @@ function Results({
   )
 }
 
+/** Provider-independent search with an accessible input and results list. */
 export const SearchBar = Object.assign(Root, { Input, Results })

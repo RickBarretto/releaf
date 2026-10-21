@@ -9,10 +9,12 @@ import { MapContext, useEventHandlers, useMapContext } from "./context"
 export interface MapContainerProps extends ComponentPropsWithoutRef<"div"> {
   /** Creation-only options. Change the component key to recreate the map. */
   options?: Leaflet.MapOptions
+  /** Initial camera only; use MapView for subsequent camera changes. */
   initialCenter?: Leaflet.LatLngExpression
   initialZoom?: number
   eventHandlers?: Leaflet.LeafletEventHandlerFnMap
   ref?: Ref<Leaflet.Map>
+  /** Rendered until Leaflet loads and the map instance is ready. */
   fallback?: ReactNode
 }
 
@@ -34,6 +36,7 @@ function Ready({
   return <MapContext value={context}>{children}</MapContext>
 }
 
+/** Load Leaflet in the browser and own the map, resize observer, and teardown. */
 export function MapContainer({
   options,
   initialCenter = [0, 0],
