@@ -1,12 +1,12 @@
 import { LocateFixed, MapPin, Maximize2, Minus, Plus } from "lucide-react"
-import { Map as ReleafMap } from "releaf"
+import { Map } from "releaf"
 import { Button } from "../components/ui/button"
 import { home, panel } from "./MapFrame"
 
 export function Navigation() {
-  const map = ReleafMap.useController()
+  const map = Map.useController()
   return (
-    <ReleafMap.Toolbar top right>
+    <Map.Toolbar top right>
       <div className={`${panel} flex flex-col gap-1`}>
         <Button
           size="icon"
@@ -58,6 +58,6 @@ export function Navigation() {
           <Maximize2 />
         </Button>
       </div>
-    </ReleafMap.Toolbar>
+    </Map.Toolbar>
   )
 }

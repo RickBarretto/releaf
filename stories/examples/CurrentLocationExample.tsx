@@ -3,8 +3,8 @@ import { LocateFixed, MapPinOff } from "lucide-react"
 import { Component, type ReactNode, Suspense, useState } from "react"
 
 import {
+  Map,
   type Position,
-  Map as ReleafMap,
   requestCurrentLocation,
   useCurrentLocation,
 } from "releaf"
@@ -39,10 +39,10 @@ function LocatedPosition({ request }: { request: Promise<Position> }) {
   const position = useCurrentLocation(request)
   return (
     <>
-      <ReleafMap.View position={position} zoom={16} />
-      <ReleafMap.Marker position={position}>
-        <ReleafMap.Popup open>Your current location</ReleafMap.Popup>
-      </ReleafMap.Marker>
+      <Map.View position={position} zoom={16} />
+      <Map.Marker position={position}>
+        <Map.Popup open>Your current location</Map.Popup>
+      </Map.Marker>
       <p role="status">
         {position.latitude.toFixed(5)}, {position.longitude.toFixed(5)}
       </p>

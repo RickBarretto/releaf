@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-import { Map as ReleafMap } from "releaf"
+import { Map } from "releaf"
 
 import { Button } from "../components/ui/button"
 
@@ -10,7 +10,7 @@ function Layers() {
   const [basemap, setBasemap] = useState<"streets" | "terrain">("streets")
   return (
     <>
-      <ReleafMap.Toolbar top left>
+      <Map.Toolbar top left>
         <div className={`${panel} flex gap-1`}>
           <Button
             size="sm"
@@ -33,11 +33,11 @@ function Layers() {
             Terrain
           </Button>
         </div>
-      </ReleafMap.Toolbar>
+      </Map.Toolbar>
       {basemap === "streets" ? (
-        <ReleafMap.Tiles.OpenStreetMap />
+        <Map.Tiles.OpenStreetMap />
       ) : (
-        <ReleafMap.Tiles.Custom
+        <Map.Tiles.Custom
           url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
           attribution="Map data © OpenStreetMap contributors, SRTM | Map style © OpenTopoMap (CC-BY-SA)"
           maxZoom={17}

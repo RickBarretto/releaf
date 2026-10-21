@@ -1,7 +1,7 @@
 import type { Marker } from "leaflet"
 import { AlertCircle, Minus, Plus } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { type Position, Map as ReleafMap, requestCurrentLocation } from "releaf"
+import { Map, type Position, requestCurrentLocation } from "releaf"
 import { useMapEvents } from "releaf/events"
 import {
   Alert,
@@ -95,16 +95,16 @@ function PickerControls() {
 
   return (
     <TooltipProvider>
-      <ReleafMap.View position={camera} zoom={13} animate={false} />
-      <ReleafMap.Toolbar top right>
+      <Map.View position={camera} zoom={13} animate={false} />
+      <Map.Toolbar top right>
         <div className="rounded-xl border bg-background p-2 text-foreground shadow-lg flex flex-col gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
-              <ReleafMap.Actions.ZoomIn>
+              <Map.Actions.ZoomIn>
                 <Button variant="ghost" size="icon" aria-label="Zoom in">
                   <Plus />
                 </Button>
-              </ReleafMap.Actions.ZoomIn>
+              </Map.Actions.ZoomIn>
             </TooltipTrigger>
             <TooltipContent side="left" className="z-[1100]">
               Zoom in
@@ -112,19 +112,19 @@ function PickerControls() {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <ReleafMap.Actions.ZoomOut>
+              <Map.Actions.ZoomOut>
                 <Button variant="ghost" size="icon" aria-label="Zoom out">
                   <Minus />
                 </Button>
-              </ReleafMap.Actions.ZoomOut>
+              </Map.Actions.ZoomOut>
             </TooltipTrigger>
             <TooltipContent side="left" className="z-[1100]">
               Zoom out
             </TooltipContent>
           </Tooltip>
         </div>
-      </ReleafMap.Toolbar>
-      <ReleafMap.Marker
+      </Map.Toolbar>
+      <Map.Marker
         ref={marker}
         position={selected}
         draggable
@@ -144,14 +144,14 @@ function PickerControls() {
           },
         }}
       >
-        <ReleafMap.Tooltip>Drag me to refine your selection</ReleafMap.Tooltip>
-      </ReleafMap.Marker>
-      <ReleafMap.Toolbar top left onClick={(event) => event.stopPropagation()}>
+        <Map.Tooltip>Drag me to refine your selection</Map.Tooltip>
+      </Map.Marker>
+      <Map.Toolbar top left onClick={(event) => event.stopPropagation()}>
         <Card className={panel}>
           <CardContent className="space-y-4">
             <Field>
               <FieldLabel htmlFor="picker-search">Find a location</FieldLabel>
-              <ReleafMap.SearchBar
+              <Map.SearchBar
                 className="flex flex-col gap-2 [&_[role=status]:empty]:hidden [&_[role=listbox]:empty]:hidden"
                 search={(query) =>
                   places.filter((place) =>
@@ -168,18 +168,18 @@ function PickerControls() {
                   )
                 }
               >
-                <ReleafMap.SearchBar.Input
+                <Map.SearchBar.Input
                   id="picker-search"
                   aria-describedby="picker-search-description"
                   aria-label="Find a location"
                   placeholder="Try Paris or São Paulo"
                 />
-                <ReleafMap.SearchBar.Results
+                <Map.SearchBar.Results
                   className="m-0 list-none p-0 [&_[role=option]]:cursor-pointer [&_[role=option]]:rounded-sm [&_[role=option]]:px-2 [&_[role=option]]:py-1.5 [&_[aria-selected=true]]:bg-accent [&_[aria-selected=true]]:text-accent-foreground"
                   emptyMessage="No matching demo places"
                   errorMessage="Search failed. Try again."
                 />
-              </ReleafMap.SearchBar>
+              </Map.SearchBar>
               <FieldDescription id="picker-search-description">
                 Four demo places · Use arrow keys and Enter to select.
               </FieldDescription>
@@ -214,8 +214,8 @@ function PickerControls() {
             )}
           </CardContent>
         </Card>
-      </ReleafMap.Toolbar>
-      <ReleafMap.Toolbar bottom left>
+      </Map.Toolbar>
+      <Map.Toolbar bottom left>
         <Card className={panel} role="status" aria-label="Selected coordinates">
           <CardHeader>
             <CardTitle>Selected coordinates</CardTitle>
@@ -229,7 +229,7 @@ function PickerControls() {
             </output>
           </CardContent>
         </Card>
-      </ReleafMap.Toolbar>
+      </Map.Toolbar>
     </TooltipProvider>
   )
 }
@@ -243,7 +243,7 @@ export function LocationPicker({ tileUrl }: { tileUrl?: string }) {
         Search, use your current location, or drag the marker. Location access
         requires HTTPS or localhost.
       </p>
-      <ReleafMap.Root
+      <Map.Root
         className="mt-4 h-[600px] overflow-hidden rounded-xl border border-border"
         aria-label="Location picker map"
         initialCenter={[initial.latitude, initial.longitude]}
@@ -252,15 +252,12 @@ export function LocationPicker({ tileUrl }: { tileUrl?: string }) {
         fallback={<p>Loading map…</p>}
       >
         {tileUrl ? (
-          <ReleafMap.Tiles.Custom
-            url={tileUrl}
-            attribution="Local test tiles"
-          />
+          <Map.Tiles.Custom url={tileUrl} attribution="Local test tiles" />
         ) : (
-          <ReleafMap.Tiles.OpenStreetMap />
+          <Map.Tiles.OpenStreetMap />
         )}
         <PickerControls />
-      </ReleafMap.Root>
+      </Map.Root>
     </section>
   )
 }

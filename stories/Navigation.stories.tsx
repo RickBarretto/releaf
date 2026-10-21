@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-
-import { Playground } from "./examples/NavigationExample"
-
 import exampleSource from "./examples/Navigation.tsx?raw"
+import { Playground } from "./examples/NavigationExample"
 
 const meta = {
   title: "Map/Navigation",
