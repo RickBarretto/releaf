@@ -7,6 +7,7 @@ import { createPortal } from "react-dom"
 import { LayerContext, useMapContext } from "./context"
 
 export interface PopupProps {
+  className?: string
   children?: ReactNode
   /** Required for standalone popups; nested popups bind to their layer. */
   position?: Leaflet.LatLngExpression
@@ -17,6 +18,7 @@ export interface PopupProps {
 }
 
 export interface TooltipProps {
+  className?: string
   children?: ReactNode
   /** Required when the tooltip is not nested inside a layer. */
   position?: Leaflet.LatLngExpression
@@ -29,7 +31,7 @@ export interface TooltipProps {
 /** Bind to the nearest layer, or open directly on the map when standalone. */
 function useOverlay(
   kind: "popup" | "tooltip",
-  { children, position, options, open }: PopupProps | TooltipProps,
+  { children, position, options, open, className }: PopupProps | TooltipProps,
 ) {
   const { map, leaflet } = useMapContext()
   const parent = useContext(LayerContext)
@@ -85,6 +87,13 @@ function useOverlay(
       } else state.overlay.openOn(map)
     }
   }, [state, parent, position, open, kind, map])
+
+  useEffect(() => {
+    if (state) {
+      state.element.className = className ?? ""
+      state.overlay.update()
+    }
+  }, [state, className])
 
   // Portal content commits before passive effects; update Leaflet's layout afterward.
   // biome-ignore lint/correctness/useExhaustiveDependencies: New portal content requires Leaflet to recalculate the overlay layout.

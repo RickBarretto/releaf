@@ -17,6 +17,8 @@ import {
 } from "./context"
 
 interface LayerProps<T extends Leaflet.Layer, O> {
+  /** CSS classes applied to rendered layer elements, including group descendants. */
+  className?: string
   /** Creation-only Leaflet options; change key to recreate. */
   options?: O
   eventHandlers?: Leaflet.LeafletEventHandlerFnMap
@@ -47,14 +49,47 @@ function useLayer<T extends Leaflet.Layer>(
   return layer
 }
 
+/** Keep consumer classes separate from Leaflet's own classes and inline geometry. */
+function useLayerClassName(layer: Leaflet.Layer, className?: string) {
+  useEffect(() => {
+    const classes = className?.split(/\s+/).filter(Boolean) ?? []
+    const added = new Map<Element, string[]>()
+    const apply = (target: Leaflet.Layer) => {
+      const rendered = target as Leaflet.Layer & {
+        getElement?: () => Element | undefined
+        getContainer?: () => HTMLElement | null
+        eachLayer?: (callback: (child: Leaflet.Layer) => void) => void
+      }
+      const element = rendered.getElement?.() ?? rendered.getContainer?.()
+      if (element && !added.has(element)) {
+        const tokens = classes.filter(
+          (token) => !element.classList.contains(token),
+        )
+        element.classList.add(...tokens)
+        added.set(element, tokens)
+      }
+      rendered.eachLayer?.(apply)
+    }
+    const update = () => apply(layer)
+    layer.on("add layeradd", update)
+    update()
+    return () => {
+      layer.off("add layeradd", update)
+      for (const [element, tokens] of added) element.classList.remove(...tokens)
+    }
+  }, [layer, className])
+}
+
 /** Mount descendants only after their Leaflet parent exists. */
 function LayerReady<T extends Leaflet.Layer>({
   layer,
   layerRef,
   eventHandlers,
+  className,
   children,
 }: {
   layer: T
+  className?: string
   layerRef?: Ref<T>
   eventHandlers?: Leaflet.LeafletEventHandlerFnMap
   children?: ReactNode
@@ -62,6 +97,7 @@ function LayerReady<T extends Leaflet.Layer>({
   useImperativeHandle(layerRef, () => layer, [layer])
 
   useEventHandlers(layer, eventHandlers)
+  useLayerClassName(layer, className)
 
   return <LayerContext value={layer}>{children}</LayerContext>
 }
@@ -73,6 +109,7 @@ function renderLayer<T extends Leaflet.Layer>(
   return layer ? (
     <LayerReady
       layer={layer}
+      className={props.className}
       layerRef={props.ref}
       eventHandlers={props.eventHandlers}
     >

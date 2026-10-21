@@ -45,7 +45,7 @@ test("maps run without ResizeObserver and expose live Leaflet to descendants", a
   }
   try {
     await render(
-      <MapContainer ref={ref} aria-label="Custom map" style={{ height: 300 }}>
+      <MapContainer ref={ref} aria-label="Custom map" className="h-[300px]">
         <Probe />
       </MapContainer>,
     )
@@ -54,8 +54,8 @@ test("maps run without ResizeObserver and expose live Leaflet to descendants", a
     expect(
       document
         .querySelector('[aria-label="Custom map"]')!
-        .getAttribute("style"),
-    ).toContain("300px")
+        .getAttribute("class"),
+    ).toBe("h-[300px]")
     expect(observers).toHaveLength(0)
   } finally {
     globalThis.ResizeObserver = observer

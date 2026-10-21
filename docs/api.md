@@ -21,7 +21,7 @@ props update the instance and override matching options.
 
 ### `Map.Root` / `MapContainer`
 
-Creates the map and loads Leaflet on the client. Also accepts HTML `div` props.
+Creates the map and loads Leaflet on the client. Also accepts HTML `div` props, including `className?: string`, except `style`.
 
 | Prop | Type | Default / purpose |
 | --- | --- | --- |
@@ -32,11 +32,16 @@ Creates the map and loads Leaflet on the client. Also accepts HTML `div` props.
 | `ref` | `Ref<Leaflet.Map>` | Access the Leaflet instance |
 | `fallback` | `ReactNode` | `null`; content displayed while loading |
 | `children` | `ReactNode` | Layers, camera settings, and controls |
-| `style` | `CSSProperties` | Includes a default height of `400px` |
+| `className` | `string` | CSS classes merged with the default height of `400px` |
 
 ```tsx
-<Map.Root style={{ height: 420 }} aria-label="City map">…</Map.Root>
+<Map.Root className="h-96" aria-label="City map">…</Map.Root>
 ```
+
+Use Tailwind utilities such as `h-96` in a Tailwind app, or pass a custom CSS
+class with a height rule (for example, `.city-map { height: 24rem; }`).
+`className` merges with the defaults using the same class-merging utility as
+shadcn/ui. The `style` prop is not supported.
 
 ### Coordinates
 
@@ -109,8 +114,11 @@ For compound tile components, `options` overrides direct tile options at creatio
 | `eventHandlers` | `Leaflet.LeafletEventHandlerFnMap` | Native layer event callbacks |
 | `ref` | `Ref<T>` | Instance of the corresponding Leaflet layer |
 | `children` | `ReactNode` | Nested content, such as popups |
+| `className` | `string` | Mutable CSS classes on rendered layer elements; groups apply classes to descendants |
 | `pathOptions` | `Leaflet.PathOptions` | Updated styling; available on shapes and `GeoJSON` |
 
+Use `className` for CSS styling. Shapes and GeoJSON retain `pathOptions` for
+Leaflet rendering options, including Canvas rendering where no DOM path exists.
 Pass new arrays or objects when changing geometry or styles.
 
 ### `Marker` / `Map.Marker`
@@ -181,6 +189,7 @@ position. Use at most one of each per parent layer.
 | Prop | Type | Required / purpose |
 | --- | --- | --- |
 | `children` | `ReactNode` | Overlay content |
+| `className` | `string` | Mutable CSS classes on the React content container |
 | `position` | `Leaflet.LatLngExpression` | Required when standalone |
 | `options` | `Leaflet.PopupOptions` or `Leaflet.TooltipOptions` | Creation configuration |
 | `open` | `boolean` | Changes open or close the overlay; omit for normal click/hover behavior |
@@ -199,7 +208,7 @@ Standalone overlays open by default.
 ### `Map.Toolbar`
 
 Places React UI in a map corner and stops clicks/scrolling reaching the map.
-Also accepts HTML `div` props.
+Also accepts HTML `div` props, including `className?: string`, except `style`.
 
 | Prop | Type | Default / purpose |
 | --- | --- | --- |
@@ -209,7 +218,7 @@ Also accepts HTML `div` props.
 
 ### `Map.Actions`
 
-Buttons that invoke map commands. All accept HTML `button` props and optional
+Buttons that invoke map commands. All accept HTML `button` props (including `className?: string`, except `style`) and optional
 `asChild`. A single element child is cloned automatically; `asChild` is unnecessary.
 Calling `event.preventDefault()` in a click handler cancels the command.
 
@@ -243,7 +252,7 @@ combobox. Supply your own provider and handle selection with `onSelect`.
 | `getLabel` | `(place: T) => string` | Required if results have no `label: string` field |
 | `minLength` | `number` | `1` |
 | `debounceMs` | `number` | `250` |
-| HTML `div` props | Standard React props, except native `onSelect` | Container attributes and children |
+| HTML `div` props | Standard React props, except native `onSelect` and `style` | Container attributes and children |
 
 The exported `SearchPlace` type has a required `label: string` and optional
 `id: string | number`. Other result shapes require `getLabel`.
@@ -251,8 +260,8 @@ Pass `signal` to remote fetches for cancellation.
 
 | Child component | Props | Purpose |
 | --- | --- | --- |
-| `SearchBar.Input` | HTML `input` props; value is managed internally | Search input |
-| `SearchBar.Results` | HTML `ul` props and the messages below | Result list |
+| `SearchBar.Input` | HTML `input` props except `style`; value is managed internally | Search input |
+| `SearchBar.Results` | HTML `ul` props except `style`, and the messages below | Result list |
 
 Both children must be inside `SearchBar`; the same children are available on `Map.SearchBar`.
 

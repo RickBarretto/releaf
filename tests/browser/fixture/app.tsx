@@ -35,7 +35,7 @@ export function App() {
               },
             }}
             initialZoom={5}
-            style={{ height: 450 }}
+            className="test-map"
             options={{
               zoomAnimation: false,
               fadeAnimation: false,

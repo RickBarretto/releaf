@@ -14,6 +14,7 @@ import { Button } from "./components/ui/button"
 import { useMap, useMapContext } from "./context"
 import type { MarkerProps, TileLayerProps } from "./layers"
 import { Marker, TileLayer } from "./layers"
+import { cn } from "./lib/utils"
 import { MapContainer } from "./map"
 import type { PopupProps, TooltipProps } from "./overlays"
 import { Popup, Tooltip } from "./overlays"
@@ -116,7 +117,8 @@ function Zoom({ zoom, minZoom, maxZoom }: ZoomProps) {
   return null
 }
 
-export interface ToolbarProps extends ComponentPropsWithoutRef<"div"> {
+export interface ToolbarProps
+  extends Omit<ComponentPropsWithoutRef<"div">, "style"> {
   /** Overrides corner flags; otherwise defaults to top right. */
   position?: Leaflet.ControlPosition
   top?: boolean
@@ -160,7 +162,8 @@ function Toolbar({
     : null
 }
 
-export interface ActionProps extends ComponentPropsWithoutRef<"button"> {
+export interface ActionProps
+  extends Omit<ComponentPropsWithoutRef<"button">, "style"> {
   asChild?: boolean
 }
 
@@ -181,6 +184,7 @@ function Action({
 
     return cloneElement(child, {
       ...props,
+      className: cn(child.props.className, props.className),
       disabled: props.disabled ?? child.props.disabled,
       onClick: (event) => {
         child.props.onClick?.(event)

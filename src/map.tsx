@@ -5,8 +5,10 @@ import type { ComponentPropsWithoutRef, ReactNode, Ref } from "react"
 import { useEffect, useImperativeHandle, useRef, useState } from "react"
 import type { MapContextValue } from "./context"
 import { MapContext, useEventHandlers, useMapContext } from "./context"
+import { cn } from "./lib/utils"
 
-export interface MapContainerProps extends ComponentPropsWithoutRef<"div"> {
+export interface MapContainerProps
+  extends Omit<ComponentPropsWithoutRef<"div">, "style"> {
   /** Creation-only options. Change the component key to recreate the map. */
   options?: Leaflet.MapOptions
   /** Initial camera only; use MapView for subsequent camera changes. */
@@ -45,7 +47,7 @@ export function MapContainer({
   ref,
   fallback = null,
   children,
-  style,
+  className,
   ...props
 }: MapContainerProps) {
   const container = useRef<HTMLDivElement>(null)
@@ -92,8 +94,12 @@ export function MapContainer({
   if (error) throw error
 
   return (
-    <div {...props} style={{ height: 400, ...style }}>
-      <div ref={container} style={{ height: "100%", width: "100%" }} />
+    <div {...props} data-slot="map" className={cn("h-[400px]", className)}>
+      <div
+        ref={container}
+        data-slot="map-container"
+        className="h-full w-full"
+      />
       {context ? (
         <Ready context={context} mapRef={ref} eventHandlers={eventHandlers}>
           {children}

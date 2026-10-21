@@ -18,7 +18,7 @@ export interface SearchPlace {
 }
 
 export interface SearchBarProps<T>
-  extends Omit<ComponentPropsWithoutRef<"div">, "onSelect"> {
+  extends Omit<ComponentPropsWithoutRef<"div">, "onSelect" | "style"> {
   /** Receives the original query; aborts when it changes or the component unmounts. */
   search: (
     query: string,
@@ -158,7 +158,7 @@ function Input({
   onChange,
   onKeyDown,
   ...props
-}: ComponentPropsWithoutRef<"input">) {
+}: Omit<ComponentPropsWithoutRef<"input">, "style">) {
   const state = useSearch()
 
   return (
@@ -202,7 +202,8 @@ function Input({
   )
 }
 
-export interface SearchResultsProps extends ComponentPropsWithoutRef<"ul"> {
+export interface SearchResultsProps
+  extends Omit<ComponentPropsWithoutRef<"ul">, "style"> {
   loadingMessage?: ReactNode
   emptyMessage?: ReactNode
   errorMessage?: ReactNode

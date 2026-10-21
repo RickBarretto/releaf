@@ -35,7 +35,7 @@ import { Map } from "releaf";
 
 export function CityMap() {
   return (
-    <Map.Root style={{ height: 420 }} aria-label="Map of São Paulo">
+    <Map.Root className="my-map" aria-label="Map of São Paulo">
       <Map.View position={{ latitude: -23.55, longitude: -46.63 }} />
       <Map.Zoom zoom={12} />
       <Map.Tiles.OpenStreetMap />
@@ -48,6 +48,19 @@ export function CityMap() {
 
 Map actions and search inputs use internal shadcn/ui components. Import
 `releaf/styles.css` once for compiled styles; Tailwind is not required in your app.
+Customize map sizing with `className`. The quick start uses a custom CSS class:
+
+```css
+.my-map {
+  height: 24rem;
+}
+```
+
+Layers, popups, tooltips, toolbars, actions, and search components also accept
+`className` strings for CSS styling.
+
+In a Tailwind app, use `className="h-96"` instead. Classes merge with the default
+height of 400px, so Tailwind height utilities override it.
 Styles omit Tailwind Preflight and inherit your shadcn theme variables, with neutral
 fallback colors. You can still supply custom child buttons.
 

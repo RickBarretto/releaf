@@ -64,8 +64,7 @@ function Frame({
         <p className="text-sm text-muted-foreground">{description}</p>
       </header>
       <ReleafMap.Root
-        className="demo-map"
-        style={{ height: 520 }}
+        className="demo-map h-[520px]"
         options={{ zoomControl: false, zoomAnimation: false }}
         fallback={<p>Loading map…</p>}
       >

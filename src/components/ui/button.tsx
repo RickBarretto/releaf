@@ -34,7 +34,7 @@ export function Button({
   asChild = false,
   type = "button",
   ...props
-}: ComponentProps<"button"> &
+}: Omit<ComponentProps<"button">, "style"> &
   VariantProps<typeof buttonVariants> & { asChild?: boolean }) {
   const Component = asChild ? Slot : "button"
   return (

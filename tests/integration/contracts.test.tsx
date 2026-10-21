@@ -388,3 +388,40 @@ test("event callbacks refresh without resubscribing and removed listeners stop f
   })
   expect(calls).toEqual(["second"])
 })
+
+test("layer and overlay classes update without replacing Leaflet classes", async () => {
+  const ref = createRef<Leaflet.Marker>()
+  const tree = (className?: string) => (
+    <MapContainer>
+      <Marker ref={ref} position={[0, 0]} className={className}>
+        <ReleafMap.Popup open className={className}>
+          Content
+        </ReleafMap.Popup>
+      </Marker>
+      <ReleafMap.Toolbar>
+        <ReleafMap.Actions.ZoomIn className="h-8">
+          <button type="button" className="h-9 custom-button">
+            Zoom
+          </button>
+        </ReleafMap.Actions.ZoomIn>
+      </ReleafMap.Toolbar>
+    </MapContainer>
+  )
+  await render(tree("first"))
+  const marker = ref.current!
+  expect(marker.getElement()!.classList.contains("first")).toBe(true)
+  expect(marker.getPopup()!.getContent()).toHaveProperty("className", "first")
+  expect(document.querySelector(".custom-button")!.className).toBe(
+    "custom-button h-8",
+  )
+  await render(tree("second"))
+  expect(ref.current).toBe(marker)
+  expect(marker.getElement()!.classList.contains("first")).toBe(false)
+  expect(marker.getElement()!.classList.contains("second")).toBe(true)
+  expect(marker.getElement()!.classList.contains("leaflet-marker-icon")).toBe(
+    true,
+  )
+  expect(marker.getPopup()!.getContent()).toHaveProperty("className", "second")
+  await render(tree())
+  expect(marker.getElement()!.classList.contains("second")).toBe(false)
+})
