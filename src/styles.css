@@ -19,7 +19,7 @@
   --color-ring: var(--releaf-ring);
 }
 
-:where([data-slot="button"], [data-slot="input"]) {
+:where([data-slot="button"], [data-slot="input"], [data-slot="map-footer"]) {
   --releaf-background: var(--background, #fff);
   --releaf-foreground: var(--foreground, #171717);
   --releaf-primary: var(--primary, #171717);
@@ -31,6 +31,37 @@
   --releaf-muted-foreground: var(--muted-foreground, #737373);
   --releaf-border: var(--border, #e5e5e5);
   --releaf-ring: var(--ring, #737373);
+}
+
+/* Higher specificity keeps Leaflet's bundled control styles from overriding the footer. */
+.leaflet-container .leaflet-control-attribution.releaf-map-footer {
+  box-sizing: border-box;
+  max-width: calc(100vw - 2rem);
+  margin: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--releaf-border);
+  border-radius: 0.5rem;
+  background: var(--releaf-background);
+  color: var(--releaf-muted-foreground);
+  box-shadow: 0 1px 3px #0000001a;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+}
+
+.leaflet-container .releaf-map-footer a.releaf-attribution-link {
+  display: inline;
+  height: auto;
+  padding: 0;
+  border-radius: 0.125rem;
+  color: var(--releaf-foreground);
+  font-size: inherit;
+  white-space: normal;
+  text-decoration: none;
+}
+
+.leaflet-container .releaf-map-footer a.releaf-attribution-link:hover {
+  text-decoration: underline;
 }
 @layer components {
   :where([data-slot="button"], [data-slot="input"]) {

@@ -3,9 +3,53 @@
 import type * as Leaflet from "leaflet"
 import type { ComponentPropsWithoutRef, ReactNode, Ref } from "react"
 import { useEffect, useImperativeHandle, useRef, useState } from "react"
+import { buttonVariants } from "./components/ui/button"
 import type { MapContextValue } from "./context"
 import { MapContext, useEventHandlers, useMapContext } from "./context"
 import { cn } from "./lib/utils"
+
+/** Keep Leaflet's live provider credits, with the same tokens as shadcn controls. */
+function AttributionFooter() {
+  const { map } = useMapContext()
+
+  useEffect(() => {
+    const control = map.attributionControl
+    const element = control?.getContainer()
+    if (!element) return
+
+    const previousPrefix = control.options.prefix
+    const branding =
+      '<a href="https://github.com/RickBarretto/releaf">{Re}leaf</a> · Powered by <a href="https://leafletjs.com">Leaflet</a>'
+    control.setPrefix(branding)
+    element.dataset.slot = "map-footer"
+    element.setAttribute("aria-label", "Map copyright and contributors")
+    element.classList.add("releaf-map-footer")
+    const styleLinks = () => {
+      for (const link of element.querySelectorAll("a")) {
+        link.className = cn(
+          link.className,
+          buttonVariants({ variant: "ghost", size: "sm" }),
+          "releaf-attribution-link",
+        )
+      }
+    }
+    styleLinks()
+    const observer = new window.MutationObserver(styleLinks)
+    observer.observe(element, { childList: true, subtree: true })
+
+    return () => {
+      observer.disconnect()
+      control.setPrefix(
+        typeof previousPrefix === "string" ? previousPrefix : false,
+      )
+      element.classList.remove("releaf-map-footer")
+      delete element.dataset.slot
+      element.removeAttribute("aria-label")
+    }
+  }, [map])
+
+  return null
+}
 
 export interface MapContainerProps
   extends Omit<ComponentPropsWithoutRef<"div">, "style"> {
@@ -35,7 +79,12 @@ function Ready({
 
   useEventHandlers(context.map, eventHandlers)
 
-  return <MapContext value={context}>{children}</MapContext>
+  return (
+    <MapContext value={context}>
+      <AttributionFooter />
+      {children}
+    </MapContext>
+  )
 }
 
 /** Load Leaflet in the browser and own the map, resize observer, and teardown. */
