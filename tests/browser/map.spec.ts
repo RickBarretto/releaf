@@ -116,6 +116,41 @@ test("rotation keeps marker click coordinates aligned after camera and size chan
   await expect(pane).toHaveCSS("rotate", "0deg")
 })
 
+for (const turns of [1, 2, 5]) {
+  test(`navigation follows screen axes at ${turns * 45} degrees`, async ({
+    page,
+  }) => {
+    const map = page.locator(".leaflet-container")
+    const marker = page.locator(".leaflet-marker-icon")
+    for (let i = 0; i < turns; i++) {
+      await page.getByRole("button", { name: "Rotate", exact: true }).click()
+    }
+    const before = (await marker.boundingBox())!
+    const box = (await map.boundingBox())!
+    await page.mouse.move(box.x + 150, box.y + 100)
+    await page.mouse.down()
+    await page.mouse.move(box.x + 230, box.y + 130, { steps: 10 })
+    const dragged = (await marker.boundingBox())!
+    expect(dragged.x - before.x).toBeCloseTo(80, -1)
+    expect(dragged.y - before.y).toBeCloseTo(30, -1)
+    // End without momentum so the keyboard displacement can be measured alone.
+    await page.waitForTimeout(100)
+    await page.mouse.up()
+    await map.focus()
+    await page.keyboard.press("ArrowRight")
+    await expect
+      .poll(async () => (await marker.boundingBox())!.x)
+      .toBeCloseTo(dragged.x - 80, -1)
+    const right = (await marker.boundingBox())!
+    expect(right.y).toBeCloseTo(dragged.y, -1)
+    await page.keyboard.press("ArrowDown")
+    await expect
+      .poll(async () => (await marker.boundingBox())!.y)
+      .toBeCloseTo(right.y - 80, -1)
+    expect((await marker.boundingBox())!.x).toBeCloseTo(right.x, -1)
+  })
+}
+
 test("server markup hydrates and becomes interactive without errors", async ({
   page,
 }) => {

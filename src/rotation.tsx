@@ -57,21 +57,65 @@ export function Rotation({ enabled = true }: RotationProps) {
     const pane = map.getPane("mapPane")
     if (!pane) return
 
+    // Leaflet 1.9 exposes no public hook for adjusting navigation vectors.
+    const dragging = map.dragging as Leaflet.Handler & {
+      _onPreDragLimit: () => void
+      _onPreDragWrap: () => void
+      _draggable?: { _newPos: Leaflet.Point; _startPos: Leaflet.Point }
+    }
+    const keyboard = map.keyboard as Leaflet.Handler & {
+      _panKeys: Record<string, [number, number]>
+    }
     const original = {
       to: map.layerPointToContainerPoint,
       from: map.containerPointToLayerPoint,
       rotate: pane.style.rotate,
       origin: pane.style.transformOrigin,
+      preDragLimit: dragging._onPreDragLimit,
+      panKeys: keyboard._panKeys,
     }
     // Leaflet coordinates are unrotated; both conversions must match the CSS rotation.
     const rotate = (point: Leaflet.Point, angle: number) =>
       rotateAroundCenter(leaflet, point, map.getSize().divideBy(2), angle)
+    const movement = (point: Leaflet.Point) =>
+      rotateAroundCenter(
+        leaflet,
+        point,
+        leaflet.point(0, 0),
+        enabled ? -state.bearing : 0,
+      )
+    const preDragLimit = () => {
+      const draggable = dragging._draggable
+      if (draggable) {
+        draggable._newPos = draggable._startPos.add(
+          movement(draggable._newPos.subtract(draggable._startPos)),
+        )
+      }
+      original.preDragLimit.call(dragging)
+    }
+    // Replace the existing listener in place, before Leaflet's world wrapping.
+    const draggable = dragging._draggable as
+      | (Leaflet.Evented & NonNullable<typeof dragging._draggable>)
+      | undefined
+    draggable?.off("predrag", original.preDragLimit, dragging)
+    draggable?.on("predrag", preDragLimit, dragging)
+    if (map.options.worldCopyJump) {
+      draggable?.off("predrag", dragging._onPreDragWrap, dragging)
+      draggable?.on("predrag", dragging._onPreDragWrap, dragging)
+    }
+    dragging._onPreDragLimit = preDragLimit
     state.enabled = enabled
     state.apply = () => {
       const offset = original.to.call(map, leaflet.point(0, 0))
       const center = map.getSize().divideBy(2).subtract(offset)
       pane.style.transformOrigin = `${center.x}px ${center.y}px`
       pane.style.rotate = `${enabled ? state.bearing : 0}deg`
+      keyboard._panKeys = Object.fromEntries(
+        Object.entries(original.panKeys).map(([key, offset]) => {
+          const point = movement(leaflet.point(offset))
+          return [key, [point.x, point.y]]
+        }),
+      )
     }
     map.layerPointToContainerPoint = (point) =>
       rotate(original.to.call(map, point), enabled ? state.bearing : 0)
@@ -87,6 +131,15 @@ export function Rotation({ enabled = true }: RotationProps) {
       map.off("move resize zoom", state.apply)
       map.layerPointToContainerPoint = original.to
       map.containerPointToLayerPoint = original.from
+      const activeDraggable = dragging._draggable as typeof draggable
+      activeDraggable?.off("predrag", preDragLimit, dragging)
+      activeDraggable?.on("predrag", original.preDragLimit, dragging)
+      if (map.options.worldCopyJump) {
+        activeDraggable?.off("predrag", dragging._onPreDragWrap, dragging)
+        activeDraggable?.on("predrag", dragging._onPreDragWrap, dragging)
+      }
+      dragging._onPreDragLimit = original.preDragLimit
+      keyboard._panKeys = original.panKeys
       pane.style.rotate = original.rotate
       pane.style.transformOrigin = original.origin
       state.enabled = false
