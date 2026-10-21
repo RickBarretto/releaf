@@ -31,7 +31,10 @@ describe("Map DSL", () => {
     const tree = (enabled: boolean) => (
       <StrictMode>
         <ReleafMap.Root ref={mapRef} options={{ zoomAnimation: false }}>
-          <ReleafMap.View position={{ latitude: 1, longitude: 2 }} />
+          <ReleafMap.View
+            position={{ latitude: 1, longitude: 2 }}
+            animate={false}
+          />
           <ReleafMap.Zoom zoom={7} minZoom={3} maxZoom={19} />
           <ReleafMap.Rotation animate={false} enabled={enabled} />
           <ReleafMap.Tiles.OpenStreetMap />
