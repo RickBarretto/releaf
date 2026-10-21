@@ -10,7 +10,7 @@ We should not require users to write a bunch of code to have simple features imp
 import { Map, type Position } from "@releaf"
 import { Button } from "@/components/ui/button"
 import {
-  Plus, Minus, Compass, RotateCw,
+  Plus, Minus,
   MapPin, Maximize2, LocateFixed,
 } from "lucide-react"
 
@@ -33,16 +33,6 @@ const NavigationToolbar = () => {
         <Button size="icon" variant="ghost" aria-label="Zoom out"
           onClick={() => map.zoomOut()}>
           <Minus />
-        </Button>
-
-        <Button size="icon" variant="ghost" aria-label="Rotate right"
-          onClick={() => map.rotateBy(45)}>
-          <RotateCw />
-        </Button>
-
-        <Button size="icon" variant="ghost" aria-label="Reset north"
-          onClick={() => map.resetNorth()}>
-          <Compass />
         </Button>
 
         <Button size="icon" variant="ghost" aria-label="Go home"
@@ -71,7 +61,6 @@ const App = () => (
   <Map.Root className="h-screen w-full">
     <Map.View position={home} />
     <Map.Zoom zoom={13} minZoom={3} maxZoom={19} />
-    <Map.Rotation enabled />
     <Map.Tiles.OpenStreetMap />
 
     <Map.Marker position={home}>
@@ -176,43 +165,6 @@ function LayerSwitcher() {
 }
 ```
 
-## Rotation and Compass controls
-
-```tsx
-
-import { Map } from "@your-scope/leaflet"
-import { Button } from "@/components/ui/button"
-import { RotateCcw, RotateCw, Compass } from "lucide-react"
-
-function RotationToolbar() {
-  const map = Map.useController()
-
-  return (
-    <Map.Toolbar position="bottomright">
-      <div className="flex gap-1 rounded-xl border bg-background p-1 shadow-lg">
-        <Button size="icon" variant="ghost" aria-label="Rotate left"
-          onClick={() => map.rotateBy(-15)}
-        >
-          <RotateCcw />
-        </Button>
-
-        <Button size="icon" variant="ghost" aria-label="Reset orientation"
-          onClick={() => map.resetNorth()}
-        >
-          <Compass />
-        </Button>
-
-        <Button size="icon" variant="ghost" aria-label="Rotate right"
-          onClick={() => map.rotateBy(15)}
-        >
-          <RotateCw />
-        </Button>
-      </div>
-    </Map.Toolbar>
-  )
-}
-```
-
 ## Action Components
 
 ```tsx
@@ -220,7 +172,6 @@ function RotationToolbar() {
   <Map.Actions.ZoomIn />
   <Map.Actions.ZoomOut />
   <Map.Actions.Locate />
-  <Map.Actions.ResetNorth />
 
   <Map.Actions.FlyTo position={home} zoom={15}>
     <Button variant="secondary">Go home</Button>

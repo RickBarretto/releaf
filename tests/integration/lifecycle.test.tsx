@@ -128,33 +128,22 @@ test("nested popup and tooltip bindings detach while the parent survives", async
   expect(marker.getTooltip()).toBeNull()
 })
 
-test("zoom limits, rotation methods and pane styles restore when controls unmount", async () => {
+test("zoom limits restore when controls unmount", async () => {
   const ref = createRef<L.Map>()
   await render(
     <ReleafMap.Root ref={ref} options={{ minZoom: 2, maxZoom: 18 }} />,
   )
-  const map = ref.current!,
-    to = map.layerPointToContainerPoint,
-    from = map.containerPointToLayerPoint
-  const pane = map.getPane("mapPane")!,
-    rotate = pane.style.rotate,
-    origin = pane.style.transformOrigin
+  const map = ref.current!
   await render(
     <ReleafMap.Root ref={ref}>
       <ReleafMap.Zoom zoom={5} minZoom={3} maxZoom={10} />
-      <ReleafMap.Rotation />
     </ReleafMap.Root>,
   )
   expect(map.getMinZoom()).toBe(3)
   expect(map.getMaxZoom()).toBe(10)
-  expect(map.layerPointToContainerPoint).not.toBe(to)
   await render(<ReleafMap.Root ref={ref} />)
   expect(map.getMinZoom()).toBe(2)
   expect(map.getMaxZoom()).toBe(18)
-  expect(map.layerPointToContainerPoint).toBe(to)
-  expect(map.containerPointToLayerPoint).toBe(from)
-  expect(pane.style.rotate).toBe(rotate)
-  expect(pane.style.transformOrigin).toBe(origin)
 })
 
 test("both published entrypoints retain client directives and import without browser globals", async () => {

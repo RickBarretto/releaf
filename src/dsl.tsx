@@ -18,10 +18,7 @@ import { cn } from "./lib/utils"
 import { MapContainer } from "./map"
 import type { PopupProps, TooltipProps } from "./overlays"
 import { Popup, Tooltip } from "./overlays"
-import { getRotationState, Rotation } from "./rotation"
 import { SearchBar } from "./search"
-
-export type { RotationProps } from "./rotation"
 
 /** Geographic coordinates in degrees, independent of Leaflet tuple ordering. */
 export interface Position {
@@ -40,7 +37,7 @@ export function toLatLng(
     : position
 }
 
-/** Stable imperative actions for the current map. Rotation requires <Map.Rotation>. */
+/** Stable imperative actions for the current map. */
 export function useController() {
   const map = useMap()
 
@@ -62,12 +59,6 @@ export function useController() {
           positions.map(toLatLng) as Leaflet.LatLngTuple[],
           options,
         ),
-      rotateBy: (degrees: number) => {
-        getRotationState(map).turn(degrees)
-      },
-      resetNorth: () => {
-        getRotationState(map).turn(null)
-      },
     }),
     [map],
   )
@@ -239,21 +230,6 @@ function ZoomOut(props: ActionProps) {
   )
 }
 
-function ResetNorth(props: ActionProps) {
-  const map = useController()
-
-  return (
-    <Action
-      aria-label="Reset north"
-      title="Reset north"
-      {...props}
-      run={map.resetNorth}
-    >
-      {props.children ?? "Reset north"}
-    </Action>
-  )
-}
-
 export interface LocateProps extends ActionProps {
   options?: Leaflet.LocateOptions
 }
@@ -357,13 +333,12 @@ const ReleafMap = {
   Root: MapContainer,
   View,
   Zoom,
-  Rotation,
   Toolbar,
   Marker: DSLMarker,
   Popup: DSLPopup,
   Tooltip: DSLTooltip,
   Tiles: { OpenStreetMap, Custom: CustomTiles },
-  Actions: { ZoomIn, ZoomOut, Locate, ResetNorth, FlyTo },
+  Actions: { ZoomIn, ZoomOut, Locate, FlyTo },
   SearchBar,
   useController,
 }

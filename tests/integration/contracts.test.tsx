@@ -242,7 +242,6 @@ test("actions compose handlers, cancellation, disabled children and controller m
   }
   await render(
     <ReleafMap.Root ref={ref}>
-      <ReleafMap.Rotation animate={false} />
       <Controls />
     </ReleafMap.Root>,
   )
@@ -286,10 +285,6 @@ test("actions compose handlers, cancellation, disabled children and controller m
     ],
     undefined,
   )
-  controller.rotateBy(-45)
-  expect(map.getPane("mapPane")!.style.rotate).toBe("315deg")
-  controller.resetNorth()
-  expect(map.getPane("mapPane")!.style.rotate).toBe("0deg")
   locate.mockRestore()
   fly.mockRestore()
   fit.mockRestore()

@@ -4,14 +4,12 @@ import {
   MapContainer,
   type Position,
   Map as ReleafMap,
-  useController,
   useMapEvents,
   useMapView,
 } from "releaf"
 export function App() {
   const [mounted, setMounted] = useState(true)
   const [wide, setWide] = useState(false)
-  const [rotation, setRotation] = useState(true)
   return (
     <StrictMode>
       <button type="button" onClick={() => setMounted(!mounted)}>
@@ -19,9 +17,6 @@ export function App() {
       </button>
       <button type="button" onClick={() => setWide(!wide)}>
         Resize map
-      </button>
-      <button type="button" onClick={() => setRotation(!rotation)}>
-        Toggle rotation
       </button>
       <div style={{ width: wide ? 900 : 700 }}>
         {mounted && (
@@ -44,7 +39,6 @@ export function App() {
             fallback={<p>Loading map</p>}
           >
             <ReleafMap.Tiles.Custom url="/tiles/{z}/{x}/{y}.svg" />
-            <ReleafMap.Rotation enabled={rotation} />
             <ReleafMap.Marker
               position={[0, 0]}
               options={{ draggable: true }}
@@ -78,7 +72,6 @@ function Counter() {
   )
 }
 function Status() {
-  const controller = useController()
   const view = useMapView()
   const [clicked, setClicked] = useState<Position | null>(null)
   const [selected, setSelected] = useState("")
@@ -91,10 +84,6 @@ function Status() {
       <ReleafMap.Toolbar bottom left>
         <ReleafMap.Actions.ZoomIn />
         <ReleafMap.Actions.ZoomOut />
-        <button type="button" onClick={() => controller.rotateBy(45)}>
-          Rotate
-        </button>
-        <ReleafMap.Actions.ResetNorth />
         <ReleafMap.Actions.FlyTo
           position={{ latitude: 2, longitude: 2 }}
           zoom={6}
