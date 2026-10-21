@@ -133,6 +133,9 @@ with error feedback and retry.
 
 ## Explore
 
+- **Map / Location Picker / Complete** in Storybook combines search, current
+  location with retry, a draggable marker, map clicks, and selected coordinates.
+  [Example source](stories/examples/LocationPicker.tsx) · [composition notes](docs/location-picker.md).
 - [API guide](docs/api.md) — components, hooks, search, and shadcn composition.
 - [Development guide](docs/development.md) — setup, tests, and Storybook demos.
 - [DSL design](DSL.md) — the compound Map API.
