@@ -16,7 +16,6 @@ export {
   Map,
   type Position,
   type PositionExpression,
-  type RotationProps,
   type ToolbarProps,
   useController,
   type ViewProps,

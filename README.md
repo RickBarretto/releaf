@@ -14,7 +14,7 @@ components for Leaflet. Built-in controls use shadcn/ui, with support for your o
 
 - **Composable:** markers, popups, shapes, GeoJSON, and tile layers.
 - **Customizable:** shadcn/ui controls that fit your design system.
-- **Interactive:** zoom, rotation, fly-to, and search with your provider.
+- **Interactive:** zoom, fly-to, and search with your provider.
 - **React-ready:** typed hooks, refs, and server rendering support.
 
 ## Quick start

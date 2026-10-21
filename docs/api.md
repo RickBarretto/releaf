@@ -70,7 +70,6 @@ Camera components apply settings when their props change.
 | `Map.Zoom` | `zoom` | `number` | Required |
 | | `minZoom` | `number` | `0` |
 | | `maxZoom` | `number` | `Infinity` |
-| `Map.Rotation` | `enabled` | `boolean` | `true`; enables controller rotation |
 | | `animate` | `boolean` | `true`; respects reduced motion preferences |
 | | `duration` | `number` | `300`; animation duration in milliseconds |
 | `MapView` | `center` | `Leaflet.LatLngExpression` | Required |
@@ -226,7 +225,6 @@ Calling `event.preventDefault()` in a click handler cancels the command.
 | --- | --- | --- |
 | `Map.Actions.ZoomIn` | Zoom in one step | — |
 | `Map.Actions.ZoomOut` | Zoom out one step | — |
-| `Map.Actions.ResetNorth` | Reset bearing to zero | — |
 | `Map.Actions.Locate` | Request browser geolocation | `options?: Leaflet.LocateOptions`; defaults to `{ setView: true }` |
 | `Map.Actions.FlyTo` | Animate to a location | Required `position: PositionExpression`; optional `zoom: number`, `options: Leaflet.ZoomPanOptions` |
 
@@ -307,8 +305,6 @@ The snapshot and its fields are readonly.
 | `zoomIn`, `zoomOut` | Optional `delta: number` | `Leaflet.Map` |
 | `flyTo` | Required `position: PositionExpression`; optional `zoom: number`, `options: Leaflet.ZoomPanOptions` | `Leaflet.Map` |
 | `fitBounds` | Required `positions: readonly PositionExpression[]`; optional `options: Leaflet.FitBoundsOptions` | `Leaflet.Map` |
-| `rotateBy` | Required `degrees: number`; clockwise, requires `Map.Rotation` | `void` |
-| `resetNorth` | None | `void` |
 
 ```tsx
 const map = Map.useController();

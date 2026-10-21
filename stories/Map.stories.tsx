@@ -1,15 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import {
-  Compass,
-  Copy,
-  LocateFixed,
-  MapPin,
-  Maximize2,
-  Minus,
-  Plus,
-  RotateCcw,
-  RotateCw,
-} from "lucide-react"
+import { Copy, LocateFixed, MapPin, Maximize2, Minus, Plus } from "lucide-react"
 import { type ReactNode, useState } from "react"
 import { type Position, Map as ReleafMap } from "releaf"
 import { useMapEvents } from "releaf/events"
@@ -44,14 +34,12 @@ function Frame({
   title,
   description,
   zoom = 13,
-  rotation = true,
   tiles = true,
 }: {
   children?: ReactNode
   title: string
   description: string
   zoom?: number
-  rotation?: boolean
   tiles?: boolean
 }) {
   return (
@@ -70,7 +58,6 @@ function Frame({
       >
         <ReleafMap.View position={home} />
         <ReleafMap.Zoom zoom={zoom} minZoom={3} maxZoom={19} />
-        <ReleafMap.Rotation enabled={rotation} />
         {tiles && <ReleafMap.Tiles.OpenStreetMap />}
         {children}
       </ReleafMap.Root>
@@ -100,33 +87,6 @@ function Navigation() {
           onClick={() => map.zoomOut()}
         >
           <Minus />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          aria-label="Rotate left"
-          title="Rotate left"
-          onClick={() => map.rotateBy(-15)}
-        >
-          <RotateCcw />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          aria-label="Rotate right"
-          title="Rotate right"
-          onClick={() => map.rotateBy(15)}
-        >
-          <RotateCw />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          aria-label="Reset north"
-          title="Reset north"
-          onClick={map.resetNorth}
-        >
-          <Compass />
         </Button>
         <Button
           size="icon"
@@ -164,13 +124,12 @@ function Navigation() {
   )
 }
 
-function Playground({ zoom, rotation }: { zoom: number; rotation: boolean }) {
+function Playground({ zoom }: { zoom: number }) {
   return (
     <Frame
       title="Your map, your controls"
-      description="Pan the map, open a marker, or try the navigation toolbar. Adjust zoom and rotation in Storybook Controls."
+      description="Pan the map, open a marker, or try the navigation toolbar. Adjust zoom in Storybook Controls."
       zoom={zoom}
-      rotation={rotation}
     >
       <ReleafMap.Marker position={home}>
         <ReleafMap.Popup>
@@ -188,10 +147,9 @@ function Playground({ zoom, rotation }: { zoom: number; rotation: boolean }) {
 const meta = {
   title: "Map/DSL",
   component: Playground,
-  args: { zoom: 13, rotation: true },
+  args: { zoom: 13 },
   argTypes: {
     zoom: { control: { type: "range", min: 3, max: 19, step: 1 } },
-    rotation: { control: "boolean" },
   },
   parameters: {
     docs: {
@@ -359,16 +317,6 @@ export const ActionComponents: Story = {
               <LocateFixed />
             </Button>
           </ReleafMap.Actions.Locate>
-          <ReleafMap.Actions.ResetNorth>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Reset north"
-              title="Reset north"
-            >
-              <Compass />
-            </Button>
-          </ReleafMap.Actions.ResetNorth>
           <ReleafMap.Actions.FlyTo position={home} zoom={15}>
             <Button
               variant="secondary"
