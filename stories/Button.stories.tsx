@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import type { Meta, StoryObj } from "@storybook/react-vite"
+import { Plus } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 const meta = {
   title: "Development/Button",
@@ -26,10 +26,10 @@ const meta = {
       },
     },
   },
-} satisfies Meta<typeof Button>;
-export default meta;
-type Story = StoryObj<typeof meta>;
-export const Default: Story = {};
+} satisfies Meta<typeof Button>
+export default meta
+type Story = StoryObj<typeof meta>
+export const Default: Story = {}
 export const Variants: Story = {
   render: () => (
     <div className="flex flex-wrap gap-3">
@@ -40,7 +40,7 @@ export const Variants: Story = {
       <Button disabled>Disabled</Button>
     </div>
   ),
-};
+}
 export const Icon: Story = {
   args: { size: "icon", "aria-label": "Zoom in", children: <Plus /> },
-};
+}

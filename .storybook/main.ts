@@ -1,7 +1,7 @@
-import { fileURLToPath } from "node:url";
-import type { StorybookConfig } from "@storybook/react-vite";
-import tailwindcss from "@tailwindcss/vite";
-import { mergeConfig } from "vite";
+import { fileURLToPath } from "node:url"
+import type { StorybookConfig } from "@storybook/react-vite"
+import tailwindcss from "@tailwindcss/vite"
+import { mergeConfig } from "vite"
 
 const config: StorybookConfig = {
   stories: ["../stories/**/*.stories.tsx"],
@@ -22,5 +22,5 @@ const config: StorybookConfig = {
         dedupe: ["react", "react-dom", "leaflet"],
       },
     }),
-};
-export default config;
+}
+export default config

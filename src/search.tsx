@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import type { ComponentPropsWithoutRef, ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react"
 import {
   createContext,
   useContext,
@@ -8,46 +8,52 @@ import {
   useId,
   useRef,
   useState,
-} from "react";
+} from "react"
 
 export interface SearchPlace {
-  id?: string | number;
-  label: string;
+  id?: string | number
+  label: string
 }
+
 export interface SearchBarProps<T>
   extends Omit<ComponentPropsWithoutRef<"div">, "onSelect"> {
   search: (
     query: string,
     signal: AbortSignal,
-  ) => readonly T[] | Promise<readonly T[]>;
-  onSelect: (place: T) => void;
-  getLabel?: (place: T) => string;
-  minLength?: number;
-  debounceMs?: number;
+  ) => readonly T[] | Promise<readonly T[]>
+  onSelect: (place: T) => void
+  getLabel?: (place: T) => string
+  minLength?: number
+  debounceMs?: number
 }
+
 interface SearchState {
-  query: string;
-  setQuery: (query: string) => void;
-  results: readonly unknown[];
-  label: (place: unknown) => string;
-  select: (place: unknown) => void;
-  loading: boolean;
-  error: unknown;
-  id: string;
-  active: number;
-  setActive: (index: number) => void;
+  query: string
+  setQuery: (query: string) => void
+  results: readonly unknown[]
+  label: (place: unknown) => string
+  select: (place: unknown) => void
+  loading: boolean
+  error: unknown
+  id: string
+  active: number
+  setActive: (index: number) => void
 }
-const Context = createContext<SearchState | null>(null);
+
+const Context = createContext<SearchState | null>(null)
+
 function useSearch() {
-  const value = useContext(Context);
+  const value = useContext(Context)
   if (!value)
-    throw new Error("SearchBar components must be inside <Map.SearchBar>.");
-  return value;
+    throw new Error("SearchBar components must be inside <Map.SearchBar>.")
+
+  return value
 }
-function Root<T extends SearchPlace>(props: SearchBarProps<T>): ReactNode;
+
+function Root<T extends SearchPlace>(props: SearchBarProps<T>): ReactNode
 function Root<T>(
   props: SearchBarProps<T> & { getLabel: (place: T) => string },
-): ReactNode;
+): ReactNode
 function Root<T>({
   search,
   onSelect,
@@ -57,86 +63,94 @@ function Root<T>({
   children,
   ...props
 }: SearchBarProps<T>) {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<readonly T[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<unknown>(null);
-  const [active, setActive] = useState(-1);
-  const [selected, setSelected] = useState<string | null>(null);
-  const id = useId();
-  const callbacks = useRef({ search, onSelect, getLabel });
+  const [query, setQuery] = useState("")
+  const [results, setResults] = useState<readonly T[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<unknown>(null)
+  const [active, setActive] = useState(-1)
+  const [selected, setSelected] = useState<string | null>(null)
+  const id = useId()
+  const callbacks = useRef({ search, onSelect, getLabel })
+
   useEffect(() => {
-    callbacks.current = { search, onSelect, getLabel };
-  });
+    callbacks.current = { search, onSelect, getLabel }
+  })
+
   useEffect(() => {
-    const controller = new AbortController();
-    setResults([]);
-    setActive(-1);
-    setError(null);
-    setLoading(false);
-    if (query.trim().length < minLength || query === selected) return;
-    setLoading(true);
+    const controller = new AbortController()
+    setResults([])
+    setActive(-1)
+    setError(null)
+    setLoading(false)
+    if (query.trim().length < minLength || query === selected) return
+
+    setLoading(true)
     const timer = setTimeout(() => {
       void Promise.resolve()
         .then(() => callbacks.current.search(query, controller.signal))
         .then(
           (items) => {
             if (!controller.signal.aborted) {
-              setResults(items);
-              setLoading(false);
+              setResults(items)
+              setLoading(false)
             }
           },
           (cause) => {
             if (!controller.signal.aborted) {
-              setError(cause);
-              setLoading(false);
+              setError(cause)
+              setLoading(false)
             }
           },
-        );
-    }, debounceMs);
+        )
+    }, debounceMs)
+
     return () => {
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, [query, minLength, debounceMs, selected]);
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [query, minLength, debounceMs, selected])
+
   const label = (place: T) =>
     callbacks.current.getLabel
       ? callbacks.current.getLabel(place)
-      : (place as SearchPlace).label;
+      : (place as SearchPlace).label
   const state: SearchState = {
     query,
     setQuery: (value) => {
-      setSelected(null);
-      setQuery(value);
+      setSelected(null)
+      setQuery(value)
     },
     results,
     label: (place) => label(place as T),
     select: (place) => {
-      const text = label(place as T);
-      setSelected(text);
-      setQuery(text);
-      setResults([]);
-      setActive(-1);
-      callbacks.current.onSelect(place as T);
+      const text = label(place as T)
+      setSelected(text)
+      setQuery(text)
+      setResults([])
+      setActive(-1)
+      callbacks.current.onSelect(place as T)
     },
     loading,
     error,
     id,
     active,
     setActive,
-  };
+  }
+
   return (
     <Context value={state}>
       <div {...props}>{children}</div>
     </Context>
-  );
+  )
 }
+
 function Input({
   onChange,
   onKeyDown,
   ...props
 }: ComponentPropsWithoutRef<"input">) {
-  const state = useSearch();
+  const state = useSearch()
+
   return (
     <input
       aria-label="Search places"
@@ -150,44 +164,48 @@ function Input({
       }
       value={state.query}
       onChange={(event) => {
-        onChange?.(event);
-        if (!event.defaultPrevented) state.setQuery(event.target.value);
+        onChange?.(event)
+        if (!event.defaultPrevented) state.setQuery(event.target.value)
       }}
       onKeyDown={(event) => {
-        onKeyDown?.(event);
-        if (event.defaultPrevented) return;
+        onKeyDown?.(event)
+        if (event.defaultPrevented) return
+
         if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-          event.preventDefault();
-          const count = state.results.length;
+          event.preventDefault()
+          const count = state.results.length
           if (count)
             state.setActive(
               (state.active +
                 (event.key === "ArrowDown" ? 1 : count - 1) +
                 count) %
                 count,
-            );
+            )
         } else if (event.key === "Enter" && state.active >= 0) {
-          event.preventDefault();
-          state.select(state.results[state.active]);
+          event.preventDefault()
+          state.select(state.results[state.active])
         } else if (event.key === "Escape") {
-          state.setQuery("");
+          state.setQuery("")
         }
       }}
     />
-  );
+  )
 }
+
 export interface SearchResultsProps extends ComponentPropsWithoutRef<"ul"> {
-  loadingMessage?: ReactNode;
-  emptyMessage?: ReactNode;
-  errorMessage?: ReactNode;
+  loadingMessage?: ReactNode
+  emptyMessage?: ReactNode
+  errorMessage?: ReactNode
 }
+
 function Results({
   loadingMessage = "Searching…",
   emptyMessage = "No results",
   errorMessage = "Search failed",
   ...props
 }: SearchResultsProps) {
-  const state = useSearch();
+  const state = useSearch()
+
   return (
     <>
       <div role="status">
@@ -217,8 +235,8 @@ function Results({
             tabIndex={-1}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                state.select(place);
+                event.preventDefault()
+                state.select(place)
               }
             }}
             aria-selected={state.active === index}
@@ -231,6 +249,7 @@ function Results({
         ))}
       </ul>
     </>
-  );
+  )
 }
-export const SearchBar = Object.assign(Root, { Input, Results });
+
+export const SearchBar = Object.assign(Root, { Input, Results })

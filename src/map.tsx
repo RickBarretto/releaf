@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import type * as Leaflet from "leaflet";
-import type { ComponentPropsWithoutRef, ReactNode, Ref } from "react";
-import { useEffect, useImperativeHandle, useRef, useState } from "react";
-import type { MapContextValue } from "./context";
-import { MapContext, useEventHandlers, useMapContext } from "./context";
+import type * as Leaflet from "leaflet"
+import type { ComponentPropsWithoutRef, ReactNode, Ref } from "react"
+import { useEffect, useImperativeHandle, useRef, useState } from "react"
+import type { MapContextValue } from "./context"
+import { MapContext, useEventHandlers, useMapContext } from "./context"
 
 export interface MapContainerProps extends ComponentPropsWithoutRef<"div"> {
   /** Creation-only options. Change the component key to recreate the map. */
-  options?: Leaflet.MapOptions;
-  initialCenter?: Leaflet.LatLngExpression;
-  initialZoom?: number;
-  eventHandlers?: Leaflet.LeafletEventHandlerFnMap;
-  ref?: Ref<Leaflet.Map>;
-  fallback?: ReactNode;
+  options?: Leaflet.MapOptions
+  initialCenter?: Leaflet.LatLngExpression
+  initialZoom?: number
+  eventHandlers?: Leaflet.LeafletEventHandlerFnMap
+  ref?: Ref<Leaflet.Map>
+  fallback?: ReactNode
 }
 
 function Ready({
@@ -22,14 +22,16 @@ function Ready({
   eventHandlers,
   children,
 }: {
-  context: MapContextValue;
-  mapRef?: Ref<Leaflet.Map>;
-  eventHandlers?: Leaflet.LeafletEventHandlerFnMap;
-  children?: ReactNode;
+  context: MapContextValue
+  mapRef?: Ref<Leaflet.Map>
+  eventHandlers?: Leaflet.LeafletEventHandlerFnMap
+  children?: ReactNode
 }) {
-  useImperativeHandle(mapRef, () => context.map, [context.map]);
-  useEventHandlers(context.map, eventHandlers);
-  return <MapContext value={context}>{children}</MapContext>;
+  useImperativeHandle(mapRef, () => context.map, [context.map])
+
+  useEventHandlers(context.map, eventHandlers)
+
+  return <MapContext value={context}>{children}</MapContext>
 }
 
 export function MapContainer({
@@ -43,47 +45,48 @@ export function MapContainer({
   style,
   ...props
 }: MapContainerProps) {
-  const container = useRef<HTMLDivElement>(null);
+  const container = useRef<HTMLDivElement>(null)
   const [initialOptions] = useState(() => ({
     center: initialCenter,
     zoom: initialZoom,
     ...options,
-  }));
-  const [context, setContext] = useState<MapContextValue | null>(null);
-  const [error, setError] = useState<Error | null>(null);
+  }))
+  const [context, setContext] = useState<MapContextValue | null>(null)
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    let cancelled = false;
-    let map: Leaflet.Map | undefined;
-    let observer: ResizeObserver | undefined;
+    let cancelled = false
+    let map: Leaflet.Map | undefined
+    let observer: ResizeObserver | undefined
 
     // Leaflet reads window at module scope, so never import it during SSR.
     void import("leaflet")
       .then((leaflet) => {
-        if (cancelled || !container.current) return;
-        map = leaflet.map(container.current, initialOptions);
+        if (cancelled || !container.current) return
+
+        map = leaflet.map(container.current, initialOptions)
         if (typeof ResizeObserver !== "undefined") {
           observer = new ResizeObserver(() =>
             map?.invalidateSize({ pan: false }),
-          );
-          observer.observe(container.current);
+          )
+          observer.observe(container.current)
         }
-        setContext({ map, leaflet });
+        setContext({ map, leaflet })
       })
       .catch((cause: unknown) => {
         if (!cancelled)
-          setError(cause instanceof Error ? cause : new Error(String(cause)));
-      });
+          setError(cause instanceof Error ? cause : new Error(String(cause)))
+      })
 
     return () => {
-      cancelled = true;
-      observer?.disconnect();
-      map?.remove();
-      setContext(null);
-    };
-  }, [initialOptions]);
+      cancelled = true
+      observer?.disconnect()
+      map?.remove()
+      setContext(null)
+    }
+  }, [initialOptions])
 
-  if (error) throw error;
+  if (error) throw error
 
   return (
     <div {...props} style={{ height: 400, ...style }}>
@@ -96,23 +99,25 @@ export function MapContainer({
         fallback
       )}
     </div>
-  );
+  )
 }
 
 export interface MapViewProps {
-  center: Leaflet.LatLngExpression;
-  zoom: number;
-  animate?: boolean;
+  center: Leaflet.LatLngExpression
+  zoom: number
+  animate?: boolean
 }
 
 /** Apply camera prop changes; user pan/zoom remains free between changes. */
 export function MapView({ center, zoom, animate = false }: MapViewProps) {
-  const { map, leaflet } = useMapContext();
-  const { lat, lng } = leaflet.latLng(center);
+  const { map, leaflet } = useMapContext()
+  const { lat, lng } = leaflet.latLng(center)
+
   useEffect(() => {
     if (!map.getCenter().equals([lat, lng]) || map.getZoom() !== zoom) {
-      map.setView([lat, lng], zoom, { animate });
+      map.setView([lat, lng], zoom, { animate })
     }
-  }, [map, lat, lng, zoom, animate]);
-  return null;
+  }, [map, lat, lng, zoom, animate])
+
+  return null
 }

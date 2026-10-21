@@ -1,1 +1,1 @@
-import "@storybook/addon-docs/manager";
+import "@storybook/addon-docs/manager"

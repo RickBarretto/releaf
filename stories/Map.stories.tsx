@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import {
   Compass,
   Copy,
@@ -9,13 +9,13 @@ import {
   Plus,
   RotateCcw,
   RotateCw,
-} from "lucide-react";
-import { type ReactNode, useState } from "react";
-import { type Position, Map as ReleafMap } from "releaf";
-import { useMapEvents } from "releaf/events";
-import { Button } from "@/components/ui/button";
+} from "lucide-react"
+import { type ReactNode, useState } from "react"
+import { type Position, Map as ReleafMap } from "releaf"
+import { useMapEvents } from "releaf/events"
+import { Button } from "@/components/ui/button"
 
-const home: Position = { latitude: 51.5074, longitude: -0.1278 };
+const home: Position = { latitude: 51.5074, longitude: -0.1278 }
 const places = [
   { id: "home", label: "London · City center", ...home },
   {
@@ -36,8 +36,8 @@ const places = [
     latitude: -22.9711,
     longitude: -43.1822,
   },
-];
-const panel = "rounded-xl border bg-background p-2 text-foreground shadow-lg";
+]
+const panel = "rounded-xl border bg-background p-2 text-foreground shadow-lg"
 
 function Frame({
   children,
@@ -47,12 +47,12 @@ function Frame({
   rotation = true,
   tiles = true,
 }: {
-  children?: ReactNode;
-  title: string;
-  description: string;
-  zoom?: number;
-  rotation?: boolean;
-  tiles?: boolean;
+  children?: ReactNode
+  title: string
+  description: string
+  zoom?: number
+  rotation?: boolean
+  tiles?: boolean
 }) {
   return (
     <section className="mx-auto max-w-6xl space-y-4 p-2">
@@ -76,11 +76,11 @@ function Frame({
         {children}
       </ReleafMap.Root>
     </section>
-  );
+  )
 }
 
 function Navigation() {
-  const map = ReleafMap.useController();
+  const map = ReleafMap.useController()
   return (
     <ReleafMap.Toolbar top right>
       <div className={`${panel} flex flex-col gap-1`}>
@@ -154,7 +154,7 @@ function Navigation() {
         </Button>
       </div>
     </ReleafMap.Toolbar>
-  );
+  )
 }
 
 function Playground({ zoom, rotation }: { zoom: number; rotation: boolean }) {
@@ -176,7 +176,7 @@ function Playground({ zoom, rotation }: { zoom: number; rotation: boolean }) {
       </ReleafMap.Marker>
       <Navigation />
     </Frame>
-  );
+  )
 }
 const meta = {
   title: "Map/DSL",
@@ -194,31 +194,29 @@ const meta = {
       },
     },
   },
-} satisfies Meta<typeof Playground>;
-export default meta;
-type Story = StoryObj<typeof meta>;
-export const NavigationPlayground: Story = {};
+} satisfies Meta<typeof Playground>
+export default meta
+type Story = StoryObj<typeof meta>
+export const NavigationPlayground: Story = {}
 
 function Picker() {
-  const [selected, setSelected] = useState<Position | null>(null);
-  const [status, setStatus] = useState("");
+  const [selected, setSelected] = useState<Position | null>(null)
+  const [status, setStatus] = useState("")
   useMapEvents({
     click: (event) => {
-      setSelected(event.position);
-      setStatus("");
+      setSelected(event.position)
+      setStatus("")
     },
-  });
+  })
   async function copy() {
-    if (!selected) return;
+    if (!selected) return
     try {
       await navigator.clipboard.writeText(
         `${selected.latitude}, ${selected.longitude}`,
-      );
-      setStatus("Coordinates copied");
+      )
+      setStatus("Coordinates copied")
     } catch {
-      setStatus(
-        "Clipboard unavailable. Select and copy the coordinates above.",
-      );
+      setStatus("Clipboard unavailable. Select and copy the coordinates above.")
     }
   }
   return (
@@ -241,7 +239,7 @@ function Picker() {
       </ReleafMap.Toolbar>
       {selected && <ReleafMap.Marker position={selected} />}
     </>
-  );
+  )
 }
 export const CoordinatePicker: Story = {
   render: () => (
@@ -253,10 +251,10 @@ export const CoordinatePicker: Story = {
     </Frame>
   ),
   parameters: { controls: { disable: true } },
-};
+}
 
 function Layers() {
-  const [basemap, setBasemap] = useState<"streets" | "terrain">("streets");
+  const [basemap, setBasemap] = useState<"streets" | "terrain">("streets")
   return (
     <>
       <ReleafMap.Toolbar top left>
@@ -289,7 +287,7 @@ function Layers() {
         />
       )}
     </>
-  );
+  )
 }
 export const LayerSwitcher: Story = {
   render: () => (
@@ -302,7 +300,7 @@ export const LayerSwitcher: Story = {
     </Frame>
   ),
   parameters: { controls: { disable: true } },
-};
+}
 export const ActionComponents: Story = {
   render: () => (
     <Frame
@@ -345,13 +343,11 @@ export const ActionComponents: Story = {
     </Frame>
   ),
   parameters: { controls: { disable: true } },
-};
+}
 
 function PlaceSearch() {
-  const map = ReleafMap.useController();
-  const [selected, setSelected] = useState<(typeof places)[number] | null>(
-    null,
-  );
+  const map = ReleafMap.useController()
+  const [selected, setSelected] = useState<(typeof places)[number] | null>(null)
   return (
     <>
       <ReleafMap.Toolbar top left>
@@ -365,8 +361,8 @@ function PlaceSearch() {
               )
             }
             onSelect={(place) => {
-              setSelected(place);
-              map.flyTo(place, 13);
+              setSelected(place)
+              map.flyTo(place, 13)
             }}
           >
             <ReleafMap.SearchBar.Input
@@ -390,7 +386,7 @@ function PlaceSearch() {
         </ReleafMap.Marker>
       )}
     </>
-  );
+  )
 }
 export const SearchPlaces: Story = {
   render: () => (
@@ -402,9 +398,9 @@ export const SearchPlaces: Story = {
     </Frame>
   ),
   parameters: { controls: { disable: true } },
-};
+}
 
-const grid = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#f0f5ed"/><path d="M0 0H256V256H0Z M128 0V256 M0 128H256" stroke="#c8d8bf" fill="none"/><path d="M0 60L256 190 M80 0L190 256" stroke="#fff" stroke-width="12"/></svg>')}`;
+const grid = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#f0f5ed"/><path d="M0 0H256V256H0Z M128 0V256 M0 128H256" stroke="#c8d8bf" fill="none"/><path d="M0 60L256 190 M80 0L190 256" stroke="#fff" stroke-width="12"/></svg>')}`
 export const OfflinePreview: Story = {
   render: () => (
     <Frame
@@ -423,4 +419,4 @@ export const OfflinePreview: Story = {
     </Frame>
   ),
   parameters: { controls: { disable: true } },
-};
+}
