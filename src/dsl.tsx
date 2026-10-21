@@ -210,7 +210,12 @@ function ZoomIn(props: ActionProps) {
   const map = useController()
 
   return (
-    <Action aria-label="Zoom in" {...props} run={() => map.zoomIn()}>
+    <Action
+      aria-label="Zoom in"
+      title="Zoom in"
+      {...props}
+      run={() => map.zoomIn()}
+    >
       {props.children ?? "+"}
     </Action>
   )
@@ -220,7 +225,12 @@ function ZoomOut(props: ActionProps) {
   const map = useController()
 
   return (
-    <Action aria-label="Zoom out" {...props} run={() => map.zoomOut()}>
+    <Action
+      aria-label="Zoom out"
+      title="Zoom out"
+      {...props}
+      run={() => map.zoomOut()}
+    >
       {props.children ?? "−"}
     </Action>
   )
@@ -230,7 +240,12 @@ function ResetNorth(props: ActionProps) {
   const map = useController()
 
   return (
-    <Action {...props} run={map.resetNorth}>
+    <Action
+      aria-label="Reset north"
+      title="Reset north"
+      {...props}
+      run={map.resetNorth}
+    >
       {props.children ?? "Reset north"}
     </Action>
   )
@@ -244,7 +259,12 @@ function Locate({ options, ...props }: LocateProps) {
   const map = useMap()
 
   return (
-    <Action {...props} run={() => map.locate({ setView: true, ...options })}>
+    <Action
+      aria-label="Locate me"
+      title="Locate me"
+      {...props}
+      run={() => map.locate({ setView: true, ...options })}
+    >
       {props.children ?? "Locate me"}
     </Action>
   )
@@ -260,7 +280,12 @@ function FlyTo({ position, zoom, options, ...props }: FlyToProps) {
   const map = useController()
 
   return (
-    <Action {...props} run={() => map.flyTo(position, zoom, options)}>
+    <Action
+      aria-label="Go to location"
+      title="Go to location"
+      {...props}
+      run={() => map.flyTo(position, zoom, options)}
+    >
       {props.children ?? "Go to location"}
     </Action>
   )

@@ -7,11 +7,13 @@ const meta = {
   component: Button,
   args: {
     children: "Go home",
+    title: "Go home",
     variant: "default",
     size: "default",
     disabled: false,
   },
   argTypes: {
+    title: { control: "text", description: "Custom button tooltip." },
     variant: {
       control: "select",
       options: ["default", "secondary", "outline", "ghost"],
@@ -33,14 +35,30 @@ export const Default: Story = {}
 export const Variants: Story = {
   render: () => (
     <div className="flex flex-wrap gap-3">
-      <Button>Default</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="ghost">Ghost</Button>
-      <Button disabled>Disabled</Button>
+      <Button title="Default action">Default</Button>
+      <Button variant="secondary" title="Secondary action">
+        Secondary
+      </Button>
+      <Button variant="outline" title="Outline action">
+        Outline
+      </Button>
+      <Button variant="ghost" title="Ghost action">
+        Ghost
+      </Button>
+      <Button disabled title="Disabled action">
+        Disabled
+      </Button>
     </div>
   ),
 }
 export const Icon: Story = {
-  args: { size: "icon", "aria-label": "Zoom in", children: <Plus /> },
+  args: {
+    size: "icon",
+    "aria-label": "Zoom in",
+    title: "Zoom in",
+    children: <Plus />,
+  },
+}
+export const CustomTooltip: Story = {
+  args: { children: "Go home", title: "Reset the map to its starting view" },
 }

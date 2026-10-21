@@ -88,6 +88,7 @@ function Navigation() {
           size="icon"
           variant="ghost"
           aria-label="Zoom in"
+          title="Zoom in"
           onClick={() => map.zoomIn()}
         >
           <Plus />
@@ -96,6 +97,7 @@ function Navigation() {
           size="icon"
           variant="ghost"
           aria-label="Zoom out"
+          title="Zoom out"
           onClick={() => map.zoomOut()}
         >
           <Minus />
@@ -104,6 +106,7 @@ function Navigation() {
           size="icon"
           variant="ghost"
           aria-label="Rotate left"
+          title="Rotate left"
           onClick={() => map.rotateBy(-15)}
         >
           <RotateCcw />
@@ -112,6 +115,7 @@ function Navigation() {
           size="icon"
           variant="ghost"
           aria-label="Rotate right"
+          title="Rotate right"
           onClick={() => map.rotateBy(15)}
         >
           <RotateCw />
@@ -120,6 +124,7 @@ function Navigation() {
           size="icon"
           variant="ghost"
           aria-label="Reset north"
+          title="Reset north"
           onClick={map.resetNorth}
         >
           <Compass />
@@ -128,6 +133,7 @@ function Navigation() {
           size="icon"
           variant="ghost"
           aria-label="Go home"
+          title="Go home"
           onClick={() => map.flyTo(home, 14)}
         >
           <MapPin />
@@ -136,6 +142,7 @@ function Navigation() {
           size="icon"
           variant="ghost"
           aria-label="Locate me"
+          title="Locate me"
           onClick={() => map.native.locate({ setView: true })}
         >
           <LocateFixed />
@@ -144,6 +151,7 @@ function Navigation() {
           size="icon"
           variant="ghost"
           aria-label="Fit markers"
+          title="Fit markers"
           onClick={() =>
             map.fitBounds([home, { latitude: 51.515, longitude: -0.09 }], {
               padding: [50, 50],
@@ -228,7 +236,13 @@ function Picker() {
               ? `${selected.latitude.toFixed(5)}, ${selected.longitude.toFixed(5)}`
               : "Click the map to select a location"}
           </p>
-          <Button size="sm" disabled={!selected} onClick={copy}>
+          <Button
+            size="sm"
+            aria-label="Copy selected coordinates"
+            title="Copy selected coordinates"
+            disabled={!selected}
+            onClick={copy}
+          >
             <Copy />
             Copy coordinates
           </Button>
@@ -262,6 +276,8 @@ function Layers() {
           <Button
             size="sm"
             variant={basemap === "streets" ? "default" : "ghost"}
+            aria-label="Show street map"
+            title="Show street map"
             aria-pressed={basemap === "streets"}
             onClick={() => setBasemap("streets")}
           >
@@ -270,6 +286,8 @@ function Layers() {
           <Button
             size="sm"
             variant={basemap === "terrain" ? "default" : "ghost"}
+            aria-label="Show terrain map"
+            title="Show terrain map"
             aria-pressed={basemap === "terrain"}
             onClick={() => setBasemap("terrain")}
           >
@@ -313,27 +331,51 @@ export const ActionComponents: Story = {
       <ReleafMap.Toolbar top right>
         <div className={`${panel} flex flex-wrap items-center gap-1`}>
           <ReleafMap.Actions.ZoomIn>
-            <Button variant="ghost" size="icon" aria-label="Zoom in">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Zoom in"
+              title="Zoom in"
+            >
               <Plus />
             </Button>
           </ReleafMap.Actions.ZoomIn>
           <ReleafMap.Actions.ZoomOut>
-            <Button variant="ghost" size="icon" aria-label="Zoom out">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Zoom out"
+              title="Zoom out"
+            >
               <Minus />
             </Button>
           </ReleafMap.Actions.ZoomOut>
           <ReleafMap.Actions.Locate>
-            <Button variant="ghost" size="icon" aria-label="Locate me">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Locate me"
+              title="Locate me"
+            >
               <LocateFixed />
             </Button>
           </ReleafMap.Actions.Locate>
           <ReleafMap.Actions.ResetNorth>
-            <Button variant="ghost" size="icon" aria-label="Reset north">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Reset north"
+              title="Reset north"
+            >
               <Compass />
             </Button>
           </ReleafMap.Actions.ResetNorth>
           <ReleafMap.Actions.FlyTo position={home} zoom={15}>
-            <Button variant="secondary">
+            <Button
+              variant="secondary"
+              aria-label="Return to London"
+              title="Return to London"
+            >
               <MapPin />
               Go home
             </Button>
