@@ -1,6 +1,6 @@
 "use client";
 
-import type * as L from "leaflet";
+import type * as Leaflet from "leaflet";
 import type { ReactNode, Ref } from "react";
 import {
   useContext,
@@ -16,16 +16,16 @@ import {
   useMapContext,
 } from "./context";
 
-interface LayerProps<T extends L.Layer, O> {
+interface LayerProps<T extends Leaflet.Layer, O> {
   /** Creation-only Leaflet options; change key to recreate. */
   options?: O;
-  eventHandlers?: L.LeafletEventHandlerFnMap;
+  eventHandlers?: Leaflet.LeafletEventHandlerFnMap;
   ref?: Ref<T>;
   children?: ReactNode;
 }
 
-function useLayer<T extends L.Layer>(
-  factory: (leaflet: typeof L) => T,
+function useLayer<T extends Leaflet.Layer>(
+  factory: (leaflet: typeof Leaflet) => T,
 ): T | null {
   const { map, leaflet } = useMapContext();
   const parent = useContext(LayerContainerContext) ?? map;
@@ -43,7 +43,7 @@ function useLayer<T extends L.Layer>(
   return layer;
 }
 
-function LayerReady<T extends L.Layer>({
+function LayerReady<T extends Leaflet.Layer>({
   layer,
   layerRef,
   eventHandlers,
@@ -51,7 +51,7 @@ function LayerReady<T extends L.Layer>({
 }: {
   layer: T;
   layerRef?: Ref<T>;
-  eventHandlers?: L.LeafletEventHandlerFnMap;
+  eventHandlers?: Leaflet.LeafletEventHandlerFnMap;
   children?: ReactNode;
 }) {
   useImperativeHandle(layerRef, () => layer, [layer]);
@@ -59,7 +59,7 @@ function LayerReady<T extends L.Layer>({
   return <LayerContext value={layer}>{children}</LayerContext>;
 }
 
-function renderLayer<T extends L.Layer>(
+function renderLayer<T extends Leaflet.Layer>(
   layer: T | null,
   props: LayerProps<T, unknown>,
 ) {
@@ -75,7 +75,7 @@ function renderLayer<T extends L.Layer>(
 }
 
 export interface TileLayerProps
-  extends LayerProps<L.TileLayer, L.TileLayerOptions> {
+  extends LayerProps<Leaflet.TileLayer, Leaflet.TileLayerOptions> {
   url: string;
   opacity?: number;
   zIndex?: number;
@@ -100,8 +100,8 @@ export function TileLayer(props: TileLayerProps) {
   return renderLayer(layer, props);
 }
 
-export interface MarkerProps extends LayerProps<L.Marker, L.MarkerOptions> {
-  position: L.LatLngExpression;
+export interface MarkerProps extends LayerProps<Leaflet.Marker, Leaflet.MarkerOptions> {
+  position: Leaflet.LatLngExpression;
   opacity?: number;
   draggable?: boolean;
   zIndexOffset?: number;
@@ -131,22 +131,22 @@ export function Marker(props: MarkerProps) {
   return renderLayer(layer, props);
 }
 
-interface PathProps<T extends L.Path, O extends L.PathOptions = L.PathOptions>
+interface PathProps<T extends Leaflet.Path, O extends Leaflet.PathOptions = Leaflet.PathOptions>
   extends LayerProps<T, O> {
   /** Mutable path style. Omitted style keys return to their creation values. */
-  pathOptions?: L.PathOptions;
+  pathOptions?: Leaflet.PathOptions;
 }
 
-function usePathStyle(layer: L.Path | null, style?: L.PathOptions) {
+function usePathStyle(layer: Leaflet.Path | null, style?: Leaflet.PathOptions) {
   const initial = useMemo(() => {
     if (!layer) return null;
     // Leaflet stores defaults on the options prototype; include inherited keys.
     const options: Record<string, unknown> = {};
     for (const key in layer.options)
-      options[key] = layer.options[key as keyof L.PathOptions];
+      options[key] = layer.options[key as keyof Leaflet.PathOptions];
     // CircleMarker.setStyle also accepts radius internally; the radius prop owns it.
     delete options.radius;
-    return options as L.PathOptions;
+    return options as Leaflet.PathOptions;
   }, [layer]);
   useEffect(() => {
     if (layer && initial) layer.setStyle({ ...initial, ...style });
@@ -154,8 +154,8 @@ function usePathStyle(layer: L.Path | null, style?: L.PathOptions) {
 }
 
 export interface PolylineProps
-  extends PathProps<L.Polyline, L.PolylineOptions> {
-  positions: L.LatLngExpression[] | L.LatLngExpression[][];
+  extends PathProps<Leaflet.Polyline, Leaflet.PolylineOptions> {
+  positions: Leaflet.LatLngExpression[] | Leaflet.LatLngExpression[][];
 }
 
 export function Polyline(props: PolylineProps) {
@@ -167,11 +167,11 @@ export function Polyline(props: PolylineProps) {
   return renderLayer(layer, props);
 }
 
-export interface PolygonProps extends PathProps<L.Polygon, L.PolylineOptions> {
+export interface PolygonProps extends PathProps<Leaflet.Polygon, Leaflet.PolylineOptions> {
   positions:
-    | L.LatLngExpression[]
-    | L.LatLngExpression[][]
-    | L.LatLngExpression[][][];
+    | Leaflet.LatLngExpression[]
+    | Leaflet.LatLngExpression[][]
+    | Leaflet.LatLngExpression[][][];
 }
 
 export function Polygon(props: PolygonProps) {
@@ -184,8 +184,8 @@ export function Polygon(props: PolygonProps) {
 }
 
 export interface CircleProps
-  extends PathProps<L.Circle, L.CircleMarkerOptions> {
-  center: L.LatLngExpression;
+  extends PathProps<Leaflet.Circle, Leaflet.CircleMarkerOptions> {
+  center: Leaflet.LatLngExpression;
   radius: number;
 }
 
@@ -204,8 +204,8 @@ export function Circle(props: CircleProps) {
 }
 
 export interface CircleMarkerProps
-  extends PathProps<L.CircleMarker, L.CircleMarkerOptions> {
-  center: L.LatLngExpression;
+  extends PathProps<Leaflet.CircleMarker, Leaflet.CircleMarkerOptions> {
+  center: Leaflet.LatLngExpression;
   radius?: number;
 }
 
@@ -222,8 +222,8 @@ export function CircleMarker(props: CircleMarkerProps) {
   return renderLayer(layer, props);
 }
 
-export interface RectangleProps extends PathProps<L.Rectangle> {
-  bounds: L.LatLngBoundsExpression;
+export interface RectangleProps extends PathProps<Leaflet.Rectangle> {
+  bounds: Leaflet.LatLngBoundsExpression;
 }
 
 export function Rectangle(props: RectangleProps) {
@@ -235,7 +235,7 @@ export function Rectangle(props: RectangleProps) {
   return renderLayer(layer, props);
 }
 
-export type LayerGroupProps = LayerProps<L.LayerGroup, L.LayerOptions>;
+export type LayerGroupProps = LayerProps<Leaflet.LayerGroup, Leaflet.LayerOptions>;
 
 export function LayerGroup(props: LayerGroupProps) {
   const layer = useLayer((L) => L.layerGroup([], props.options));
@@ -246,7 +246,7 @@ export function LayerGroup(props: LayerGroupProps) {
   ) : null;
 }
 
-export type FeatureGroupProps = LayerProps<L.FeatureGroup, L.LayerOptions>;
+export type FeatureGroupProps = LayerProps<Leaflet.FeatureGroup, Leaflet.LayerOptions>;
 
 export function FeatureGroup(props: FeatureGroupProps) {
   const layer = useLayer((L) => L.featureGroup([], props.options));
@@ -257,9 +257,9 @@ export function FeatureGroup(props: FeatureGroupProps) {
   ) : null;
 }
 
-export interface GeoJSONProps extends LayerProps<L.GeoJSON, L.GeoJSONOptions> {
-  data: Parameters<typeof L.geoJSON>[0];
-  pathOptions?: L.PathOptions;
+export interface GeoJSONProps extends LayerProps<Leaflet.GeoJSON, Leaflet.GeoJSONOptions> {
+  data: Parameters<typeof Leaflet.geoJSON>[0];
+  pathOptions?: Leaflet.PathOptions;
 }
 
 /** Replaces features when data identity changes; memoize large datasets. */
@@ -281,9 +281,9 @@ export function GeoJSON(props: GeoJSONProps) {
 }
 
 export interface ImageOverlayProps
-  extends LayerProps<L.ImageOverlay, L.ImageOverlayOptions> {
+  extends LayerProps<Leaflet.ImageOverlay, Leaflet.ImageOverlayOptions> {
   url: string;
-  bounds: L.LatLngBoundsExpression;
+  bounds: Leaflet.LatLngBoundsExpression;
   opacity?: number;
   zIndex?: number;
 }

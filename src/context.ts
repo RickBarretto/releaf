@@ -1,6 +1,6 @@
 "use client";
 
-import type * as L from "leaflet";
+import type * as Leaflet from "leaflet";
 import {
   createContext,
   useContext,
@@ -11,13 +11,13 @@ import {
 } from "react";
 
 export interface MapContextValue {
-  map: L.Map;
-  leaflet: typeof L;
+  map: Leaflet.Map;
+  leaflet: typeof Leaflet;
 }
 
 export const MapContext = createContext<MapContextValue | null>(null);
-export const LayerContext = createContext<L.Layer | null>(null);
-export const LayerContainerContext = createContext<L.LayerGroup | null>(null);
+export const LayerContext = createContext<Leaflet.Layer | null>(null);
+export const LayerContainerContext = createContext<Leaflet.LayerGroup | null>(null);
 
 export function useMapContext(): MapContextValue {
   const context = useContext(MapContext);
@@ -29,25 +29,25 @@ export function useMapContext(): MapContextValue {
 }
 
 /** Access the live map for plugins and imperative operations. */
-export function useMap(): L.Map {
+export function useMap(): Leaflet.Map {
   return useMapContext().map;
 }
 
 /** Access the browser-loaded Leaflet module without breaking server rendering. */
-export function useLeaflet(): typeof L {
+export function useLeaflet(): typeof Leaflet {
   return useMapContext().leaflet;
 }
 
 export function useEventHandlers(
-  target: L.Evented | null,
-  handlers?: L.LeafletEventHandlerFnMap,
+  target: Leaflet.Evented | null,
+  handlers?: Leaflet.LeafletEventHandlerFnMap,
 ): void {
   const names = Object.keys(handlers ?? {})
     .sort()
     .join(" ");
-  const dispatch = useEffectEvent((name: string, event: L.LeafletEvent) => {
-    const handler = handlers?.[name as keyof L.LeafletEventHandlerFnMap] as
-      | L.LeafletEventHandlerFn
+  const dispatch = useEffectEvent((name: string, event: Leaflet.LeafletEvent) => {
+    const handler = handlers?.[name as keyof Leaflet.LeafletEventHandlerFnMap] as
+      | Leaflet.LeafletEventHandlerFn
       | undefined;
     handler?.call(target, event);
   });
@@ -55,7 +55,7 @@ export function useEventHandlers(
   useEffect(() => {
     if (!target || !names) return;
     const listeners = names.split(" ").map((name) => {
-      const listener = (event: L.LeafletEvent) => dispatch(name, event);
+      const listener = (event: Leaflet.LeafletEvent) => dispatch(name, event);
       target.on(name, listener);
       return { name, listener };
     });
@@ -66,7 +66,7 @@ export function useEventHandlers(
 }
 
 /** Subscribe with fresh callbacks without reattaching unchanged event names. */
-export function useMapEvents(handlers: L.LeafletEventHandlerFnMap): L.Map {
+export function useMapEvents(handlers: Leaflet.LeafletEventHandlerFnMap): Leaflet.Map {
   const map = useMap();
   useEventHandlers(map, handlers);
   return map;

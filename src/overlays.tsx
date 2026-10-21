@@ -1,6 +1,6 @@
 "use client";
 
-import type * as L from "leaflet";
+import type * as Leaflet from "leaflet";
 import type { ReactNode } from "react";
 import { useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -9,16 +9,16 @@ import { LayerContext, useMapContext } from "./context";
 export interface PopupProps {
   children?: ReactNode;
   /** Required for standalone popups; nested popups bind to their layer. */
-  position?: L.LatLngExpression;
-  options?: L.PopupOptions;
+  position?: Leaflet.LatLngExpression;
+  options?: Leaflet.PopupOptions;
   /** Omit for Leaflet's click-to-open behavior, or control visibility. */
   open?: boolean;
 }
 
 export interface TooltipProps {
   children?: ReactNode;
-  position?: L.LatLngExpression;
-  options?: L.TooltipOptions;
+  position?: Leaflet.LatLngExpression;
+  options?: Leaflet.TooltipOptions;
   open?: boolean;
 }
 
@@ -30,7 +30,7 @@ function useOverlay(
   const parent = useContext(LayerContext);
   const [initialOptions] = useState(() => options);
   const [state, setState] = useState<{
-    overlay: L.Popup | L.Tooltip;
+    overlay: Leaflet.Popup | Leaflet.Tooltip;
     element: HTMLDivElement;
   } | null>(null);
 
@@ -38,15 +38,15 @@ function useOverlay(
     const element = document.createElement("div");
     const overlay =
       kind === "popup"
-        ? leaflet.popup(initialOptions as L.PopupOptions, parent ?? undefined)
+        ? leaflet.popup(initialOptions as Leaflet.PopupOptions, parent ?? undefined)
         : leaflet.tooltip(
-            initialOptions as L.TooltipOptions,
+            initialOptions as Leaflet.TooltipOptions,
             parent ?? undefined,
           );
     overlay.setContent(element);
     if (parent) {
-      if (kind === "popup") parent.bindPopup(overlay as L.Popup);
-      else parent.bindTooltip(overlay as L.Tooltip);
+      if (kind === "popup") parent.bindPopup(overlay as Leaflet.Popup);
+      else parent.bindTooltip(overlay as Leaflet.Tooltip);
     }
     setState({ overlay, element });
     return () => {

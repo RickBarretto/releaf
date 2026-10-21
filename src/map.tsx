@@ -1,6 +1,6 @@
 "use client";
 
-import type * as L from "leaflet";
+import type * as Leaflet from "leaflet";
 import type { ComponentPropsWithoutRef, ReactNode, Ref } from "react";
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import type { MapContextValue } from "./context";
@@ -8,11 +8,11 @@ import { MapContext, useEventHandlers, useMapContext } from "./context";
 
 export interface MapContainerProps extends ComponentPropsWithoutRef<"div"> {
   /** Creation-only options. Change the component key to recreate the map. */
-  options?: L.MapOptions;
-  initialCenter?: L.LatLngExpression;
+  options?: Leaflet.MapOptions;
+  initialCenter?: Leaflet.LatLngExpression;
   initialZoom?: number;
-  eventHandlers?: L.LeafletEventHandlerFnMap;
-  ref?: Ref<L.Map>;
+  eventHandlers?: Leaflet.LeafletEventHandlerFnMap;
+  ref?: Ref<Leaflet.Map>;
   fallback?: ReactNode;
 }
 
@@ -23,8 +23,8 @@ function Ready({
   children,
 }: {
   context: MapContextValue;
-  mapRef?: Ref<L.Map>;
-  eventHandlers?: L.LeafletEventHandlerFnMap;
+  mapRef?: Ref<Leaflet.Map>;
+  eventHandlers?: Leaflet.LeafletEventHandlerFnMap;
   children?: ReactNode;
 }) {
   useImperativeHandle(mapRef, () => context.map, [context.map]);
@@ -54,7 +54,7 @@ export function MapContainer({
 
   useEffect(() => {
     let cancelled = false;
-    let map: L.Map | undefined;
+    let map: Leaflet.Map | undefined;
     let observer: ResizeObserver | undefined;
 
     // Leaflet reads window at module scope, so never import it during SSR.
@@ -100,7 +100,7 @@ export function MapContainer({
 }
 
 export interface MapViewProps {
-  center: L.LatLngExpression;
+  center: Leaflet.LatLngExpression;
   zoom: number;
   animate?: boolean;
 }

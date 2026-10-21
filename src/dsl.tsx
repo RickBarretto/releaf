@@ -1,6 +1,6 @@
 "use client";
 
-import type * as L from "leaflet";
+import type * as Leaflet from "leaflet";
 import type { ComponentPropsWithoutRef, ReactElement } from "react";
 import {
   cloneElement,
@@ -22,8 +22,8 @@ export interface Position {
   latitude: number;
   longitude: number;
 }
-export type PositionExpression = Position | L.LatLngExpression;
-export function toLatLng(position: PositionExpression): L.LatLngExpression {
+export type PositionExpression = Position | Leaflet.LatLngExpression;
+export function toLatLng(position: PositionExpression): Leaflet.LatLngExpression {
   return "latitude" in position
     ? [position.latitude, position.longitude]
     : position;
@@ -34,8 +34,8 @@ interface RotationState {
   enabled: boolean;
   apply: () => void;
 }
-const rotations = new WeakMap<L.Map, RotationState>();
-function rotation(map: L.Map): RotationState {
+const rotations = new WeakMap<Leaflet.Map, RotationState>();
+function rotation(map: Leaflet.Map): RotationState {
   let state = rotations.get(map);
   if (!state) {
     state = { bearing: 0, enabled: false, apply() {} };
@@ -54,12 +54,12 @@ export function useController() {
       flyTo: (
         position: PositionExpression,
         zoom?: number,
-        options?: L.ZoomPanOptions,
+        options?: Leaflet.ZoomPanOptions,
       ) => map.flyTo(toLatLng(position), zoom, options),
       fitBounds: (
         positions: readonly PositionExpression[],
-        options?: L.FitBoundsOptions,
-      ) => map.fitBounds(positions.map(toLatLng) as L.LatLngTuple[], options),
+        options?: Leaflet.FitBoundsOptions,
+      ) => map.fitBounds(positions.map(toLatLng) as Leaflet.LatLngTuple[], options),
       rotateBy: (degrees: number) => {
         const state = rotation(map);
         if (state.enabled) {
@@ -126,7 +126,7 @@ function Rotation({ enabled = true }: RotationProps) {
       rotate: pane.style.rotate,
       origin: pane.style.transformOrigin,
     };
-    const rotate = (point: L.Point, angle: number) => {
+    const rotate = (point: Leaflet.Point, angle: number) => {
       const center = map.getSize().divideBy(2);
       const p = point.subtract(center),
         radians = (angle * Math.PI) / 180;
@@ -167,7 +167,7 @@ function Rotation({ enabled = true }: RotationProps) {
 }
 
 export interface ToolbarProps extends ComponentPropsWithoutRef<"div"> {
-  position?: L.ControlPosition;
+  position?: Leaflet.ControlPosition;
   top?: boolean;
   bottom?: boolean;
   left?: boolean;
@@ -186,7 +186,7 @@ function Toolbar({
   const [element, setElement] = useState<HTMLDivElement | null>(null);
   const corner =
     position ??
-    (`${bottom ? "bottom" : "top"}${left ? "left" : "right"}` as L.ControlPosition);
+    (`${bottom ? "bottom" : "top"}${left ? "left" : "right"}` as Leaflet.ControlPosition);
   useEffect(() => {
     const container = document.createElement("div");
     const control = new leaflet.Control({ position: corner });
@@ -265,7 +265,7 @@ function ResetNorth(props: ActionProps) {
   );
 }
 export interface LocateProps extends ActionProps {
-  options?: L.LocateOptions;
+  options?: Leaflet.LocateOptions;
 }
 function Locate({ options, ...props }: LocateProps) {
   const map = useMap();
@@ -278,7 +278,7 @@ function Locate({ options, ...props }: LocateProps) {
 export interface FlyToProps extends ActionProps {
   position: PositionExpression;
   zoom?: number;
-  options?: L.ZoomPanOptions;
+  options?: Leaflet.ZoomPanOptions;
 }
 function FlyTo({ position, zoom, options, ...props }: FlyToProps) {
   const map = useController();
@@ -307,7 +307,7 @@ function DSLTooltip({
 }: Omit<TooltipProps, "position"> & { position?: PositionExpression }) {
   return <Tooltip {...props} position={position && toLatLng(position)} />;
 }
-export interface CustomTilesProps extends TileLayerProps, L.TileLayerOptions {}
+export interface CustomTilesProps extends TileLayerProps, Leaflet.TileLayerOptions {}
 function CustomTiles({
   url,
   options,
