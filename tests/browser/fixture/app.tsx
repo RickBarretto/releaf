@@ -1,6 +1,7 @@
 import type * as L from "leaflet"
 import { StrictMode, useState } from "react"
 import {
+  // biome-ignore lint/suspicious/noShadowRestrictedNames: Map is the public compound component API.
   Map,
   MapContainer,
   type Position,

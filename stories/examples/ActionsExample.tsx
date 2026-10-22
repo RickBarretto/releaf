@@ -1,5 +1,6 @@
 import { LocateFixed, MapPin, Minus, Plus } from "lucide-react"
 
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Map is the public compound component API.
 import { Map } from "releaf"
 
 import { Button } from "../components/ui/button"

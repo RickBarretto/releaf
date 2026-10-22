@@ -6,6 +6,7 @@ import { cleanup, click, observers, render, waitFor } from "./helpers"
 afterEach(cleanup)
 
 const {
+  // biome-ignore lint/suspicious/noShadowRestrictedNames: Map is the public compound component API.
   Map,
   MapContainer,
   MapView,
