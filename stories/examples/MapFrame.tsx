@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Map is the public compound component API.
 import { Map, type Position } from "releaf"
 
 export const home: Position = { latitude: 51.5074, longitude: -0.1278 }

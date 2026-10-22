@@ -1,3 +1,4 @@
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Map is the public compound component API.
 import { Map, type Position } from "releaf"
 
 const initial: Position = { latitude: 51.5074, longitude: -0.1278 }

@@ -55,6 +55,6 @@
     @apply box-border font-[inherit] border-solid;
   }
   :where([data-slot="button"]) {
-    @apply border-0 cursor-pointer;
+    @apply border-0 bg-transparent cursor-pointer;
   }
 }

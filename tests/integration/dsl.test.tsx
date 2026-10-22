@@ -6,6 +6,7 @@ import { cleanup, dom, render, waitFor } from "./helpers"
 // Test the published bundle, including its external imports and client boundary.
 afterEach(cleanup)
 
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Map is the public compound component API.
 const { Map } = await import("../../src/index")
 
 describe("Map DSL", () => {

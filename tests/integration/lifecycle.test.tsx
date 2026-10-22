@@ -7,6 +7,7 @@ import { cleanup, observers, render, waitFor } from "./helpers"
 
 afterEach(cleanup)
 
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Map is the public compound component API.
 const { MapContainer, Marker, Popup, Tooltip, useMap, useLeaflet, Map } =
   await import("../../src/index")
 class Boundary extends Component<
