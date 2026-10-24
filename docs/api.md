@@ -785,6 +785,8 @@ search(
 - `query` contains the original input text.
 - Pass `signal` to remote fetches to support cancellation.
 - Obsolete results are ignored even if a provider does not honor cancellation.
+- Changing the query immediately clears previous results and keyboard selection. Only current results can be selected.
+- Any thrown or rejected value displays failure feedback, including `null`, `undefined`, `false`, `0`, and an empty string.
 - The library does not choose a geocoding service for you.
 
 ### `SearchBar` / `Map.SearchBar`

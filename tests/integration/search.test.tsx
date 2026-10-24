@@ -1,5 +1,6 @@
-import { act } from "react"
+import { act, useLayoutEffect } from "react"
 import { afterEach, describe, expect, test } from "vitest"
+import { useSearch } from "../../src/search/shared"
 import { cleanup, click, key, render, type, waitFor } from "./helpers"
 
 afterEach(cleanup)
@@ -205,4 +206,91 @@ test("empty results, prevented input handlers and selection avoid extra searches
   await key("Enter")
   expect(selected).toEqual(["Chosen"])
   expect(calls).toEqual(["none", "find"])
+})
+
+test("falsy provider rejections always display failure", async () => {
+  await render(
+    <SearchBar
+      search={(query) =>
+        Promise.reject([undefined, null, false, 0, ""][Number(query)])
+      }
+      debounceMs={0}
+      onSelect={() => {}}
+    >
+      <SearchBar.Input />
+      <SearchBar.Results />
+    </SearchBar>,
+  )
+  for (const query of ["0", "1", "2", "3", "4"]) {
+    await type(query)
+    await waitFor(() =>
+      expect(document.querySelector('[role="status"]')!.textContent).toBe(
+        "Search failed",
+      ),
+    )
+  }
+})
+
+test("query changes immediately invalidate active results and ignore obsolete successes", async () => {
+  let finish!: (items: { label: string }[]) => void
+  const snapshots: { query: string; count: number; active: number }[] = []
+  function Probe() {
+    const state = useSearch()
+    useLayoutEffect(() => {
+      snapshots.push({
+        query: state.query,
+        count: state.results.length,
+        active: state.active,
+      })
+    })
+    return null
+  }
+  const selections: unknown[] = []
+  await render(
+    <SearchBar
+      search={(query) =>
+        query === "slow"
+          ? new Promise<{ label: string }[]>((resolve) => {
+              finish = resolve
+            })
+          : [
+              { label: "Duplicate", id: 1 },
+              { label: "Duplicate", id: 1 },
+            ]
+      }
+      debounceMs={0}
+      onSelect={(place) => selections.push(place)}
+    >
+      <SearchBar.Input />
+      <SearchBar.Results />
+      <Probe />
+    </SearchBar>,
+  )
+  await type("first")
+  await waitFor(() =>
+    expect(document.querySelectorAll('[role="option"]')).toHaveLength(2),
+  )
+  await key("ArrowDown")
+  await type("slow")
+  expect(document.querySelectorAll('[role="option"]')).toHaveLength(0)
+  expect(
+    document.querySelector("input")!.getAttribute("aria-activedescendant"),
+  ).toBeNull()
+  expect(
+    snapshots
+      .filter((snapshot) => snapshot.query === "slow")
+      .every((snapshot) => snapshot.count === 0 && snapshot.active === -1),
+  ).toBe(true)
+  await key("Enter")
+  expect(selections).toEqual([])
+  await waitFor(() => expect(finish).toBeDefined())
+  await type("current")
+  await waitFor(() =>
+    expect(document.querySelectorAll('[role="option"]')).toHaveLength(2),
+  )
+  await act(async () => finish([{ label: "Obsolete" }]))
+  expect(document.querySelectorAll('[role="option"]')).toHaveLength(2)
+  await key("ArrowUp")
+  await key("Enter")
+  expect(selections).toEqual([{ label: "Duplicate", id: 1 }])
 })

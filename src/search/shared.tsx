@@ -27,13 +27,12 @@ export interface SearchBarProps<T>
 export interface SearchState {
   query: string
   setQuery: (query: string) => void
-  results: readonly unknown[]
-  resultKeys: readonly number[]
+  results: readonly { place: unknown; key: number }[]
   label: (place: unknown) => string
-  select: (place: unknown) => void
+  select: (key: number) => void
   loading: boolean
   showEmpty: boolean
-  error: unknown
+  failed: boolean
   id: string
   active: number
   setActive: (index: number) => void

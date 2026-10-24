@@ -50,7 +50,7 @@ export function Input({
           }
         } else if (event.key === "Enter" && state.active >= 0) {
           event.preventDefault()
-          state.select(state.results[state.active])
+          state.select(state.results[state.active].key)
         } else if (event.key === "Escape") {
           state.setQuery("")
         }

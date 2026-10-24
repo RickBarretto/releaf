@@ -1,13 +1,10 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { useEffect, useId, useRef, useState } from "react"
-import {
-  type SearchBarProps,
-  SearchContext,
-  type SearchPlace,
-  type SearchState,
-} from "./shared"
+import { useId } from "react"
+import { type SearchBarProps, SearchContext, type SearchPlace } from "./shared"
+
+import { useSearchRequest } from "./use-search"
 
 /**
  * Owns the typed query, asynchronous results, and context for SearchBar children.
@@ -31,97 +28,31 @@ export function Root<T>({
   children,
   ...props
 }: SearchBarProps<T>) {
-  const [query, setQuery] = useState("")
-  const [results, setResults] = useState<readonly { place: T; key: number }[]>(
-    [],
-  )
-  const nextResultKey = useRef(0)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<unknown>(null)
-  const [active, setActive] = useState(-1)
-  const [selected, setSelected] = useState<string | null>(null)
-  const id = useId()
-  const callbacks = useRef({ search, onSelect, getLabel })
-
-  // Callback identity changes must not restart the current debounce or request.
-  useEffect(() => {
-    callbacks.current = { search, onSelect, getLabel }
+  const request = useSearchRequest({
+    search,
+    onSelect,
+    getLabel,
+    minLength,
+    debounceMs,
   })
-
-  useEffect(() => {
-    const controller = new AbortController()
-    setResults([])
-    setActive(-1)
-    setError(null)
-    setLoading(false)
-    // Selecting a result updates the input without searching for its label again.
-    if (query.trim().length < minLength || query === selected) return
-
-    setLoading(true)
-    const timer = setTimeout(() => {
-      void Promise.resolve()
-        .then(() => callbacks.current.search(query, controller.signal))
-        .then(
-          // Check cancellation even when the provider ignores its AbortSignal.
-          (items) => {
-            if (!controller.signal.aborted) {
-              // Each returned occurrence owns an identity, including duplicates
-              // and generic results without IDs. New responses replace the list.
-              setResults(
-                items.map((place) => ({
-                  place,
-                  key: nextResultKey.current++,
-                })),
-              )
-              setLoading(false)
-            }
-          },
-          (cause) => {
-            if (!controller.signal.aborted) {
-              setError(cause)
-              setLoading(false)
-            }
-          },
-        )
-    }, debounceMs)
-
-    return () => {
-      clearTimeout(timer)
-      controller.abort()
-    }
-  }, [query, minLength, debounceMs, selected])
-
-  const label = (place: T) =>
-    callbacks.current.getLabel
-      ? callbacks.current.getLabel(place)
-      : (place as SearchPlace).label
-  const state: SearchState = {
-    query,
-    setQuery: (value) => {
-      setSelected(null)
-      setQuery(value)
-    },
-    results: results.map(({ place }) => place),
-    resultKeys: results.map(({ key }) => key),
-    label: (place) => label(place as T),
-    select: (place) => {
-      const text = label(place as T)
-      setSelected(text)
-      setQuery(text)
-      setResults([])
-      setActive(-1)
-      callbacks.current.onSelect(place as T)
-    },
-    loading,
-    showEmpty: query.trim().length >= minLength && query !== selected,
-    error,
+  const id = useId()
+  const { state } = request
+  const context = {
+    query: state.query,
+    setQuery: request.setQuery,
+    results: state.status === "success" ? state.results : [],
+    label: (place: unknown) => request.label(place as T),
+    select: request.select,
+    loading: state.status === "pending",
+    showEmpty: state.status === "success" && state.results.length === 0,
+    failed: state.status === "error",
     id,
-    active,
-    setActive,
+    active: state.status === "success" ? state.active : -1,
+    setActive: request.setActive,
   }
 
   return (
-    <SearchContext value={state}>
+    <SearchContext value={context}>
       <div {...props}>{children}</div>
     </SearchContext>
   )

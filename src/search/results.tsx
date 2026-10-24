@@ -23,7 +23,7 @@ export function Results({
       <div role="status" className="empty:hidden">
         {state.loading
           ? loadingMessage
-          : state.error
+          : state.failed
             ? errorMessage
             : state.showEmpty && !state.results.length
               ? emptyMessage
@@ -42,9 +42,9 @@ export function Results({
         aria-label="Search results"
         aria-busy={state.loading}
       >
-        {state.results.map((place, index) => (
+        {state.results.map(({ place, key }, index) => (
           <li
-            key={state.resultKeys[index]}
+            key={key}
             id={`${state.id}-${index}`}
             // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: These list items are ARIA options controlled by the combobox.
             role="option"
@@ -52,13 +52,13 @@ export function Results({
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault()
-                state.select(place)
+                state.select(key)
               }
             }}
             aria-selected={state.active === index}
             onMouseDown={(event) => event.preventDefault()}
             onMouseMove={() => state.setActive(index)}
-            onClick={() => state.select(place)}
+            onClick={() => state.select(key)}
           >
             {state.label(place)}
           </li>
