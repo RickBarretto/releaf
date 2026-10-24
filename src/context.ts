@@ -64,15 +64,12 @@ export function useEventHandlers(
   useEffect(() => {
     if (!target || !names) return
 
-    const listeners = names.split(" ").map((name) => {
-      const listener = (event: Leaflet.LeafletEvent) => dispatch(name, event)
-      target.on(name, listener)
-
-      return { name, listener }
-    })
+    const listener = (event: Leaflet.LeafletEvent) =>
+      dispatch(event.type, event)
+    target.on(names, listener)
 
     return () => {
-      for (const { name, listener } of listeners) target.off(name, listener)
+      target.off(names, listener)
     }
   }, [target, names])
 }

@@ -34,11 +34,12 @@ test("location requests ignore obsolete successes, failures, resets and unmounts
     return <p>{location.status}</p>
   }
   await render(<Probe />)
+  const onError = vi.fn()
   let first!: Promise<unknown>
   let second!: Promise<unknown>
   await act(async () => {
-    first = location.request()
-    second = location.request()
+    first = location.request(undefined, onError)
+    second = location.request(undefined, onError)
   })
   await act(async () =>
     callbacks[0].success({
@@ -52,8 +53,9 @@ test("location requests ignore obsolete successes, failures, resets and unmounts
   )
   expect(await second).toBeNull()
   expect(location.error?.message).toBe("Denied")
+  expect(onError).toHaveBeenCalledExactlyOnceWith(location.error)
   await act(async () => {
-    first = location.request()
+    first = location.request(undefined, onError)
     location.reset()
   })
   await act(async () =>
@@ -64,11 +66,12 @@ test("location requests ignore obsolete successes, failures, resets and unmounts
   expect(await first).toBeNull()
   expect(location.status).toBe("idle")
   await act(async () => {
-    first = location.request()
+    first = location.request(undefined, onError)
   })
   await render(null)
   callbacks[3].failure({ message: "Late" } as GeolocationPositionError)
   expect(await first).toBeNull()
+  expect(onError).toHaveBeenCalledTimes(1)
 })
 
 test("controlled picker respects rejected selections and invalidates location on external changes", async () => {
@@ -117,6 +120,9 @@ test("controlled picker respects rejected selections and invalidates location on
   )
   await request
   expect(picker.value).toEqual({ latitude: 3, longitude: 4 })
+  expect(picker.source).toBe("External value")
+  await act(async () => change({ latitude: 1, longitude: 2 }))
+  expect(picker.source).toBe("External value")
   expect(onChange).toHaveBeenCalledTimes(1)
 })
 

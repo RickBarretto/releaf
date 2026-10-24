@@ -35,39 +35,44 @@ export function PickerRoot({
 }: LocationPickerProps) {
   const [internal, setInternal] = useState(defaultValue)
   const selected = value === undefined ? internal : value
-  const [source, setSource] = useState<SelectionSource>("Initial location")
   const location = useLocationRequest()
   const map = useMap()
-  const [pendingCamera, setPendingCamera] = useState<Position | null>(null)
+  const pendingCamera = useRef<Position | null>(null)
   const selectedKey = selected
     ? `${selected.latitude},${selected.longitude}`
     : ""
+  const [selection, setSelection] = useState<{
+    key: string
+    source: SelectionSource
+  }>(() => ({ key: selectedKey, source: "Initial location" }))
+  const source =
+    selection.key === selectedKey ? selection.source : "External value"
+  if (selection.key !== selectedKey) {
+    // Reset the label before children render an externally replaced selection.
+    setSelection({ key: selectedKey, source: "External value" })
+  }
   const previousKey = useRef(selectedKey)
-  const proposedKey = useRef<string | null>(null)
   function select(
     position: Position | null,
     nextSource: SelectionSource = "External value",
     recenter = false,
   ) {
     location.reset()
-    proposedKey.current = position
-      ? `${position.latitude},${position.longitude}`
-      : ""
-    setPendingCamera(recenter ? position : null)
+    const key = position ? `${position.latitude},${position.longitude}` : ""
+    pendingCamera.current = recenter ? position : null
     if (value === undefined) setInternal(position)
-    setSource(nextSource)
+    setSelection({ key, source: nextSource })
     onValueChange?.(position, { source: nextSource })
   }
   useEffect(() => {
     if (previousKey.current !== selectedKey) {
       location.reset()
-      if (proposedKey.current !== selectedKey) setSource("External value")
       previousKey.current = selectedKey
     }
-    proposedKey.current = null
   }, [selectedKey, location.reset])
   useEffect(() => {
-    const target = pendingCamera
+    const target = pendingCamera.current
+    pendingCamera.current = null
     if (
       target &&
       selected &&
@@ -76,8 +81,7 @@ export function PickerRoot({
     ) {
       map.setView(toLatLng(selected), zoom, { animate: motion() })
     }
-    if (pendingCamera) setPendingCamera(null)
-  }, [pendingCamera, selected, map, zoom])
+  })
   useMapEvents({ click: (event) => select(event.position, "Map click") })
   async function locate() {
     const position = await location.request(locationOptions)

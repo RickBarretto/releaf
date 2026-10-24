@@ -1,7 +1,6 @@
 "use client"
 
 import type { ComponentPropsWithoutRef } from "react"
-import { useEffect, useEffectEvent } from "react"
 import { useMap } from "../context"
 import type { Position } from "../dsl-core"
 import { toLatLng } from "../dsl-core"
@@ -38,12 +37,8 @@ export function LocationControl({
 }: LocationControlProps) {
   const location = useLocationRequest()
   const map = useMap()
-  const reportError = useEffectEvent((error: Error) => onError?.(error))
-  useEffect(() => {
-    if (location.error) reportError(location.error)
-  }, [location.error])
   async function request() {
-    const position = await location.request(options)
+    const position = await location.request(options, onError)
     if (!position) return
     if (recenter) map.setView(toLatLng(position), zoom, { animate: motion() })
     onSuccess?.(position)

@@ -1,7 +1,7 @@
 "use client"
 
 import { Copy, LocateFixed, MapPin, Maximize2, Minus, Plus } from "lucide-react"
-import { createContext, type ReactNode, useContext } from "react"
+import { createContext, type ReactNode, useContext, useMemo } from "react"
 
 const defaultIcons = {
   plus: <Plus aria-hidden="true" />,
@@ -25,11 +25,8 @@ export function IconProvider({
   children: ReactNode
 }) {
   const inherited = useContext(IconsContext)
-  return (
-    <IconsContext.Provider value={{ ...inherited, ...icons }}>
-      {children}
-    </IconsContext.Provider>
-  )
+  const value = useMemo(() => ({ ...inherited, ...icons }), [inherited, icons])
+  return <IconsContext.Provider value={value}>{children}</IconsContext.Provider>
 }
 
 export function useIcons() {

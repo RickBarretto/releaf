@@ -47,7 +47,10 @@ export function useLocationRequest() {
     setState({ position: null, status: "idle", error: null })
   }, [])
   const request = useCallback(
-    async (options?: PositionOptions): Promise<Position | null> => {
+    async (
+      options?: PositionOptions,
+      onError?: (error: Error) => void,
+    ): Promise<Position | null> => {
       const id = ++generation.current
       setState({ position: null, status: "pending", error: null })
       try {
@@ -59,6 +62,7 @@ export function useLocationRequest() {
         if (id !== generation.current) return null
         const error = cause instanceof Error ? cause : new Error(String(cause))
         setState({ position: null, status: "error", error })
+        onError?.(error)
         return null
       }
     },
