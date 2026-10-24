@@ -4,7 +4,7 @@ import type * as Leaflet from "leaflet"
 import type { ReactNode, Ref } from "react"
 import { useImperativeHandle } from "react"
 import { LayerContext, useEventHandlers } from "../context"
-import { type LayerProps, useLayerClassName } from "./shared"
+import { useLayerClassName } from "./shared"
 
 /**
  * Provides an initialized Leaflet layer to nested overlays and descendants.
@@ -31,20 +31,4 @@ export function LayerReady<T extends Leaflet.Layer>({
   useLayerClassName(layer, className)
 
   return <LayerContext value={layer}>{children}</LayerContext>
-}
-
-export function renderLayer<T extends Leaflet.Layer>(
-  layer: T | null,
-  props: LayerProps<T, unknown>,
-) {
-  return layer ? (
-    <LayerReady
-      layer={layer}
-      className={props.className}
-      layerRef={props.ref}
-      eventHandlers={props.eventHandlers}
-    >
-      {props.children}
-    </LayerReady>
-  ) : null
 }

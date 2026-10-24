@@ -3,7 +3,7 @@
 import type * as Leaflet from "leaflet"
 import { useEffect, useState } from "react"
 import { useMapContext } from "../context"
-import { renderLayer } from "./layer-ready"
+import { renderLayer } from "./render-layer"
 import { type LayerProps, useLayer } from "./shared"
 
 export interface ImageOverlayProps

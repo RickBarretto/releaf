@@ -2,7 +2,7 @@
 
 import type * as Leaflet from "leaflet"
 import { useEffect } from "react"
-import { renderLayer } from "./layer-ready"
+import { renderLayer } from "./render-layer"
 import { type PathProps, useLayer, usePathStyle } from "./shared"
 
 export interface CircleProps

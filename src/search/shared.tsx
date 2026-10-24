@@ -28,6 +28,7 @@ export interface SearchState {
   query: string
   setQuery: (query: string) => void
   results: readonly unknown[]
+  resultKeys: readonly number[]
   label: (place: unknown) => string
   select: (place: unknown) => void
   loading: boolean

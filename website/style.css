@@ -258,7 +258,7 @@ h2 em {
   position: relative;
 }
 .hero-map {
-  height: 420px !important;
+  height: 420px;
 }
 .map-demo .leaflet-tile-pane {
   filter: saturate(0.55);
@@ -725,7 +725,7 @@ aside nav a:hover {
     flex-wrap: wrap;
   }
   .hero-map {
-    height: 370px !important;
+    height: 370px;
   }
   .map-title {
     font-size: 7px;
@@ -793,7 +793,7 @@ aside nav a:hover {
     margin: 25px 0;
   }
   .hero-map {
-    height: 340px !important;
+    height: 340px;
   }
   .map-frame {
     transform: none;
@@ -845,7 +845,7 @@ aside nav a:hover {
     justify-content: center;
     text-align: center;
   }
-  footer > span {
+  footer > .footer-copyright {
     width: 100%;
     order: 3;
   }
@@ -891,7 +891,9 @@ aside nav a:hover {
   *,
   *::before,
   *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: Reduced motion must override all component and third-party transitions. */
     transition: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: Reduced motion must override all component and third-party animations. */
     animation: none !important;
   }
 }

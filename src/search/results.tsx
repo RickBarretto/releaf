@@ -44,8 +44,7 @@ export function Results({
       >
         {state.results.map((place, index) => (
           <li
-            // biome-ignore lint/suspicious/noArrayIndexKey: Generic results may have duplicate labels and no IDs; options contain no local state.
-            key={index}
+            key={state.resultKeys[index]}
             id={`${state.id}-${index}`}
             // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: These list items are ARIA options controlled by the combobox.
             role="option"

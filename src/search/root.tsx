@@ -32,7 +32,10 @@ export function Root<T>({
   ...props
 }: SearchBarProps<T>) {
   const [query, setQuery] = useState("")
-  const [results, setResults] = useState<readonly T[]>([])
+  const [results, setResults] = useState<readonly { place: T; key: number }[]>(
+    [],
+  )
+  const nextResultKey = useRef(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<unknown>(null)
   const [active, setActive] = useState(-1)
@@ -62,7 +65,14 @@ export function Root<T>({
           // Check cancellation even when the provider ignores its AbortSignal.
           (items) => {
             if (!controller.signal.aborted) {
-              setResults(items)
+              // Each returned occurrence owns an identity, including duplicates
+              // and generic results without IDs. New responses replace the list.
+              setResults(
+                items.map((place) => ({
+                  place,
+                  key: nextResultKey.current++,
+                })),
+              )
               setLoading(false)
             }
           },
@@ -91,7 +101,8 @@ export function Root<T>({
       setSelected(null)
       setQuery(value)
     },
-    results,
+    results: results.map(({ place }) => place),
+    resultKeys: results.map(({ key }) => key),
     label: (place) => label(place as T),
     select: (place) => {
       const text = label(place as T)

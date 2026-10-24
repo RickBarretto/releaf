@@ -546,7 +546,9 @@ function App() {
             <b>Leaf</b>
           </span>
         </a>
-        <span>A little less boilerplate. A little more possibility.</span>
+        <span className="footer-copyright">
+          A little less boilerplate. A little more possibility.
+        </span>
         <a href="https://github.com/RickBarretto">Made by RickBarretto ↗</a>
       </footer>
     </>
