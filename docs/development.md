@@ -9,6 +9,14 @@ bun run test
 bun run build
 ```
 
+Run [React Doctor](https://github.com/millionco/react-doctor) to scan the project
+for React issues:
+
+```sh
+bun run doctor
+bun run doctor --verbose
+```
+
 Vitest tests exercise the source against real Leaflet in jsdom, plus
 server rendering and published-entrypoint checks in fresh Node processes.
 
