@@ -525,7 +525,7 @@ function App() {
           </span>
         </a>
         <span>A little less boilerplate. A little more possibility.</span>
-        <a href={repo}>Made for the way you build. ↗</a>
+        <a href="https://github.com/RickBarretto">Made by RickBarretto ↗</a>
       </footer>
     </>
   )
