@@ -1,9 +1,9 @@
 "use client"
 
 import type { ComponentPropsWithoutRef } from "react"
-import { MapIcon } from "../components/map-icon"
 import { Button } from "../components/ui/button"
 import { MapPrimitives as ReleafMap } from "../dsl-core"
+import { useIcons } from "../icons"
 import { cn } from "../lib/utils"
 import { panel } from "./shared"
 
@@ -29,6 +29,7 @@ export function LocationFeedback({
   error: Error | null
   request: () => void
 }) {
+  const icons = useIcons()
   return (
     <>
       <Button
@@ -56,7 +57,7 @@ export function LocationFeedback({
         disabled={status === "pending" || buttonProps?.disabled}
         onClick={request}
       >
-        <MapIcon name="locate" />
+        {icons.locate}
         {!compact &&
           (status === "pending"
             ? "Finding your location…"

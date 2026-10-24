@@ -2,9 +2,9 @@
 
 import type { ComponentPropsWithoutRef } from "react"
 import { useEffect, useRef, useState } from "react"
-import { MapIcon } from "../components/map-icon"
 import { Button } from "../components/ui/button"
 import type { Position } from "../dsl-core"
+import { useIcons } from "../icons"
 import { cn } from "../lib/utils"
 import { panel } from "./shared"
 
@@ -31,6 +31,7 @@ export function Coordinates({
   className,
   ...props
 }: CoordinatesProps) {
+  const icons = useIcons()
   const text = position
     ? format
       ? format(position)
@@ -76,7 +77,7 @@ export function Coordinates({
           disabled={!position}
           onClick={copyText}
         >
-          <MapIcon name="copy" />
+          {icons.copy}
           Copy coordinates
         </Button>
       )}

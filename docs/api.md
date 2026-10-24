@@ -20,6 +20,7 @@ you need to implement your own controls.
 - [Search](#search)
 - [Geolocation](#geolocation)
 - [Map hooks](#hooks)
+- [Icons](#icons)
 
 ## Setup
 
@@ -1022,3 +1023,38 @@ useMapEvents({
 - [Navigation toolbox](../stories/examples/Navigation.tsx)
 - [Provider-independent search](../stories/examples/SearchPlacesExample.tsx)
 - [Offline preview](../stories/examples/OfflinePreviewExample.tsx): a schematic recipe, without geographic tile caching.
+
+## Icons
+
+Built-in controls use Lucide by default, matching this project's shadcn configuration.
+Wrap your maps in `IconProvider` to use your app's icon library, including Phosphor.
+Install your chosen icon package in your app before importing it.
+
+```tsx
+import { IconProvider, Map } from "releaf";
+import { PlusIcon, MinusIcon } from "@phosphor-icons/react";
+
+<IconProvider icons={{
+  plus: <PlusIcon aria-hidden="true" />,
+  minus: <MinusIcon aria-hidden="true" />,
+}}>
+  <Map.Root className="h-96" options={{ zoomControl: false }}>
+    <Map.View position={{ latitude: 38.713, longitude: -9.139 }} zoom={13} />
+    <Map.Tiles.OpenStreetMap />
+    <Map.Navigation />
+  </Map.Root>
+</IconProvider>
+```
+
+| Slot | Used by |
+| --- | --- |
+| `plus` | Zoom in |
+| `minus` | Zoom out |
+| `locate` | Current-location buttons |
+| `pin` | Navigation home action |
+| `fit` | Fit markers action |
+| `copy` | Copy coordinates |
+
+`icons` accepts React nodes. Omitted slots inherit from the nearest provider or
+use the defaults. Set a slot to `null` to hide it. Mark decorative icons with
+`aria-hidden="true"`; the controls retain their accessible labels.

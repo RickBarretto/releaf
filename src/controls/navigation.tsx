@@ -2,7 +2,6 @@
 
 import type * as Leaflet from "leaflet"
 import type { ReactNode } from "react"
-import { MapIcon } from "../components/map-icon"
 import { Button } from "../components/ui/button"
 import {
   Tooltip,
@@ -12,6 +11,7 @@ import {
 } from "../components/ui/tooltip"
 import type { PositionExpression, ToolbarProps } from "../dsl-core"
 import { MapPrimitives as ReleafMap } from "../dsl-core"
+import { useIcons } from "../icons"
 import { cn } from "../lib/utils"
 import { LocationControl } from "./location-control"
 import { panel } from "./shared"
@@ -42,6 +42,7 @@ export function Navigation({
   className,
   ...props
 }: NavigationProps) {
+  const icons = useIcons()
   function tip(label: string, child: ReactNode) {
     return (
       <Tooltip>
@@ -82,7 +83,7 @@ export function Navigation({
                       aria-label="Go home"
                       title="Go home"
                     >
-                      <MapIcon name="pin" />
+                      {icons.pin}
                     </Button>
                   </ReleafMap.Actions.FlyTo>,
                 )}
@@ -95,7 +96,7 @@ export function Navigation({
                     options={fitOptions}
                   >
                     <Button type="button" variant="ghost" size="icon">
-                      <MapIcon name="fit" />
+                      {icons.fit}
                     </Button>
                   </ReleafMap.Actions.FitBounds>,
                 )}

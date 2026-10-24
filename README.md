@@ -44,6 +44,29 @@ export function CityMap() {
 }
 ```
 
+## Icons
+
+Built-in controls default to Lucide, matching this project's shadcn configuration.
+Use `IconProvider` to supply icons from your app's preferred library:
+
+```tsx
+import { IconProvider, Map } from "releaf";
+import { PlusIcon, MinusIcon } from "@phosphor-icons/react";
+
+<IconProvider icons={{
+  plus: <PlusIcon aria-hidden="true" />,
+  minus: <MinusIcon aria-hidden="true" />,
+}}>
+  <Map.Root>
+    <Map.Navigation />
+  </Map.Root>
+</IconProvider>
+```
+
+Available slots are `plus`, `minus`, `locate`, `pin`, `fit`, and `copy`.
+Omitted slots inherit their defaults. Set a slot to `null` to hide its icon.
+You can also compose actions with your own buttons and icons.
+
 ## shadcn/ui
 
 The library uses Tailwind CSS v4 utilities, including its attribution footer.

@@ -1,7 +1,7 @@
 "use client"
 
-import { MapIcon } from "../components/map-icon"
 import { Button } from "../components/ui/button"
+import { useIcons } from "../icons"
 import { Action, type ActionProps } from "./action"
 import { useController, useZoomLimit } from "./shared"
 
@@ -12,6 +12,7 @@ import { useController, useZoomLimit } from "./shared"
  * Supply a child element to customize the button; preventDefault() cancels zooming.
  */
 export function ZoomOut(props: ActionProps) {
+  const icons = useIcons()
   const map = useController()
   const atLimit = useZoomLimit("min")
 
@@ -25,7 +26,7 @@ export function ZoomOut(props: ActionProps) {
     >
       {props.children ?? (
         <Button type="button" variant="ghost" size="icon">
-          <MapIcon name="minus" />
+          {icons.minus}
         </Button>
       )}
     </Action>

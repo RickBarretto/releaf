@@ -15,7 +15,9 @@ import {
   Layers,
   Leaf,
   Menu,
+  Minus,
   MousePointer2,
+  Plus,
   Search,
   X,
 } from "lucide-react"
@@ -23,7 +25,7 @@ import { marked } from "marked"
 import { useEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 import api from "../docs/api.md?raw"
-import { CircleMarker, Polyline, Map as ReleafMap } from "../src"
+import { CircleMarker, IconProvider, Polyline, Map as ReleafMap } from "../src"
 import "leaflet/dist/leaflet.css"
 import "../src/styles.css"
 import "./style.css"
@@ -50,6 +52,7 @@ const repo = "https://github.com/RickBarretto/releaf"
 const snippets = {
   simple: `<Map.Root className="city-map">\n  <Map.View position={lisbon} zoom={13} />\n  <Map.Tiles.OpenStreetMap />\n  <Map.Marker position={lisbon}>\n    <Map.Popup>Hello, Lisbon.</Map.Popup>\n  </Map.Marker>\n</Map.Root>`,
   controls: `<Map.Root className="city-map"\n  options={{ zoomControl: false }}>\n  <Map.View position={lisbon} zoom={13} />\n  <Map.Tiles.OpenStreetMap />\n  <Map.Navigation home={lisbon} zoom={13} />\n</Map.Root>`,
+  icons: `import { IconProvider, Map } from "releaf";\nimport { Plus, Minus } from "lucide-react";\n\n<IconProvider icons={{\n  plus: <Plus aria-hidden="true" strokeWidth={3} />,\n  minus: <Minus aria-hidden="true" strokeWidth={3} />,\n}}>\n  <Map.Root className="city-map"\n    options={{ zoomControl: false }}>\n    <Map.View position={lisbon} zoom={13} />\n    <Map.Tiles.OpenStreetMap />\n    <Map.Navigation />\n  </Map.Root>\n</IconProvider>`,
   picker: `<Map.Root className="city-map">\n  <Map.View position={lisbon} zoom={13} />\n  <Map.Tiles.OpenStreetMap />\n  <Map.LocationPicker\n    defaultValue={lisbon}\n    onValueChange={setPosition}\n  />\n</Map.Root>`,
 }
 const lisbon = { latitude: 38.713, longitude: -9.139 }
@@ -334,6 +337,7 @@ function Landing() {
                 ["simple", "01", "A place to start"],
                 ["controls", "02", "Make it your own"],
                 ["picker", "03", "Pick a location"],
+                ["icons", "04", "Bring your own icons"],
               ] as const
             ).map(([key, number, title]) => (
               <button
@@ -355,7 +359,7 @@ function Landing() {
               <span className="status-dot" /> LIVE EXAMPLE ·{" "}
               {example === "picker"
                 ? "CLICK THE MAP OR DRAG THE MARKER"
-                : example === "controls"
+                : example === "controls" || example === "icons"
                   ? "TRY THE NAVIGATION CONTROLS"
                   : "CLICK THE MARKER"}
             </div>
@@ -375,6 +379,16 @@ function Landing() {
               {example === "controls" && (
                 <ReleafMap.Navigation home={lisbon} zoom={13} />
               )}
+              {example === "icons" && (
+                <IconProvider
+                  icons={{
+                    plus: <Plus aria-hidden="true" strokeWidth={3} />,
+                    minus: <Minus aria-hidden="true" strokeWidth={3} />,
+                  }}
+                >
+                  <ReleafMap.Navigation />
+                </IconProvider>
+              )}
               {example === "picker" && (
                 <ReleafMap.LocationPicker defaultValue={lisbon} />
               )}
@@ -390,6 +404,13 @@ function Landing() {
             <code>lisbon = {"{ latitude: 38.713, longitude: -9.139 }"}</code>
             {example === "picker" && " and a React state setter, setPosition."}{" "}
             Set .city-map to a visible height.
+            {example === "icons" && (
+              <>
+                {" "}
+                Use Phosphor, Lucide, or your preferred library.{" "}
+                <a href={`${apiUrl}#icons`}>See all icon slots ↗</a>
+              </>
+            )}
           </small>
         </div>
       </section>
@@ -406,7 +427,8 @@ function Landing() {
             <h3>Bring your own buttons.</h3>
             <p>
               Built-in shadcn/ui controls, or your own components. Wrap a button
-              with a map action and let ReLeaf handle the rest.
+              with a map action and let ReLeaf handle the rest. Bring your own
+              Phosphor, Lucide, or other icons with IconProvider.
             </p>
             <a href={`${apiUrl}#controls`}>Explore controls ↗</a>
           </div>

@@ -41,6 +41,7 @@ export {
   type ZoomProps,
 } from "./dsl"
 export { type MapEventHandlers, useMapEvents } from "./events"
+export { IconProvider, type ReleafIcons } from "./icons"
 export {
   Circle,
   CircleMarker,
