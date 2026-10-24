@@ -66,3 +66,25 @@ bun run lint                 # Check library, stories, and configuration
 ```
 
 Storybook uses the [React + Vite framework](https://storybook.js.org/docs/get-started/frameworks/react-vite).
+
+## Landing page and API website
+
+The GitHub Pages site lives in `website/`. It uses Vite and the actual ReLeaf
+components for its interactive map. The API reference is rendered from
+`docs/api.md`; update that file to update the website documentation.
+
+```sh
+bun run dev:website      # Local development
+bun run build:website    # Typecheck and build into website-dist/
+bun run preview:website  # Preview the production build
+```
+
+The `GitHub Pages` workflow builds and deploys on pushes to `main`, and can also
+be started manually. In the repository's **Settings → Pages → Build and
+deployment**, select **GitHub Actions** as the source. The workflow needs the
+`github-pages` environment to allow deployment from `main`.
+
+Assets use relative paths and documentation uses hash navigation, so both work
+under a repository subpath without server redirects. The demo loads
+OpenStreetMap tiles, and Google Fonts provides optional fonts; the page uses
+system font fallbacks when fonts are unavailable.

@@ -15,6 +15,14 @@ test("navigation keeps its size through location pending, failure and retry", as
   const initial = (await toolbox.boundingBox())!
   expect(initial.width).toBeLessThanOrEqual(60)
   await expect(home).toHaveAttribute("data-size", "icon")
+  // Tooltip composition must preserve the Button slot used by scoped styles.
+  for (const name of ["Zoom in", "Zoom out", "Go home"]) {
+    const button = toolbox.getByRole("button", { name, exact: true })
+    await expect(button).toHaveAttribute("data-slot", "button")
+    await expect(button).toHaveCSS("border-top-width", "0px")
+    await expect(button).toHaveCSS("background-color", "rgba(0, 0, 0, 0)")
+    await expect(button).toHaveCSS("width", "36px")
+  }
   await page.evaluate(() => {
     Object.defineProperty(navigator, "geolocation", {
       configurable: true,
