@@ -330,3 +330,95 @@ test("camera actions honor reduced motion and fit supplied bounds", async () => 
     else Reflect.deleteProperty(window, "matchMedia")
   }
 })
+
+test("typed layer options fall back, handle removal and empty lists, and preserve map ownership", async () => {
+  const ref = createRef<L.Map>()
+  const first = createRef<L.TileLayer>()
+  const second = createRef<L.TileLayer>()
+  const onChange = vi.fn()
+  const options = [
+    {
+      value: "one",
+      label: "One",
+      layer: <ReleafMap.Tiles.Custom ref={first} url="one" />,
+    },
+    {
+      value: "two",
+      label: "Two",
+      layer: <ReleafMap.Tiles.Custom ref={second} url="two" />,
+    },
+  ]
+  const tree = (items: typeof options, value: string) => (
+    <ReleafMap.Root ref={ref} options={{ zoomControl: false }}>
+      <ReleafMap.LayerSwitcher
+        options={items}
+        value={value}
+        onValueChange={onChange}
+      />
+    </ReleafMap.Root>
+  )
+  await render(tree(options, "missing"))
+  const original = ref.current!
+  expect(original.hasLayer(first.current!)).toBe(true)
+  expect(document.querySelector("button")!.getAttribute("aria-pressed")).toBe(
+    "true",
+  )
+  expect(onChange).not.toHaveBeenCalled()
+  await click(document.querySelectorAll("button")[1])
+  expect(onChange).toHaveBeenCalledExactlyOnceWith("two")
+  await render(tree(options, "two"))
+  expect(first.current).toBeNull()
+  expect(original.hasLayer(second.current!)).toBe(true)
+  await render(tree(options.slice(0, 1), "two"))
+  expect(second.current).toBeNull()
+  expect(original.hasLayer(first.current!)).toBe(true)
+  await render(tree([], "two"))
+  expect(first.current).toBeNull()
+  expect(document.querySelectorAll("button")).toHaveLength(0)
+  expect(ref.current).toBe(original)
+  expect(onChange).toHaveBeenCalledTimes(1)
+})
+
+test("uncontrolled layer selection settles on the first remaining option", async () => {
+  const options = [
+    { value: "one", label: "One", layer: <span>First layer</span> },
+    { value: "two", label: "Two", layer: <span>Second layer</span> },
+  ]
+  const tree = (items: typeof options) => (
+    <ReleafMap.LayerSwitcher options={items} defaultValue="missing" />
+  )
+  await render(tree(options))
+  expect(document.body.textContent).toContain("First layer")
+  await click(document.querySelectorAll("button")[1])
+  expect(document.body.textContent).toContain("Second layer")
+  await render(tree(options.slice(0, 1)))
+  expect(document.body.textContent).toContain("First layer")
+  await render(tree(options))
+  expect(document.body.textContent).toContain("First layer")
+})
+
+test("duplicate layer values are configuration errors for both inputs", async () => {
+  const { renderToString } = await import("react-dom/server")
+  expect(() =>
+    renderToString(
+      <ReleafMap.LayerSwitcher
+        options={[
+          { value: "one", label: "One", layer: null },
+          { value: "one", label: "Duplicate", layer: null },
+        ]}
+      />,
+    ),
+  ).toThrow('LayerSwitcher values must be unique: "one"')
+  expect(() =>
+    renderToString(
+      <ReleafMap.LayerSwitcher>
+        <ReleafMap.LayerSwitcher.Item value="one" label="One">
+          One
+        </ReleafMap.LayerSwitcher.Item>
+        <ReleafMap.LayerSwitcher.Item value="one" label="Duplicate">
+          Duplicate
+        </ReleafMap.LayerSwitcher.Item>
+      </ReleafMap.LayerSwitcher>,
+    ),
+  ).toThrow('LayerSwitcher values must be unique: "one"')
+})

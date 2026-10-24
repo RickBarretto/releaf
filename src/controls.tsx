@@ -9,7 +9,7 @@ import { PickerSearch } from "./controls/picker-search"
 import { Switcher } from "./controls/switcher"
 
 /**
- * Selects one mounted layer set through labeled LayerSwitcher.Item children.
+ * Selects one mounted layer set through typed options or LayerSwitcher.Item children.
  *
  * Use value/onValueChange for controlled selection, or defaultValue for local
  * state. The first item is selected by default; inactive items are unmounted.
@@ -60,6 +60,7 @@ export { MapSearch, type MapSearchProps } from "./controls/map-search"
 export { Navigation, type NavigationProps } from "./controls/navigation"
 export type { PickerSearchProps } from "./controls/picker-search"
 export {
+  type LayerSwitcherOption,
   type LayerSwitcherProps,
   type LocationPickerProps,
   type SelectionDetails,

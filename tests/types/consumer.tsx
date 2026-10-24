@@ -1,6 +1,8 @@
 import type * as L from "leaflet"
 import { createRef } from "react"
 import {
+  LayerSwitcher,
+  type LayerSwitcherOption,
   // biome-ignore lint/suspicious/noShadowRestrictedNames: Map is the public compound component API.
   Map,
   MapContainer,
@@ -108,3 +110,54 @@ const invalidLocationState: import("releaf").LocationRequestState = {
   position: { latitude: 0, longitude: 0 },
 }
 void invalidLocationState
+
+const basemaps = [
+  { value: "streets", label: "Streets", layer: <Map.Tiles.OpenStreetMap /> },
+  {
+    value: "terrain",
+    label: "Terrain",
+    layer: <Map.Tiles.Custom url="terrain" />,
+  },
+] as const satisfies readonly LayerSwitcherOption[]
+export const typedLayers = (
+  <Map.LayerSwitcher
+    options={basemaps}
+    value="streets"
+    onValueChange={(value) => {
+      const inferred: "streets" | "terrain" = value
+      void inferred
+      // @ts-expect-error The callback is restricted to the options.
+      const invalid: "other" = value
+      void invalid
+    }}
+  />
+)
+export const invalidLayerValue = (
+  // @ts-expect-error Selection must not widen the options' value union.
+  <Map.LayerSwitcher options={basemaps} value="other" />
+)
+export const invalidLayerDefault = (
+  // @ts-expect-error Default selection must not widen the options' value union.
+  <LayerSwitcher options={basemaps} defaultValue="other" />
+)
+export const mixedLayers = (
+  // @ts-expect-error Options and compound children are mutually exclusive.
+  <Map.LayerSwitcher options={basemaps}>
+    <Map.LayerSwitcher.Item value="other" label="Other">
+      Other
+    </Map.LayerSwitcher.Item>
+  </Map.LayerSwitcher>
+)
+export const inlineLayers = (
+  <LayerSwitcher
+    options={[{ value: "one", label: "One", layer: null }]}
+    onValueChange={(value) => {
+      const one: "one" = value
+      void one
+    }}
+  />
+)
+export const invalidLayerCallback = (
+  // @ts-expect-error Callback types must not widen the options' values.
+  <LayerSwitcher options={basemaps} onValueChange={(_value: "other") => {}} />
+)

@@ -14,6 +14,8 @@ The API has three related layers:
 
 Implement behavior in the owning primitive or shared helper, then compose it into higher-level controls. Avoid separate implementations of the same map operation. `useMap`, `useLeaflet`, refs, and the controller's native map access provide escape hatches for Leaflet plugins and imperative work.
 
+Layer switching accepts typed options or compound children. Option values determine the selection type; selection props do not widen it. Only the active layer mounts. Invalid selections fall back to the first available layer without a user-change callback, and duplicate values are configuration errors.
+
 Named positions use `{ latitude, longitude }`; supported coordinate expressions are normalized at the DSL boundary. Keep coordinate conversion explicit to avoid latitude/longitude order mistakes.
 
 ## Runtime ownership

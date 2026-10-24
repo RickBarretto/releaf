@@ -9,18 +9,27 @@ export const LayerSwitcherExample = () => (
     tiles={false}
   >
     <Map.Toolbar top left>
-      <Map.LayerSwitcher defaultValue="streets">
-        <Map.LayerSwitcher.Item value="streets" label="Streets">
-          <Map.Tiles.OpenStreetMap />
-        </Map.LayerSwitcher.Item>
-        <Map.LayerSwitcher.Item value="terrain" label="Terrain">
-          <Map.Tiles.Custom
-            url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
-            attribution="Map data © OpenStreetMap contributors, SRTM | Map style © OpenTopoMap (CC-BY-SA)"
-            maxZoom={17}
-          />
-        </Map.LayerSwitcher.Item>
-      </Map.LayerSwitcher>
+      <Map.LayerSwitcher
+        defaultValue="streets"
+        options={[
+          {
+            value: "streets",
+            label: "Streets",
+            layer: <Map.Tiles.OpenStreetMap />,
+          },
+          {
+            value: "terrain",
+            label: "Terrain",
+            layer: (
+              <Map.Tiles.Custom
+                url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+                attribution="Map data © OpenStreetMap contributors, SRTM | Map style © OpenTopoMap (CC-BY-SA)"
+                maxZoom={17}
+              />
+            ),
+          },
+        ]}
+      />
     </Map.Toolbar>
   </Frame>
 )

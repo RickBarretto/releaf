@@ -540,28 +540,59 @@ HTML `section` props are supported except `style`.
 ### `Map.LayerSwitcher`
 
 Switch between configured layers while preserving the map and camera.
+Use typed options to infer valid selection values from your layers:
 
 ```tsx
 <Map.Toolbar top left>
-  <Map.LayerSwitcher defaultValue="streets">
-    <Map.LayerSwitcher.Item value="streets" label="Streets">
-      <Map.Tiles.OpenStreetMap />
-    </Map.LayerSwitcher.Item>
-    <Map.LayerSwitcher.Item value="custom" label="Custom">
-      <Map.Tiles.Custom url={tileUrl} attribution="© Map provider" />
-    </Map.LayerSwitcher.Item>
-  </Map.LayerSwitcher>
+  <Map.LayerSwitcher
+    defaultValue="streets"
+    options={[
+      { value: "streets", label: "Streets", layer: <Map.Tiles.OpenStreetMap /> },
+      {
+        value: "custom",
+        label: "Custom",
+        layer: <Map.Tiles.Custom url={tileUrl} attribution="© Map provider" />,
+      },
+    ]}
+    onValueChange={(value) => {
+      // value is "streets" | "custom"
+      console.log(value)
+    }}
+  />
 </Map.Toolbar>
+```
+
+`value`, `defaultValue`, and `onValueChange` use the values inferred from
+`options`; selection props cannot add values to that union. For separately
+declared arrays, use `as const` to retain literal values. The exported
+`LayerSwitcherOption<Value>` describes `{ value, label, layer }`, and
+`LayerSwitcherProps<Value>` describes the root props.
+
+The compound API remains available with string selection values:
+
+```tsx
+<Map.LayerSwitcher defaultValue="streets">
+  <Map.LayerSwitcher.Item value="streets" label="Streets">
+    <Map.Tiles.OpenStreetMap />
+  </Map.LayerSwitcher.Item>
+  <Map.LayerSwitcher.Item value="custom" label="Custom">
+    <Map.Tiles.Custom url={tileUrl} attribution="© Map provider" />
+  </Map.LayerSwitcher.Item>
+</Map.LayerSwitcher>
 ```
 
 #### Root props
 
 | Prop | Type | Default |
 | --- | --- | --- |
-| `value` | `string` | Uncontrolled |
-| `defaultValue` | `string` | First item's value |
-| `onValueChange` | `(value: string) => void` | — |
-| `children` | `ReactNode` | Supply `Item` children |
+| `options` | `readonly LayerSwitcherOption<Value>[]` | Supply options or compound children |
+| `value` | Inferred option values, or `string` with children | Uncontrolled |
+| `defaultValue` | Inferred option values, or `string` with children | First available value |
+| `onValueChange` | `(value: Value) => void`, or `(value: string) => void` with children | — |
+| `children` | `ReactNode` | Supply `Item` children when options are omitted |
+
+Options and compound children are mutually exclusive. Each option contains a
+unique string `value`, a `ReactNode` label, and a `ReactNode` layer.
 
 HTML `div` props are supported except `style`, native `defaultValue`, and `onChange`.
 
@@ -574,7 +605,10 @@ HTML `div` props are supported except `style`, native `defaultValue`, and `onCha
 | `children` | `ReactNode` | Required; the item's layers |
 
 Only the active item's layers mount. Use `value` with `onValueChange` for
-controlled selection, or `defaultValue` for internal state.
+controlled selection, or `defaultValue` for internal state. An invalid or removed
+selection falls back to the first available layer without calling
+`onValueChange`. An empty list mounts no layer. Duplicate values throw a
+configuration error in both APIs.
 
 ### `Map.Search`
 

@@ -11,6 +11,7 @@ export {
   type CoordinatesProps,
   type LayerItemProps,
   LayerSwitcher,
+  type LayerSwitcherOption,
   type LayerSwitcherProps,
   LocationControl,
   type LocationControlProps,

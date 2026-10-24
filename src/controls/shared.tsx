@@ -11,15 +11,35 @@ export const panel =
 export const motion = () =>
   !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
 
-export interface LayerSwitcherProps
-  extends Omit<
-    ComponentPropsWithoutRef<"div">,
-    "style" | "defaultValue" | "onChange"
-  > {
-  value?: string
-  defaultValue?: string
-  onValueChange?: (value: string) => void
+export interface LayerSwitcherOption<Value extends string = string> {
+  value: Value
+  label: ReactNode
+  layer: ReactNode
 }
+
+type LayerSwitcherContainerProps = Omit<
+  ComponentPropsWithoutRef<"div">,
+  "style" | "defaultValue" | "onChange" | "children"
+>
+
+export type LayerSwitcherProps<Value extends string = string> =
+  LayerSwitcherContainerProps &
+    (
+      | {
+          options: readonly LayerSwitcherOption<Value>[]
+          children?: never
+          value?: NoInfer<Value>
+          defaultValue?: NoInfer<Value>
+          onValueChange?: (value: NoInfer<Value>) => void
+        }
+      | {
+          options?: never
+          children?: ReactNode
+          value?: string
+          defaultValue?: string
+          onValueChange?: (value: string) => void
+        }
+    )
 
 export type SelectionSource =
   | "Initial location"

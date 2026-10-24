@@ -5,3 +5,11 @@
 .picker-map {
   height: 600px;
 }
+
+.layer-options {
+  pointer-events: auto;
+}
+
+.layer-test-map [data-slot="map-container"] {
+  height: 100%;
+}
