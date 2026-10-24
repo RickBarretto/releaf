@@ -143,6 +143,8 @@ See the [control and picker APIs](docs/api.md#composed-controls).
 
 ## Explore
 
+- [Website and API docs](https://rickbarretto.github.io/releaf/) — landing page, live map, and API reference (available after GitHub Pages deployment).
+
 - **Map / Location Picker / Complete** in Storybook combines search, current
   location with retry, a draggable marker, map clicks, and selected coordinates.
   [Example source](stories/examples/LocationPicker.tsx) · [composition notes](docs/api.md#location-picker).

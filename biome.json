@@ -4,6 +4,7 @@
     "includes": [
       "**",
       "!!dist",
+      "!!website-dist",
       "!!coverage",
       "!!.vitest",
       "!!node_modules",

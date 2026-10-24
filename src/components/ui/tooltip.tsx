@@ -22,9 +22,17 @@ function Tooltip({
 }
 
 function TooltipTrigger({
+  asChild,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
+  // A composed button keeps its slot so its scoped resets and theme apply.
+  return (
+    <TooltipPrimitive.Trigger
+      {...(!asChild && { "data-slot": "tooltip-trigger" })}
+      asChild={asChild}
+      {...props}
+    />
+  )
 }
 
 function TooltipContent({

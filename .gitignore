@@ -25,3 +25,6 @@ Thumbs.db
 # Browser test artifacts
 playwright-report/
 test-results/
+
+# GitHub Pages website
+website-dist/
