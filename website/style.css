@@ -621,6 +621,19 @@ aside nav a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+.prose a.heading-anchor {
+  color: var(--green);
+  text-decoration: none;
+  font-size: 0.7em;
+  font-weight: 400;
+  opacity: 0.55;
+  padding: 0.15em;
+}
+.prose a.heading-anchor:hover,
+.prose a.heading-anchor:focus-visible {
+  opacity: 1;
+  text-decoration: underline;
+}
 .prose pre {
   background: #1e3029;
   color: #d5e4d6;
