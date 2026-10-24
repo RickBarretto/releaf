@@ -8,6 +8,12 @@ export interface LocateProps extends ActionProps {
   options?: Leaflet.LocateOptions
 }
 
+/**
+ * Renders Map.Actions.Locate using Leaflet’s browser-location request.
+ *
+ * Render inside Map.Root. Requests setView by default; options can override it.
+ * Uses Leaflet location events; use LocationControl for built-in request feedback.
+ */
 export function Locate({ options, ...props }: LocateProps) {
   const map = useMap()
 

@@ -17,6 +17,13 @@ import { ZoomOut } from "./dsl-core/zoom-out"
 import { MapAttribution, MapContainer } from "./map"
 import { SearchBar } from "./search"
 
+/**
+ * Core compound map API used to assemble the public Map namespace.
+ *
+ * Root provides the Leaflet context; View and Zoom update its camera, Toolbar
+ * hosts controls, and Actions compose buttons with imperative map operations.
+ * Tiles, Marker, Popup, and Tooltip adapt the base layers to the DSL.
+ */
 export const MapPrimitives = {
   Root: MapContainer,
   Attribution: MapAttribution,

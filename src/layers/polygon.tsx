@@ -13,7 +13,13 @@ export interface PolygonProps
     | Leaflet.LatLngExpression[][][]
 }
 
-/** A polygon, polygon with holes, or multi-polygon geometry. */
+/**
+ * Displays a polygon, polygon with holes, or multi-polygon geometry.
+ *
+ * Render inside MapContainer or a layer group. Options are creation-only; change
+ * the key to recreate the layer. Positions and pathOptions are mutable; removed style overrides restore defaults.
+ * Supports layer refs, event handlers, CSS classes, and nested overlays.
+ */
 export function Polygon(props: PolygonProps) {
   const layer = useLayer((L) => L.polygon(props.positions, props.options))
 

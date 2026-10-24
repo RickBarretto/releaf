@@ -20,6 +20,12 @@ export interface LocationControlProps
   onError?: (error: Error) => void
 }
 
+/**
+ * Requests the browser’s current location and displays progress or retry feedback.
+ *
+ * Render inside MapContainer. By default, a successful request recenters at zoom 16.
+ * Use recenter={false} to only report onSuccess; compact renders an icon control.
+ */
 export function LocationControl({
   options,
   compact = false,

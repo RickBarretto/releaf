@@ -16,6 +16,13 @@ export interface ToolbarProps
   right?: boolean
 }
 
+/**
+ * Portals Map.Toolbar children into a Leaflet control in the chosen map corner.
+ *
+ * Render inside Map.Root. An explicit position overrides corner flags; the default
+ * is top right. Click and scroll propagation are isolated from the map.
+ * Unmounting removes the Leaflet control.
+ */
 export function Toolbar({
   position,
   top,

@@ -11,7 +11,13 @@ export interface CircleProps
   radius: number
 }
 
-/** A geographic circle whose radius is measured in meters. */
+/**
+ * Displays a geographic circle with a radius measured in meters.
+ *
+ * Render inside MapContainer or a layer group. Options are creation-only; change
+ * the key to recreate the layer. Center, radius, and pathOptions update the existing layer.
+ * Supports layer refs, event handlers, CSS classes, and nested overlays.
+ */
 export function Circle(props: CircleProps) {
   const layer = useLayer((L) =>
     L.circle(props.center, { ...props.options, radius: props.radius }),

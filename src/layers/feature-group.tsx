@@ -10,7 +10,13 @@ export type FeatureGroupProps = LayerProps<
   Leaflet.LayerOptions
 >
 
-/** Group children and propagate their events to the group. */
+/**
+ * Groups nested layers and propagates their events through the group.
+ *
+ * Render inside MapContainer or a layer group. Options are creation-only; change
+ * the key to recreate the layer. Children mount after the group exists and are removed with their parent.
+ * Supports layer refs, event handlers, CSS classes, and nested overlays.
+ */
 export function FeatureGroup(props: FeatureGroupProps) {
   const layer = useLayer((L) => L.featureGroup([], props.options))
 

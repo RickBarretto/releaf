@@ -13,7 +13,13 @@ export interface MarkerProps
   zIndexOffset?: number
 }
 
-/** A marker with mutable position and interaction props. */
+/**
+ * Displays a marker with mutable position, opacity, dragging, and stacking.
+ *
+ * Render inside MapContainer or a layer group. Options are creation-only; change
+ * the key to recreate the layer. Removed opacity, draggable, and zIndexOffset props restore their initial values.
+ * Supports layer refs, event handlers, CSS classes, and nested overlays.
+ */
 export function Marker(props: MarkerProps) {
   const { position, options, opacity, draggable, zIndexOffset } = props
   const [defaults] = useState(() => ({

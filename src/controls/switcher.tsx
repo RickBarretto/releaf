@@ -6,6 +6,12 @@ import { cn } from "../lib/utils"
 import type { LayerItemProps } from "./layer-item"
 import { type LayerSwitcherProps, panel } from "./shared"
 
+/**
+ * Renders the LayerSwitcher buttons and mounts only the active item.
+ *
+ * Use value and onValueChange for controlled selection, or defaultValue for local
+ * state. Without an initial value, the first item is selected.
+ */
 export function Switcher({
   value,
   defaultValue,

@@ -13,7 +13,12 @@ export interface MapAttributionProps {
   className?: string
 }
 
-/** Customize the map's built-in attribution without duplicating provider credits. */
+/**
+ * Configures the current map’s built-in attribution control.
+ *
+ * Render inside MapContainer; the last mounted configuration takes precedence.
+ * Provider credits remain visible, and unmounting restores the prior configuration.
+ */
 export function MapAttribution({
   top,
   bottom,

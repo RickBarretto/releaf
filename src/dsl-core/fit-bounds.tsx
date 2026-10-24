@@ -9,6 +9,12 @@ export interface FitBoundsProps extends ActionProps {
   options?: Leaflet.FitBoundsOptions
 }
 
+/**
+ * Renders Map.Actions.FitBounds to frame a collection of positions.
+ *
+ * Render inside Map.Root. Accepts named or Leaflet coordinates and Leaflet bounds
+ * options. Disables the action for an empty collection and respects reduced motion.
+ */
 export function FitBounds({ positions, options, ...props }: FitBoundsProps) {
   const map = useController()
   return (

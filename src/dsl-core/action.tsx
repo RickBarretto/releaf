@@ -10,7 +10,13 @@ export interface ActionProps
   asChild?: boolean
 }
 
-/** Compose child, consumer, and built-in actions; preventDefault cancels later steps. */
+/**
+ * Composes a map action with a button or an existing React element.
+ *
+ * Runs the child handler, then the consumer handler, then run; preventDefault()
+ * cancels subsequent steps. Child and consumer classes are merged. Without a
+ * valid child element, renders the shared Button component.
+ */
 export function Action({
   children,
   asChild,

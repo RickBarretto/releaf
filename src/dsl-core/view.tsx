@@ -11,6 +11,12 @@ export interface ViewProps {
   animate?: boolean
 }
 
+/**
+ * Applies Map.View camera updates using named coordinates or Leaflet coordinates.
+ *
+ * Render inside Map.Root. Omitted zoom preserves the map’s current zoom.
+ * Animation defaults to enabled and respects reduced-motion preferences.
+ */
 export function View({ position, zoom, animate = true }: ViewProps) {
   const { map, leaflet } = useMapContext()
   const { lat, lng } = leaflet.latLng(toLatLng(position))

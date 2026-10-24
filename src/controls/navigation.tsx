@@ -25,6 +25,12 @@ export interface NavigationProps extends ToolbarProps {
   fitOptions?: Leaflet.FitBoundsOptions
 }
 
+/**
+ * Places zoom controls and optional home, locate, and fit actions in a map corner.
+ *
+ * Render inside MapContainer. Orientation defaults to vertical. Supply home, locate,
+ * or positions to enable additional actions; children replace the default controls.
+ */
 export function Navigation({
   orientation = "vertical",
   home,

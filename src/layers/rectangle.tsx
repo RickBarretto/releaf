@@ -9,7 +9,13 @@ export interface RectangleProps extends PathProps<Leaflet.Rectangle> {
   bounds: Leaflet.LatLngBoundsExpression
 }
 
-/** A rectangular path with mutable geographic bounds. */
+/**
+ * Displays a rectangle defined by mutable geographic bounds.
+ *
+ * Render inside MapContainer or a layer group. Options are creation-only; change
+ * the key to recreate the layer. Bounds and pathOptions update the existing layer.
+ * Supports layer refs, event handlers, CSS classes, and nested overlays.
+ */
 export function Rectangle(props: RectangleProps) {
   const layer = useLayer((L) => L.rectangle(props.bounds, props.options))
 

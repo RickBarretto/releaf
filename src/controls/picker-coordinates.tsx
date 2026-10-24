@@ -3,6 +3,12 @@
 import { Coordinates, type CoordinatesProps } from "./coordinates"
 import { useLocationPicker } from "./shared"
 
+/**
+ * Displays the surrounding LocationPicker’s coordinates and selection source.
+ *
+ * Render inside LocationPicker. Formatting and clipboard options are forwarded
+ * to Coordinates; children appear after the selection-source message.
+ */
 export function PickerCoordinates({
   children,
   ...props

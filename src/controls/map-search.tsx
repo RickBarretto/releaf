@@ -17,6 +17,13 @@ export interface MapSearchProps<T> extends Omit<SearchBarProps<T>, "onSelect"> {
   placeholder?: string
 }
 
+/**
+ * Searches a consumer-provided data source and moves the map to a selected result.
+ *
+ * Render inside MapContainer. getPosition converts a result to named coordinates;
+ * getLabel is required for results without a label field. Selection defaults to
+ * zoom 13 with a marker; children replace the default input and results.
+ */
 export function MapSearch<T extends { label: string }>(
   props: MapSearchProps<T>,
 ): ReactNode

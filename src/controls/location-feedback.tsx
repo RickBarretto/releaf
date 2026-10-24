@@ -7,6 +7,12 @@ import { MapPrimitives as ReleafMap } from "../dsl-core"
 import { cn } from "../lib/utils"
 import { panel } from "./shared"
 
+/**
+ * Renders the shared current-location button, pending status, and error feedback.
+ *
+ * The caller owns the request state and request callback. Pending requests disable
+ * the button; compact mode places feedback in a bottom-left map toolbar.
+ */
 export function LocationFeedback({
   status,
   error,

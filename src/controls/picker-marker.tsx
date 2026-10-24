@@ -4,6 +4,13 @@ import type * as Leaflet from "leaflet"
 import { MapPrimitives as ReleafMap, toLatLng } from "../dsl-core"
 import { useLocationPicker } from "./shared"
 
+/**
+ * Shows a draggable marker for the current LocationPicker selection.
+ *
+ * Render inside LocationPicker. No marker is rendered for a null selection.
+ * Dragging proposes a new selection while preserving the authoritative value
+ * until the picker accepts the update.
+ */
 export function PickerMarker() {
   const picker = useLocationPicker()
   return (

@@ -10,6 +10,12 @@ export interface FlyToProps extends ActionProps {
   options?: Leaflet.ZoomPanOptions
 }
 
+/**
+ * Renders Map.Actions.FlyTo to animate the map toward a target position.
+ *
+ * Render inside Map.Root. Accepts named or Leaflet coordinates and optional zoom
+ * and animation options. Respects reduced-motion preferences.
+ */
 export function FlyTo({ position, zoom, options, ...props }: FlyToProps) {
   const map = useController()
 

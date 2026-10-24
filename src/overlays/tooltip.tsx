@@ -15,7 +15,13 @@ export interface TooltipProps {
   open?: boolean
 }
 
-/** Render React content into a Leaflet tooltip through a persistent portal host. */
+/**
+ * Renders React children in a Leaflet tooltip through a persistent portal host.
+ *
+ * Nest inside a layer to bind it, or provide position for a standalone tooltip.
+ * Omit open for Leaflet’s native behavior, or control visibility explicitly.
+ * Options are creation-only; change the key to recreate the overlay.
+ */
 export function Tooltip(props: TooltipProps) {
   return useOverlay("tooltip", props)
 }

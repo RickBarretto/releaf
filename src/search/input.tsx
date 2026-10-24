@@ -4,6 +4,13 @@ import type { ComponentPropsWithoutRef } from "react"
 import { Input as UIInput } from "../components/ui/input"
 import { useSearch } from "./shared"
 
+/**
+ * Renders the SearchBar combobox and handles keyboard result navigation.
+ *
+ * Render inside SearchBar. Arrow keys move the active option, Enter selects it,
+ * and Escape clears the query. Consumer handlers can cancel built-in behavior
+ * with preventDefault().
+ */
 export function Input({
   onChange,
   onKeyDown,

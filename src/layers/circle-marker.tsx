@@ -11,7 +11,13 @@ export interface CircleMarkerProps
   radius?: number
 }
 
-/** A screen-sized circle whose radius is measured in pixels. */
+/**
+ * Displays a circular marker with a radius measured in screen pixels.
+ *
+ * Render inside MapContainer or a layer group. Options are creation-only; change
+ * the key to recreate the layer. Center, radius, and pathOptions are mutable; omitted radius restores its initial value.
+ * Supports layer refs, event handlers, CSS classes, and nested overlays.
+ */
 export function CircleMarker(props: CircleMarkerProps) {
   const [initialRadius] = useState(() => props.options?.radius ?? 10)
   const layer = useLayer((L) => L.circleMarker(props.center, props.options))

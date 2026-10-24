@@ -2,6 +2,12 @@
 
 import { CustomTiles, type CustomTilesProps } from "./custom-tiles"
 
+/**
+ * Renders Map.Tiles.OpenStreetMap with the standard OpenStreetMap tile source.
+ *
+ * Includes provider attribution and a default maximum zoom of 19. Supplied props
+ * can override these defaults; other behavior follows CustomTiles.
+ */
 export function OpenStreetMap(props: Omit<CustomTilesProps, "url">) {
   return (
     <CustomTiles

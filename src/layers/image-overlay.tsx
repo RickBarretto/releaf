@@ -14,7 +14,14 @@ export interface ImageOverlayProps
   zIndex?: number
 }
 
-/** An image stretched across mutable geographic bounds. */
+/**
+ * Stretches an image across geographic bounds on the map.
+ *
+ * Render inside MapContainer or a layer group. Options are creation-only; change
+ * the key to recreate the layer. URL, bounds, opacity, and zIndex are mutable; omitted opacity and zIndex
+ * restore their initial values.
+ * Supports layer refs, event handlers, CSS classes, and nested overlays.
+ */
 export function ImageOverlay(props: ImageOverlayProps) {
   const { leaflet } = useMapContext()
   const [defaults] = useState(() => ({

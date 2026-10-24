@@ -16,6 +16,12 @@ export interface CoordinatesProps
   copy?: boolean
 }
 
+/**
+ * Displays named latitude/longitude coordinates with optional clipboard copying.
+ *
+ * Accepts a nullable position, decimal precision, and a custom formatter.
+ * Shows an empty-selection message when position is null; copy defaults to enabled.
+ */
 export function Coordinates({
   position,
   precision = 5,

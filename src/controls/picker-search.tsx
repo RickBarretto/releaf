@@ -7,6 +7,13 @@ import { useLocationPicker } from "./shared"
 
 export type PickerSearchProps<T> = Omit<MapSearchProps<T>, "zoom" | "marker">
 
+/**
+ * Searches a data source and proposes results to the surrounding LocationPicker.
+ *
+ * Render inside LocationPicker. getPosition maps results to named coordinates;
+ * getLabel is required when results lack a label. Accepted selections recenter
+ * the map, and children replace the default input and results.
+ */
 export function PickerSearch<T extends { label: string }>(
   props: PickerSearchProps<T>,
 ): ReactNode

@@ -11,7 +11,14 @@ export interface GeoJSONProps
   pathOptions?: Leaflet.PathOptions
 }
 
-/** Replaces features when data identity changes; memoize large datasets. */
+/**
+ * Displays GeoJSON features, replacing them when the data identity changes.
+ *
+ * Render inside MapContainer or a layer group. Options are creation-only; change
+ * the key to recreate the layer. Memoize data to avoid unnecessary replacement. pathOptions are reapplied after
+ * features change; omitted style overrides reset to the layer’s configured style.
+ * Supports layer refs, event handlers, CSS classes, and nested overlays.
+ */
 export function GeoJSON(props: GeoJSONProps) {
   const layer = useLayer((L) => L.geoJSON(undefined, props.options))
 

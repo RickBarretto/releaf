@@ -12,7 +12,13 @@ export interface TileLayerProps
   zIndex?: number
 }
 
-/** A tile source with mutable URL, opacity, and stacking order. */
+/**
+ * Displays a tile source with mutable URL, opacity, and stacking order.
+ *
+ * Render inside MapContainer or a layer group. Options are creation-only; change
+ * the key to recreate the layer. Opacity and zIndex return to their initial values when their props are removed.
+ * Supports layer refs, event handlers, CSS classes, and nested overlays.
+ */
 export function TileLayer(props: TileLayerProps) {
   const { url, options, opacity, zIndex } = props
   const [defaults] = useState(() => ({

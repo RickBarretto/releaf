@@ -3,6 +3,12 @@
 import { cn } from "../lib/utils"
 import { type SearchResultsProps, useSearch } from "./shared"
 
+/**
+ * Renders SearchBar status messages and its accessible selectable results list.
+ *
+ * Render inside SearchBar. Customize loading, empty, and error messages through
+ * props; pointer interaction updates the same active option used by the input.
+ */
 export function Results({
   loadingMessage = "Searching…",
   emptyMessage = "No results",

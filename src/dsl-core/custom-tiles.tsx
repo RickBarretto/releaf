@@ -8,7 +8,13 @@ export interface CustomTilesProps
   extends TileLayerProps,
     Leaflet.TileLayerOptions {}
 
-/** Explicit options override shorthand tile options at creation. */
+/**
+ * Renders Map.Tiles.Custom with a URL and shorthand Leaflet tile options.
+ *
+ * Render inside Map.Root. Explicit options override shorthand options at creation.
+ * URL, opacity, and stacking updates are handled by the underlying TileLayer;
+ * change the component key to recreate creation-only options.
+ */
 export function CustomTiles({
   url,
   options,

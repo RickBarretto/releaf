@@ -5,6 +5,12 @@ import { Button } from "../components/ui/button"
 import { Action, type ActionProps } from "./action"
 import { useController, useZoomLimit } from "./shared"
 
+/**
+ * Renders Map.Actions.ZoomOut and zooms the surrounding map out by one step.
+ *
+ * Render inside Map.Root. Disables the action at the current minimum zoom.
+ * Supply a child element to customize the button; preventDefault() cancels zooming.
+ */
 export function ZoomOut(props: ActionProps) {
   const map = useController()
   const atLimit = useZoomLimit("min")

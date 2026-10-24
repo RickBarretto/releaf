@@ -9,6 +9,12 @@ export interface ZoomProps {
   maxZoom?: number
 }
 
+/**
+ * Applies Map.Zoom’s zoom level and temporary minimum and maximum zoom limits.
+ *
+ * Render inside Map.Root. Omitted limits use zero and infinity. Previous map
+ * limits are restored when the effect is cleaned up.
+ */
 export function Zoom({ zoom, minZoom, maxZoom }: ZoomProps) {
   const map = useMap()
 

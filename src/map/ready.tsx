@@ -9,6 +9,12 @@ import { AttributionFooter } from "./attribution-footer"
 import type { MapAttributionProps } from "./map-attribution"
 import { AttributionContext } from "./shared"
 
+/**
+ * Provides a ready map instance and attribution registration to descendants.
+ *
+ * Internal to MapContainer. Assigns the consumer ref, subscribes to map events,
+ * and renders the active attribution configuration before the children.
+ */
 export function Ready({
   context,
   mapRef,

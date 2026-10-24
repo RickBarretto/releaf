@@ -20,7 +20,13 @@ export interface MapContainerProps
   fallback?: ReactNode
 }
 
-/** Load Leaflet in the browser and own the map, resize observer, and teardown. */
+/**
+ * Creates the Leaflet map and provides context for all nested map components.
+ *
+ * Initial center, zoom, and options are read once; change the key to recreate the map.
+ * Render camera updates with MapView. The fallback is shown while Leaflet loads.
+ * Unmounting removes the map and its resize observer.
+ */
 export function MapContainer({
   options,
   initialCenter = [0, 0],

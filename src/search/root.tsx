@@ -9,6 +9,13 @@ import {
   type SearchState,
 } from "./shared"
 
+/**
+ * Owns the typed query, asynchronous results, and context for SearchBar children.
+ *
+ * Accepts a search function and onSelect callback; getLabel is required for results
+ * without a label. Searches are debounced and receive an AbortSignal. Query changes
+ * and unmounting cancel stale requests. This component does not require a map.
+ */
 export function Root<T extends SearchPlace>(props: SearchBarProps<T>): ReactNode
 
 export function Root<T>(

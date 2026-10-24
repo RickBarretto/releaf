@@ -2,7 +2,12 @@ import type { ComponentPropsWithoutRef } from "react"
 
 type MapIconName = "plus" | "minus" | "locate" | "pin" | "fit" | "copy"
 
-/** Small map-control glyphs; consumers can still supply their own icon buttons. */
+/**
+ * Renders one of the library’s small SVG map-control glyphs.
+ *
+ * Select a glyph with name and customize SVG attributes through props. Icons are
+ * hidden from assistive technology by default; label the containing control.
+ */
 export function MapIcon({
   name,
   ...props

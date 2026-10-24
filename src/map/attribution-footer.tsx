@@ -6,7 +6,12 @@ import { useMapContext } from "../context"
 import { cn } from "../lib/utils"
 import type { MapAttributionProps } from "./map-attribution"
 
-/** Keep Leaflet's live provider credits, with the same tokens as shadcn controls. */
+/**
+ * Applies branding, positioning, and classes to Leaflet’s live attribution control.
+ *
+ * Internal to the map provider. Observes provider-credit changes to style new links
+ * and restores the previous prefix and position when its effect is cleaned up.
+ */
 export function AttributionFooter({
   top,
   bottom,

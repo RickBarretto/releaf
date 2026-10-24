@@ -11,7 +11,12 @@ export interface MapViewProps {
   animate?: boolean
 }
 
-/** Apply camera prop changes; user pan/zoom remains free between changes. */
+/**
+ * Updates the current map camera from Leaflet coordinates and a zoom level.
+ *
+ * Render inside MapContainer. User pan and zoom remain free between prop changes.
+ * Animation defaults to enabled and respects reduced-motion preferences.
+ */
 export function MapView({ center, zoom, animate = true }: MapViewProps) {
   const { map, leaflet } = useMapContext()
   const { lat, lng } = leaflet.latLng(center)

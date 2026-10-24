@@ -6,7 +6,12 @@ import { useImperativeHandle } from "react"
 import { LayerContext, useEventHandlers } from "../context"
 import { type LayerProps, useLayerClassName } from "./shared"
 
-/** Mount descendants only after their Leaflet parent exists. */
+/**
+ * Provides an initialized Leaflet layer to nested overlays and descendants.
+ *
+ * Internal to layer rendering. Assigns the layer ref, subscribes to consumer events,
+ * and synchronizes consumer CSS classes for the lifetime of the mounted layer.
+ */
 export function LayerReady<T extends Leaflet.Layer>({
   layer,
   layerRef,

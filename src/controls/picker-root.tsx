@@ -18,6 +18,13 @@ import {
   type SelectionSource,
 } from "./shared"
 
+/**
+ * Owns LocationPicker selection state and coordinates its compound children.
+ *
+ * Render inside MapContainer. Use value for controlled state or defaultValue for
+ * local state; onValueChange reports the selection and its source. Map clicks
+ * select a location. Omitted children render the default marker and controls.
+ */
 export function PickerRoot({
   value,
   defaultValue = null,
