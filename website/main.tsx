@@ -488,7 +488,7 @@ function App() {
           <span>
             {"{Re}"}
             <b>Leaf</b>
-            <sup>0.1</sup>
+            <sup>{__WEBSITE_VERSION__}</sup>
           </span>
         </a>
         <button
