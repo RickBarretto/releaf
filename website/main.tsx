@@ -1,3 +1,7 @@
+import hljs from "highlight.js/lib/core"
+import css from "highlight.js/lib/languages/css"
+import plaintext from "highlight.js/lib/languages/plaintext"
+import typescript from "highlight.js/lib/languages/typescript"
 import { Icon } from "leaflet"
 import markerIcon from "leaflet/dist/images/marker-icon.png?url"
 import markerIconRetina from "leaflet/dist/images/marker-icon-2x.png?url"
@@ -112,6 +116,16 @@ function slug(text: string) {
     .replace(/\s+/g, "-")
 }
 const renderer = new marked.Renderer()
+hljs.registerLanguage("typescript", typescript)
+hljs.registerLanguage("css", css)
+hljs.registerLanguage("plaintext", plaintext)
+renderer.code = ({ text, lang }) => {
+  const language = lang?.split(/\s+/)[0] ?? "plaintext"
+  const highlighted = hljs.getLanguage(language)
+    ? hljs.highlight(text, { language }).value
+    : hljs.highlight(text, { language: "plaintext" }).value
+  return `<pre><code class="hljs">${highlighted}</code></pre>\n`
+}
 renderer.heading = ({ tokens, depth, text }) =>
   `<h${depth} id="${slug(text)}">${marked.Parser.parseInline(tokens)}</h${depth}>`
 renderer.link = ({ href, tokens }) => {

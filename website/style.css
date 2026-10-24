@@ -644,6 +644,29 @@ aside nav a:hover {
   padding: 0;
   overflow-wrap: normal;
 }
+.prose .hljs-comment {
+  color: #a0b09e;
+}
+.prose .hljs-keyword,
+.prose .hljs-selector-tag {
+  color: #cbbce8;
+}
+.prose .hljs-string,
+.prose .hljs-attr,
+.prose .hljs-selector-class {
+  color: #e0c38e;
+}
+.prose .hljs-title,
+.prose .hljs-name,
+.prose .hljs-built_in {
+  color: #bbd6a0;
+}
+.prose .hljs-number,
+.prose .hljs-literal,
+.prose .hljs-attribute,
+.prose .hljs-type {
+  color: #9dced1;
+}
 .prose table {
   display: block;
   overflow-x: auto;
