@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button"
 import { MapPrimitives as ReleafMap } from "../dsl-core"
 import { useIcons } from "../icons"
 import { cn } from "../lib/utils"
+import type { LocationRequestState } from "../location"
 import { panel } from "./shared"
 
 function LocationStatus({
@@ -53,23 +54,21 @@ function LocationStatus({
  * the button; compact mode places feedback in a bottom-left map toolbar.
  */
 export function LocationFeedback({
-  status,
-  error,
   request,
   compact = false,
   buttonProps,
-}: {
+  ...state
+}: LocationRequestState & {
   buttonProps?: Omit<
     ComponentPropsWithoutRef<"button">,
     "onClick" | "children" | "style"
   >
   compact?: boolean
-  status: string
-  error: Error | null
   request: () => void
 }) {
   const icons = useIcons()
-  const pending = status === "pending"
+  const pending = state.status === "pending"
+  const error = state.status === "error" ? state.error : null
   const actionLabel = error ? "Retry current location" : "Locate me"
   const progressLabel = pending ? "Finding your location…" : actionLabel
   return (

@@ -735,7 +735,7 @@ Use inside `Map.LocationPicker` to build custom controls.
 | `value` | `Position` or `null` | Current selection |
 | `source` | `SelectionSource` | Most recent selection source |
 | `status` | `LocationRequestStatus` | Location request state |
-| `error` | `Error` or `null` | Current location request error |
+| `error` | `Error` | Present only when status is `"error"` |
 | `select` | Signature below | Propose a selection |
 | `locate` | `() => Promise<void>` | Request location and select it on success |
 
@@ -894,11 +894,13 @@ function LocateButton() {
 
 | Member | Type | Purpose |
 | --- | --- | --- |
-| `position` | `Position` or `null` | Successful request result |
+| `position` | `Position` | Present only when status is `"success"` |
 | `status` | `LocationRequestStatus` | State listed below |
-| `error` | `Error` or `null` | Failed request error |
+| `error` | `Error` | Present only when status is `"error"` |
 | `request` | `(options?: PositionOptions) => Promise<Position \| null>` | Start a request |
 | `reset` | `() => void` | Clear state and invalidate pending work |
+
+The exported `LocationRequestState` is a discriminated union. Narrow `status` before reading `position` or `error`; idle and pending states contain only `status`. The hook adds `request` and `reset` to each variant.
 
 #### Request states
 

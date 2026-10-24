@@ -94,8 +94,7 @@ export function PickerRoot({
         source,
         select,
         locate,
-        status: location.status,
-        error: location.error,
+        ...location,
       }}
     >
       {children ?? (

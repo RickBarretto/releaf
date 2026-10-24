@@ -28,14 +28,15 @@ export function useCurrentLocation(request: Promise<Position>): Position {
 
 export type LocationRequestStatus = "idle" | "pending" | "success" | "error"
 
+export type LocationRequestState =
+  | { status: "idle" | "pending" }
+  | { status: "success"; position: Position }
+  | { status: "error"; error: Error }
+
 /** User-triggered geolocation with logical cancellation of obsolete requests. */
 export function useLocationRequest() {
   const generation = useRef(0)
-  const [state, setState] = useState<{
-    position: Position | null
-    status: LocationRequestStatus
-    error: Error | null
-  }>({ position: null, status: "idle", error: null })
+  const [state, setState] = useState<LocationRequestState>({ status: "idle" })
   useEffect(
     () => () => {
       generation.current += 1
@@ -44,7 +45,7 @@ export function useLocationRequest() {
   )
   const reset = useCallback(() => {
     generation.current += 1
-    setState({ position: null, status: "idle", error: null })
+    setState({ status: "idle" })
   }, [])
   const request = useCallback(
     async (
@@ -52,16 +53,16 @@ export function useLocationRequest() {
       onError?: (error: Error) => void,
     ): Promise<Position | null> => {
       const id = ++generation.current
-      setState({ position: null, status: "pending", error: null })
+      setState({ status: "pending" })
       try {
         const position = await requestCurrentLocation(options)
         if (id !== generation.current) return null
-        setState({ position, status: "success", error: null })
+        setState({ position, status: "success" })
         return position
       } catch (cause) {
         if (id !== generation.current) return null
         const error = cause instanceof Error ? cause : new Error(String(cause))
-        setState({ position: null, status: "error", error })
+        setState({ status: "error", error })
         onError?.(error)
         return null
       }

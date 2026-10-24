@@ -84,3 +84,27 @@ export const invalidMapSearch = (
 )
 // @ts-expect-error picker values use named coordinates
 export const invalidPicker = <Map.LocationPicker value={[1, 2]} />
+
+function locationStateContract(state: import("releaf").LocationRequestState) {
+  if (state.status === "success") {
+    const position: import("releaf").Position = state.position
+    void position
+    // @ts-expect-error Success has no error.
+    state.error
+  } else if (state.status === "error") {
+    const error: Error = state.error
+    void error
+    // @ts-expect-error Failure has no position.
+    state.position
+  } else {
+    // @ts-expect-error Idle and pending have no position.
+    state.position
+  }
+}
+void locationStateContract
+const invalidLocationState: import("releaf").LocationRequestState = {
+  status: "pending",
+  // @ts-expect-error Pending cannot contain a successful position.
+  position: { latitude: 0, longitude: 0 },
+}
+void invalidLocationState

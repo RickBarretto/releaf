@@ -3,7 +3,7 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react"
 import { createContext, useContext } from "react"
 import type { Position } from "../dsl-core"
-import type { useLocationRequest } from "../location"
+import type { LocationRequestState } from "../location"
 
 export const panel =
   "rounded-xl border border-border bg-background p-2 text-foreground shadow-lg"
@@ -42,7 +42,7 @@ export interface LocationPickerProps {
   locationOptions?: PositionOptions
 }
 
-export interface PickerState {
+export type PickerState = LocationRequestState & {
   value: Position | null
   source: SelectionSource
   select: (
@@ -51,8 +51,6 @@ export interface PickerState {
     recenter?: boolean,
   ) => void
   locate: () => Promise<void>
-  status: ReturnType<typeof useLocationRequest>["status"]
-  error: Error | null
 }
 
 export const PickerContext = createContext<PickerState | null>(null)

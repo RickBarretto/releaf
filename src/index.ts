@@ -67,6 +67,7 @@ export {
   type TileLayerProps,
 } from "./layers"
 export {
+  type LocationRequestState,
   type LocationRequestStatus,
   requestCurrentLocation,
   useCurrentLocation,

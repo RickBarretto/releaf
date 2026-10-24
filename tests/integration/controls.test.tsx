@@ -52,7 +52,8 @@ test("location requests ignore obsolete successes, failures, resets and unmounts
     callbacks[1].failure({ message: "Denied" } as GeolocationPositionError),
   )
   expect(await second).toBeNull()
-  expect(location.error?.message).toBe("Denied")
+  if (location.status !== "error") throw new Error("Expected failure")
+  expect(location.error.message).toBe("Denied")
   expect(onError).toHaveBeenCalledExactlyOnceWith(location.error)
   await act(async () => {
     first = location.request(undefined, onError)
