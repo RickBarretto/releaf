@@ -36,6 +36,16 @@ Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 })
 
+const isDocs = document.documentElement.dataset.page === "api"
+const homeUrl = isDocs ? "../" : "./"
+const apiUrl = isDocs ? "./" : "./api/"
+
+// Preserve links shared before the API became a separate page.
+if (!isDocs && location.hash.startsWith("#api")) {
+  const section = location.hash.slice(5)
+  location.replace(`${apiUrl}${section ? `#${section}` : ""}`)
+}
+
 const repo = "https://github.com/RickBarretto/releaf"
 const snippets = {
   simple: `<Map.Root className="city-map">\n  <Map.View position={lisbon} zoom={13} />\n  <Map.Tiles.OpenStreetMap />\n  <Map.Marker position={lisbon}>\n    <Map.Popup>Hello, Lisbon.</Map.Popup>\n  </Map.Marker>\n</Map.Root>`,
@@ -129,7 +139,6 @@ renderer.code = ({ text, lang }) => {
 renderer.heading = ({ tokens, depth, text }) =>
   `<h${depth} id="${slug(text)}">${marked.Parser.parseInline(tokens)}</h${depth}>`
 renderer.link = ({ href, tokens }) => {
-  if (href.startsWith("#")) href = `#api/${href.slice(1)}`
   if (href.startsWith("../")) href = `${repo}/blob/main/${href.slice(3)}`
   return `<a href="${href}">${marked.Parser.parseInline(tokens)}</a>`
 }
@@ -155,7 +164,7 @@ function Docs() {
           {headings
             .filter((h) => h.title.toLowerCase().includes(query.toLowerCase()))
             .map((h) => (
-              <a key={h.id} href={`#api/${h.id}`}>
+              <a key={h.id} href={`#${h.id}`}>
                 {h.title}
                 <ArrowUpRight size={13} />
               </a>
@@ -196,7 +205,7 @@ function Landing() {
             Leaflet that makes mapping feel like second nature.
           </p>
           <div className="hero-actions">
-            <a className="button primary" href="#api/setup">
+            <a className="button primary" href={`${apiUrl}#setup`}>
               Start building <ArrowRight size={17} />
             </a>
             <a className="text-link" href={repo}>
@@ -311,7 +320,7 @@ function Landing() {
             Start with a few components. Grow into search, location pickers, and
             custom controls — without leaving React.
           </p>
-          <a className="text-link" href="#api">
+          <a className="text-link" href={apiUrl}>
             Meet the whole API <ArrowRight size={16} />
           </a>
           <div className="example-tabs">
@@ -394,7 +403,7 @@ function Landing() {
               Built-in shadcn/ui controls, or your own components. Wrap a button
               with a map action and let ReLeaf handle the rest.
             </p>
-            <a href="#api/controls">Explore controls ↗</a>
+            <a href={`${apiUrl}#controls`}>Explore controls ↗</a>
           </div>
           <div>
             <span>02 / FLEXIBILITY</span>
@@ -403,7 +412,7 @@ function Landing() {
               Use OpenStreetMap tiles or your own tile source. Connect search to
               your provider with a simple, cancellable function.
             </p>
-            <a href="#api/search">Explore search ↗</a>
+            <a href={`${apiUrl}#search`}>Explore search ↗</a>
           </div>
           <div>
             <span>03 / REACT FIRST</span>
@@ -413,7 +422,7 @@ function Landing() {
               application in React while reaching for native map APIs when you
               need them.
             </p>
-            <a href="#api/hooks">Explore hooks ↗</a>
+            <a href={`${apiUrl}#hooks`}>Explore hooks ↗</a>
           </div>
         </div>
       </section>
@@ -424,7 +433,7 @@ function Landing() {
           <br />
           <em>on the map.</em>
         </h2>
-        <a href="#api/setup" className="button primary">
+        <a href={`${apiUrl}#setup`} className="button primary">
           Plant the first component <ArrowRight size={17} />
         </a>
       </section>
@@ -434,7 +443,6 @@ function Landing() {
 function App() {
   const [hash, setHash] = useState(location.hash)
   const [menu, setMenu] = useState(false)
-  const isDocs = hash.startsWith("#api")
   useEffect(() => {
     const update = () => {
       setHash(location.hash)
@@ -447,13 +455,13 @@ function App() {
     document.title = isDocs
       ? "API reference — ReLeaf"
       : "ReLeaf — Maps, naturally."
-    const target = hash.startsWith("#api/") ? hash.slice(5) : hash.slice(1)
+    const target = decodeURIComponent(hash.slice(1))
     requestAnimationFrame(() => {
       const el = document.getElementById(target)
       if (el) el.scrollIntoView()
       else window.scrollTo(0, 0)
     })
-  }, [hash, isDocs])
+  }, [hash])
   return (
     <>
       <button
@@ -468,7 +476,7 @@ function App() {
         Skip to content
       </button>
       <header>
-        <a className="brand" href="#home" aria-label="ReLeaf home">
+        <a className="brand" href={homeUrl} aria-label="ReLeaf home">
           <span className="brand-icon">
             <Leaf size={20} />
           </span>
@@ -488,14 +496,14 @@ function App() {
           {menu ? <X /> : <Menu />}
         </button>
         <nav className={menu ? "open" : ""} aria-label="Main navigation">
-          <a href="#api" aria-current={isDocs ? "page" : undefined}>
+          <a href={apiUrl} aria-current={isDocs ? "page" : undefined}>
             Documentation
           </a>
-          <a href="#examples">Examples</a>
+          <a href={`${homeUrl}#examples`}>Examples</a>
           <a href={repo}>
             <Code2 size={16} /> GitHub <ArrowUpRight size={13} />
           </a>
-          <a className="nav-cta" href="#api/setup">
+          <a className="nav-cta" href={`${apiUrl}#setup`}>
             Get started <ArrowRight size={15} />
           </a>
         </nav>
@@ -504,7 +512,7 @@ function App() {
         {isDocs ? <Docs /> : <Landing />}
       </main>
       <footer>
-        <a className="brand" href="#home">
+        <a className="brand" href={homeUrl}>
           <Leaf size={20} />
           <span>
             {"{Re}"}
