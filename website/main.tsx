@@ -26,6 +26,7 @@ import { useEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 import api from "../docs/api.md?raw"
 import { CircleMarker, IconProvider, Polyline, Map as ReleafMap } from "../src"
+import { useClipboard } from "../src/lib/use-clipboard"
 import "leaflet/dist/leaflet.css"
 import "../src/styles.css"
 import "./style.css"
@@ -57,26 +58,19 @@ const snippets = {
 }
 const lisbon = { latitude: 38.713, longitude: -9.139 }
 function CopyButton({ value }: { value: string }) {
-  const [state, setState] = useState("Copy")
-  useEffect(() => {
-    if (state !== "Copy") {
-      const timer = setTimeout(() => setState("Copy"), 2200)
-      return () => clearTimeout(timer)
-    }
-  }, [state])
+  const clipboard = useClipboard(value, 2200)
+  const state =
+    clipboard.status === "success"
+      ? "Copied"
+      : clipboard.status === "error"
+        ? "Copy unavailable"
+        : "Copy"
   return (
     <button
       type="button"
       className="copy"
       aria-label={state}
-      onClick={async () => {
-        try {
-          await navigator.clipboard.writeText(value)
-          setState("Copied")
-        } catch {
-          setState("Copy unavailable")
-        }
-      }}
+      onClick={clipboard.copy}
     >
       {state === "Copied" ? <Check size={14} /> : <Copy size={14} />}
       <span aria-live="polite">{state}</span>

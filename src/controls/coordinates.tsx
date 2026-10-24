@@ -1,10 +1,10 @@
 "use client"
 
 import type { ComponentPropsWithoutRef } from "react"
-import { useEffect, useRef, useState } from "react"
 import { Button } from "../components/ui/button"
 import type { Position } from "../dsl-core"
 import { useIcons } from "../icons"
+import { useClipboard } from "../lib/use-clipboard"
 import { cn } from "../lib/utils"
 import { panel } from "./shared"
 
@@ -37,28 +37,13 @@ export function Coordinates({
       ? format(position)
       : `${position.latitude.toFixed(precision)}, ${position.longitude.toFixed(precision)}`
     : "No location selected"
-  const [status, setStatus] = useState("")
-  const version = useRef(0)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Changing displayed text invalidates clipboard feedback.
-  useEffect(() => {
-    version.current += 1
-    setStatus("")
-    return () => {
-      version.current += 1
-    }
-  }, [text])
-  async function copyText() {
-    const id = ++version.current
-    try {
-      await navigator.clipboard.writeText(text)
-      if (id === version.current) setStatus("Coordinates copied")
-    } catch {
-      if (id === version.current)
-        setStatus(
-          "Clipboard unavailable. Select and copy the coordinates above.",
-        )
-    }
-  }
+  const clipboard = useClipboard(text)
+  const feedback =
+    clipboard.status === "success"
+      ? "Coordinates copied"
+      : clipboard.status === "error"
+        ? "Clipboard unavailable. Select and copy the coordinates above."
+        : ""
   return (
     <section
       data-slot="map-panel"
@@ -75,14 +60,14 @@ export function Coordinates({
           variant="secondary"
           size="sm"
           disabled={!position}
-          onClick={copyText}
+          onClick={clipboard.copy}
         >
           {icons.copy}
           Copy coordinates
         </Button>
       )}
       <span role="status" className="block text-xs empty:hidden">
-        {status}
+        {feedback}
       </span>
     </section>
   )

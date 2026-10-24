@@ -532,6 +532,7 @@ HTML `section` props are supported except `style`.
 #### Behavior
 
 - A null position displays “No location selected” and disables copying.
+- Copy feedback clears when the formatted coordinates change or another copy starts. Obsolete clipboard completions cannot report success for a new selection.
 - `format` overrides the default decimal formatting.
 - Copy uses the displayed text and announces success or clipboard failure.
 - Children appear above the coordinate output inside the same panel.
