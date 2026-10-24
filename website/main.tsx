@@ -136,8 +136,13 @@ renderer.code = ({ text, lang }) => {
     : hljs.highlight(text, { language: "plaintext" }).value
   return `<pre><code class="hljs">${highlighted}</code></pre>\n`
 }
-renderer.heading = ({ tokens, depth, text }) =>
-  `<h${depth} id="${slug(text)}">${marked.Parser.parseInline(tokens)}</h${depth}>`
+renderer.heading = ({ tokens, depth, text }) => {
+  const id = slug(text)
+  if (depth > 2) {
+    return `<h${depth} id="${id}">${marked.Parser.parseInline(tokens)}</h${depth}>`
+  }
+  return `<h${depth} id="${id}">${marked.Parser.parseInline(tokens)} <a class="heading-anchor" href="#${id}" aria-label="Link to ${id.replaceAll("-", " ")}"><span aria-hidden="true">#</span></a></h${depth}>`
+}
 renderer.link = ({ href, tokens }) => {
   if (href.startsWith("../")) href = `${repo}/blob/main/${href.slice(3)}`
   return `<a href="${href}">${marked.Parser.parseInline(tokens)}</a>`
